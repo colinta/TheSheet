@@ -1,10 +1,10 @@
 ////
-///  Attack.swift
+///  Action.swift
 //
 
 import Ashen
 
-struct Attack {
+struct Action {
     let title: String
     let check: Formula?
     let damage: [Roll]

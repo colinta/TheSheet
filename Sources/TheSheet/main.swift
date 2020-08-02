@@ -3,7 +3,8 @@ import Ashen
 try! Ashen(
     Program(
         initial(
-            Model(
+            Sheet(
+                selectedColumns: [0, 1, 2],
                 columns: [
                     SheetColumn(
                         title: "Actions",
@@ -26,11 +27,17 @@ try! Ashen(
                                     Stat(title: "Dex", value: .modifier(2)),
                                     Stat(title: "Spell", value: .modifier(5)),
                                 ]),
-                            .attack(
-                                Attack(
+                            .action(
+                                Action(
                                     title: "Dagger", check: .modifier(3),
                                     damage: [.dice(.d4), .formula(.modifier(1))], type: "piercing",
                                     description: "Finesse, Light, Thrown (range 20/60)")),
+                            .action(
+                                Action(
+                                    title: "Mage Hand",
+                                    description:
+                                        "You can use the hand to manipulate an object, open an unlocked door or container, stow or retrieve an item from an open container, or pour the contents out of a vial. You can move the hand up to 30 feet each time you use it."
+                                )),
                         ]), SheetColumn(title: "Inventory", controls: []),
                     SheetColumn(title: "Spells", controls: []),
                     SheetColumn(

@@ -13,7 +13,7 @@ enum SheetControl {
     case slots(String, [Slot])
     case countable(title: String, current: Int, max: Int)
     case stats(String, [Stat])
-    case attack(Attack)
+    case action(Action)
 
     func update(_ message: Message) -> SheetControl {
         switch (self, message) {
@@ -44,8 +44,8 @@ enum SheetControl {
                 max: max,
                 onChange: { c, m in Message.updateCount(current: c, max: m) }
             )
-        case let .attack(attack):
-            return AttackView(attack)
+        case let .action(action):
+            return ActionView(action)
         case let .stats(title, stats):
             return StatsView(title: title, stats: stats)
         }
