@@ -1,0 +1,523 @@
+{
+  "columns" : [
+    {
+      "title" : "Actions",
+      "controls" : [
+        {
+          "type" : "pointsTracker",
+          "points" : {
+            "title" : "Sorcery Points",
+            "current" : 4,
+            "max" : 4,
+            "shouldResetOnLongRest" : true
+          }
+        },
+        {
+          "type" : "pointsTracker",
+          "points" : {
+            "title" : "Ki Points",
+            "current" : 4,
+            "max" : 4,
+            "shouldResetOnLongRest" : true
+          }
+        },
+        {
+          "type" : "stats",
+          "title" : "Attack Stats",
+          "stats" : [
+            {
+              "title" : "A.C.",
+              "value" : {
+                "type" : "const",
+                "value" : 15
+              }
+            },
+            {
+              "title" : "Prof.",
+              "value" : {
+                "type" : "modifier",
+                "value" : 2
+              }
+            },
+            {
+              "title" : "Str",
+              "value" : {
+                "type" : "modifier",
+                "value" : 1
+              }
+            },
+            {
+              "title" : "Dex",
+              "value" : {
+                "type" : "modifier",
+                "value" : 2
+              }
+            },
+            {
+              "title" : "Spell",
+              "value" : {
+                "type" : "modifier",
+                "value" : 5
+              }
+            }
+          ]
+        },
+        {
+          "type" : "action",
+          "action" : {
+            "title" : "Dagger",
+            "level" : null,
+            "description" : {
+              "spans" : [
+                {
+                  "string" : "Finesse, Light, Thrown (range 20\/60)",
+                  "attrs" : [
+
+                  ]
+                }
+              ]
+            },
+            "subactions" : [
+              {
+                "check" : {
+                  "type" : "modifier",
+                  "value" : 3
+                },
+                "type" : "Piercing",
+                "damage" : [
+                  {
+                    "type" : "dice",
+                    "value" : {
+                      "dice" : "d4"
+                    }
+                  },
+                  {
+                    "type" : "formula",
+                    "value" : {
+                      "type" : "modifier",
+                      "value" : 1
+                    }
+                  }
+                ]
+              }
+            ],
+            "isExpanded" : false
+          }
+        },
+        {
+          "type" : "action",
+          "action" : {
+            "title" : "Quarterstaff",
+            "level" : null,
+            "description" : {
+              "spans" : [
+                {
+                  "string" : "Versatile",
+                  "attrs" : [
+
+                  ]
+                }
+              ]
+            },
+            "subactions" : [
+              {
+                "check" : {
+                  "type" : "modifier",
+                  "value" : 3
+                },
+                "damage" : [
+                  {
+                    "type" : "dice",
+                    "value" : {
+                      "dice" : "d6"
+                    }
+                  },
+                  {
+                    "type" : "formula",
+                    "value" : {
+                      "type" : "modifier",
+                      "value" : 1
+                    }
+                  }
+                ],
+                "title" : "One Handed",
+                "type" : "Bludgeoning"
+              },
+              {
+                "check" : {
+                  "type" : "modifier",
+                  "value" : 3
+                },
+                "damage" : [
+                  {
+                    "type" : "dice",
+                    "value" : {
+                      "dice" : "d8"
+                    }
+                  },
+                  {
+                    "type" : "formula",
+                    "value" : {
+                      "type" : "modifier",
+                      "value" : 1
+                    }
+                  }
+                ],
+                "title" : "Two Handed",
+                "type" : "Bludgeoning"
+              }
+            ],
+            "isExpanded" : false
+          }
+        }
+      ]
+    },
+    {
+      "title" : "Inventory",
+      "controls" : [
+
+      ]
+    },
+    {
+      "title" : "Spells",
+      "controls" : [
+        {
+          "type" : "slots",
+          "title" : "Spell Slots",
+          "slots" : [
+            {
+              "title" : "1",
+              "current" : 4,
+              "max" : 4,
+              "shouldResetOnLongRest" : true
+            },
+            {
+              "title" : "2",
+              "current" : 3,
+              "max" : 3,
+              "shouldResetOnLongRest" : true
+            },
+            {
+              "title" : "3",
+              "current" : 2,
+              "max" : 2,
+              "shouldResetOnLongRest" : true
+            }
+          ]
+        },
+        {
+          "type" : "action",
+          "action" : {
+            "title" : "Chill Touch",
+            "level" : "Cantrip",
+            "description" : {
+              "spans" : [
+                {
+                  "string" : "Range: 120'\nOn a hit, target can't regain hit points. Hit undead: they have disadvantage on attack rolls. Hand clings to target.",
+                  "attrs" : [
+
+                  ]
+                }
+              ]
+            },
+            "subactions" : [
+              {
+                "check" : {
+                  "type" : "modifier",
+                  "value" : 5
+                },
+                "type" : "Necrotic",
+                "damage" : [
+                  {
+                    "type" : "dice",
+                    "value" : {
+                      "dice" : "d8"
+                    }
+                  }
+                ]
+              }
+            ],
+            "isExpanded" : false
+          }
+        },
+        {
+          "type" : "action",
+          "action" : {
+            "title" : "Frostbite",
+            "level" : "Cantrip",
+            "description" : {
+              "spans" : [
+                {
+                  "string" : "Range: 60'\nOn failed CON save, takes 1d6 cold damage and disadvantage on next weapon attack",
+                  "attrs" : [
+
+                  ]
+                }
+              ]
+            },
+            "subactions" : [
+              {
+                "check" : {
+                  "type" : "modifier",
+                  "value" : 5
+                },
+                "type" : "Cold",
+                "damage" : [
+                  {
+                    "type" : "dice",
+                    "value" : {
+                      "dice" : "d6"
+                    }
+                  }
+                ]
+              }
+            ],
+            "isExpanded" : false
+          }
+        },
+        {
+          "type" : "action",
+          "action" : {
+            "title" : "Mage Hand",
+            "level" : "Cantrip",
+            "description" : {
+              "spans" : [
+                {
+                  "string" : "Range: 30' | Duration: 1 minute\nYou can use the hand to manipulate an object, open an unlocked door or container, stow or retrieve an item from an open container, or pour the contents out of a vial. You can move the hand up to 30 feet each time you use it.",
+                  "attrs" : [
+
+                  ]
+                }
+              ]
+            },
+            "subactions" : [
+
+            ],
+            "isExpanded" : false
+          }
+        },
+        {
+          "type" : "action",
+          "action" : {
+            "title" : "Minor Illusion",
+            "level" : "Cantrip",
+            "description" : {
+              "spans" : [
+                {
+                  "string" : "Range: 30' | Duration: 1 minute\nYou create a sound or an image of an object within range that lasts for the duration, or until dismissed as an action. Volume of sound from whisper to scream, can be a voice, one repeating or many sounds. Image must fit in 5' cube. Image cannot create light, sound, touch, or smell. Successful INT (Investigation) check against spell save DC can reveal the illusion.",
+                  "attrs" : [
+
+                  ]
+                }
+              ]
+            },
+            "subactions" : [
+
+            ],
+            "isExpanded" : false
+          }
+        },
+        {
+          "type" : "action",
+          "action" : {
+            "title" : "Shape Water",
+            "level" : "Cantrip",
+            "description" : {
+              "spans" : [
+                {
+                  "string" : "Range: 30' | Duration: 1 hour\nYou instantaneously move or otherwise change the flow of the water as you direct, up to 5 feet in any direction. This movement doesn’t have enough force to cause damage.\nYou cause the water to form into simple shapes and animate at your direction.\nYou change the water’s color or opacity.\nYou can freeze the water for the duration, provided that there are no creatures in it.",
+                  "attrs" : [
+
+                  ]
+                }
+              ]
+            },
+            "subactions" : [
+
+            ],
+            "isExpanded" : false
+          }
+        },
+        {
+          "type" : "action",
+          "action" : {
+            "title" : "Magic Missile",
+            "level" : "1",
+            "description" : {
+              "spans" : [
+                {
+                  "string" : "Range: 120'\nYou create darts of magical force, each dart deals the rolled force damage to a creature that you can see in range.\nUsing higher level spell slots, one more dart for each level >1.",
+                  "attrs" : [
+
+                  ]
+                }
+              ]
+            },
+            "subactions" : [
+              {
+                "check" : {
+                  "type" : "modifier",
+                  "value" : 5
+                },
+                "type" : "Force",
+                "damage" : [
+                  {
+                    "type" : "dice",
+                    "value" : {
+                      "dice" : "d4"
+                    }
+                  },
+                  {
+                    "type" : "formula",
+                    "value" : {
+                      "type" : "modifier",
+                      "value" : 1
+                    }
+                  }
+                ]
+              }
+            ],
+            "isExpanded" : false
+          }
+        },
+        {
+          "type" : "action",
+          "action" : {
+            "title" : "Ice Spear",
+            "level" : "2",
+            "description" : {
+              "spans" : [
+                {
+                  "string" : "Range: 120'\nYou create three spears of ice and hurl them at targets within range. You can hurl them at one target or several.\nMake a ranged spell attack for each spear. On a hit, the target takes 2d6 cold damage.\nUsing higher level spell slots, one more spear for each level >2.",
+                  "attrs" : [
+
+                  ]
+                }
+              ]
+            },
+            "subactions" : [
+              {
+                "check" : {
+                  "type" : "modifier",
+                  "value" : 5
+                },
+                "type" : "Cold",
+                "damage" : [
+                  {
+                    "type" : "dice",
+                    "value" : {
+                      "dice" : "2d1"
+                    }
+                  }
+                ]
+              }
+            ],
+            "isExpanded" : false
+          }
+        },
+        {
+          "type" : "action",
+          "action" : {
+            "title" : "Invisibility",
+            "level" : "2",
+            "description" : {
+              "spans" : [
+                {
+                  "string" : "Range: Touch | Duration: Concentration, 1 hour\nA creature you touch becomes invisible until the spell ends. Anything the target is wearing or carrying is invisible as long as it is on the target’s person. The spell ends for a target that attacks or casts a spell.\nUsing higher level spell slots, you can target one additional creature for each level >2.",
+                  "attrs" : [
+
+                  ]
+                }
+              ]
+            },
+            "subactions" : [
+
+            ],
+            "isExpanded" : false
+          }
+        },
+        {
+          "type" : "action",
+          "action" : {
+            "title" : "Mirror Image",
+            "level" : "2",
+            "description" : {
+              "spans" : [
+                {
+                  "string" : "Three illusory duplicates appear in your space. Each time a creature targets you, roll a d20.\n",
+                  "attrs" : [
+
+                  ]
+                },
+                {
+                  "string" : "Duplicates",
+                  "attrs" : [
+                    {
+                      "attr" : "underline"
+                    }
+                  ]
+                },
+                {
+                  "string" : ": AC=10+DEX, destroyed immediately on any successful hit, ignore area damage and effects.\n\n3: Roll 6+ on d20 to target a duplicate\n2: 8+\n1: 11+",
+                  "attrs" : [
+
+                  ]
+                }
+              ]
+            },
+            "subactions" : [
+
+            ],
+            "isExpanded" : false
+          }
+        },
+        {
+          "type" : "action",
+          "action" : {
+            "title" : "Misty Step",
+            "level" : "2",
+            "description" : {
+              "spans" : [
+                {
+                  "string" : "Briefly surrounded by silvery mist, you teleport up to 30 feet to an unoccupied space that you can see.",
+                  "attrs" : [
+
+                  ]
+                }
+              ]
+            },
+            "subactions" : [
+
+            ],
+            "isExpanded" : false
+          }
+        }
+      ]
+    },
+    {
+      "title" : "Stats",
+      "controls" : [
+        {
+          "type" : "restButtons"
+        },
+        {
+          "type" : "pointsTracker",
+          "points" : {
+            "title" : "Hit Points",
+            "current" : 44,
+            "max" : 44,
+            "shouldResetOnLongRest" : true
+          }
+        }
+      ]
+    }
+  ],
+  "formulas" : {
+
+  },
+  "selectedColumns" : [
+    0,
+    2,
+    3
+  ]
+}

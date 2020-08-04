@@ -15,5 +15,6 @@ func StatsView<Msg>(title: String, stats: [Stat]) -> View<Msg> {
                     + stats.flatMap { stat in
                         [(.flex1, StatView(stat)), (.fixed, Space().width(1))]
                     }),
+            Space().height(1),
         ])
 }

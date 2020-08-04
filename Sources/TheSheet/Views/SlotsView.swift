@@ -5,10 +5,10 @@
 import Ashen
 
 func SlotsView<Msg>(
-    title: Attributed, slots: [Slot], _ onChange: @escaping ((index: Int, current: Int)) -> Msg
+    title: Attributed, slots: [Slot], sorceryPoints: Int, toggle onChange: @escaping ((level: Int, current: Int)) -> Msg, burn onBurn: @escaping (Int) -> Msg, buy onBuy: @escaping (Int) -> Msg
 ) -> View<Msg> {
     let maxMax = slots.reduce(0) { memo, slot in
-        max(memo, slot.max)
+        max(memo, slot.max, slot.current)
     }
     let titles: View<Msg> = Stack(
         .down,
@@ -20,12 +20,12 @@ func SlotsView<Msg>(
             .fixed,
             Stack(
                 .down,
-                slots.enumerated().map { index, slot in
-                    if slot.max > column {
+                slots.enumerated().map { level, slot in
+                    if max(slot.max, slot.current) > column {
                         return SlotCell(
                             isUsed: slot.current <= column,
                             { delta in
-                                return onChange((index: index, current: slot.current + delta))
+                                return onChange((level: level, current: slot.current + delta))
                             })
                     } else {
                         return Space()
@@ -35,8 +35,16 @@ func SlotsView<Msg>(
     }
     let labels: View<Msg> = Stack(
         .down,
-        slots.map { slot in
-            Text("\(slot.current)/\(slot.max)").height(1)
+        slots.enumerated().map { level, slot in
+            let canBurn = slot.current > 0
+            let canBuy = Slot.cost(ofLevel: level).map { sorceryPoints >= $0} ?? false
+            let burnText = "(\(Slot.points(forLevel: level)))🔥"
+            let buyText = "💰(\(Slot.cost(ofLevel: level) ?? 0))"
+            return Stack(.ltr, [
+                canBurn ? OnLeftClick(Text(burnText), onBurn(level)) : Text(burnText.foreground(.black)),
+                Space().width(1),
+                canBuy ? OnLeftClick(Text(buyText), onBuy(level)) : Text(buyText.foreground(.black))
+            ]).height(1)
         })
     return Stack(
         .down,
@@ -57,5 +65,5 @@ func SlotsView<Msg>(
 func SlotCell<Msg>(isUsed: Bool, _ onChange: @escaping (Int) -> Msg) -> View<Msg> {
     OnLeftClick(
         Text("[\(isUsed ? "○" : "●")]".foreground(isUsed ? .none : .blue)),
-        { onChange(isUsed ? 1 : -1) })
+        onChange(isUsed ? 1 : -1))
 }

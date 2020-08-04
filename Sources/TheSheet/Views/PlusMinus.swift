@@ -31,9 +31,9 @@ func PlusMinus<Msg>(
                 .fixed,
                 OnClick(
                     Text("[-]".bold().foreground(.red)),
-                    { mouseEvent in
+                    { button in
                         let amount: Int
-                        if mouseEvent.button == .left {
+                        if button == .left {
                             amount = 1
                         } else {
                             amount = 5
@@ -48,9 +48,9 @@ func PlusMinus<Msg>(
                 .fixed,
                 OnClick(
                     Text("[+]".bold().foreground(.green)),
-                    { mouseEvent in
+                    { button in
                         let amount: Int
-                        if mouseEvent.button == .left {
+                        if button == .left {
                             amount = 1
                         } else {
                             amount = 5

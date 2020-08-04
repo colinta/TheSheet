@@ -4,7 +4,7 @@
 
 import Ashen
 
-struct SheetColumn {
+struct SheetColumn: Codable {
     enum Message {
         case control(Int, SheetControl.Message)
     }
@@ -12,23 +12,41 @@ struct SheetColumn {
     let title: String
     var controls: [SheetControl]
 
-    func update(_ message: Message) -> SheetColumn {
+    func replace(title: String) -> SheetColumn {
+        SheetColumn(
+            title: title,
+            controls: controls)
+    }
+
+    func replace(controls: [SheetControl]) -> SheetColumn {
+        SheetColumn(
+            title: title,
+            controls: controls)
+    }
+
+    func update(_ message: Message) -> (SheetColumn, Sheet.Mod?) {
         switch message {
         case let .control(changeIndex, message):
-            return SheetColumn(
-                title: title,
-                controls: controls.enumerated().map { index, control in
-                    guard index == changeIndex else { return control }
-                    return control.update(message)
-                })
+            var mod: Sheet.Mod? = nil
+            let controls = self.controls.enumerated().map { (index, control) -> SheetControl in
+                guard index == changeIndex else { return control }
+                let (newControl, newMod) = control.update(message)
+                mod = newMod
+                return newControl
+            }
+            let column = replace(controls: controls)
+            return (column, mod)
         }
     }
 
-    func render() -> View<SheetColumn.Message> {
+    func render(_ sheet: Sheet) -> View<SheetColumn.Message> {
         Stack(
             .down,
-            controls.enumerated().map { index, control in
-                control.render().map { SheetColumn.Message.control(index, $0) }.padding(bottom: 1)
+            controls.enumerated().flatMap { index, control in
+                [
+                    control.render(sheet).map { SheetColumn.Message.control(index, $0) },
+                    Repeating(Text("─".foreground(.black))).height(1),
+                ]
             }
         ).border(
             .single, .title(title.bold()), .alignment(.topLeft)

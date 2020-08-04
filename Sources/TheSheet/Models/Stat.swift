@@ -2,7 +2,7 @@
 ///  Stat.swift
 //
 
-struct Stat {
+struct Stat: Codable {
     let title: String
     let value: Formula
 }
