@@ -1,37 +1,11 @@
 import Ashen
 import Foundation
 
-struct Model {
-    typealias Status = (msg: String, timeout: TimeInterval)
-
-    let sheet: Sheet
-    let changeColumn: Int?
-    let fileURL: URL?
-    let status: Status?
-
-    func replace(sheet: Sheet) -> Model {
-        Model(sheet: sheet, changeColumn: changeColumn, fileURL: fileURL, status: status)
-    }
-
-    func replace(changeColumn: Int?) -> Model {
-        Model(sheet: sheet, changeColumn: changeColumn, fileURL: fileURL, status: status)
-    }
-
-    func replace(status: Status?) -> Model {
-        Model(sheet: sheet, changeColumn: changeColumn, fileURL: fileURL, status: status)
-    }
-
-    func replace(status: String) -> Model {
-        Model(
-            sheet: sheet, changeColumn: changeColumn, fileURL: fileURL,
-            status: (msg: status, timeout: Date().timeIntervalSince1970 + STATUS_TIMEOUT))
-    }
-}
-
 enum Message {
     case sheet(Sheet.Message)
     case changeColumn(Int)
     case replaceColumn(at: Int, with: Int)
+    case scroll(Int)
     case reloadJSON
     case statusDidTimeout
     case saveJSON
@@ -41,7 +15,10 @@ enum Message {
 private let STATUS_TIMEOUT: TimeInterval = 3
 
 func initial(sheet: Sheet, fileURL: URL?) -> () -> Initial<Model, Message> {
-    return { Initial(Model(sheet: sheet, changeColumn: nil, fileURL: fileURL, status: nil)) }
+    return {
+        Initial(
+            Model(offset: 0, sheet: sheet, changeColumn: nil, fileURL: fileURL, status: nil))
+    }
 }
 
 func showStatus(model: Model, status: String?) -> State<Model, Message> {
@@ -66,14 +43,19 @@ func update(model: inout Model, message: Message) -> State<Model, Message> {
     case let .replaceColumn(oldIndex, columnIndex):
         guard columnIndex >= 0, columnIndex < model.sheet.columns.count else { return .noChange }
 
-        return .model(model.replace(sheet: model.sheet.replace(selectedColumns: model.sheet.selectedColumns.enumerated().map { position, index in
-                if position == oldIndex {
-                    return columnIndex
-                }
-                else {
-                    return index
-                }
-            })))
+        return .model(
+            model.replace(
+                sheet: model.sheet.replace(
+                    selectedColumns: model.sheet.selectedColumns.enumerated().map {
+                        position, index in
+                        if position == oldIndex {
+                            return columnIndex
+                        } else {
+                            return index
+                        }
+                    })))
+    case let .scroll(delta):
+        return .model(model.replace(offset: model.offset + delta))
     case .reloadJSON:
         guard let fileURL = model.fileURL else {
             return showStatus(model: model, status: "No JSON file to reload")
@@ -113,7 +95,6 @@ func update(model: inout Model, message: Message) -> State<Model, Message> {
     case .quit:
         return .quit
     }
-    // return .noChange
 }
 
 func render(model: Model, size: Size) -> [View<Message>] {
@@ -122,9 +103,11 @@ func render(model: Model, size: Size) -> [View<Message>] {
 
 private func _render(_ model: Model, status: String?) -> [View<Message>] {
     [
-        OnKeyPress(key: .esc, { Message.quit }),
-        OnKeyPress(key: .ctrl(.s), { Message.saveJSON }),
-        OnKeyPress(key: .ctrl(.o), { Message.reloadJSON }),
+        OnKeyPress(key: .up, Message.scroll(-1)),
+        OnKeyPress(key: .down, Message.scroll(1)),
+        OnKeyPress(key: .esc, Message.quit),
+        OnKeyPress(key: .ctrl(.s), Message.saveJSON),
+        OnKeyPress(key: .ctrl(.o), Message.reloadJSON),
         Flow(
             .down,
             [
@@ -133,13 +116,24 @@ private func _render(_ model: Model, status: String?) -> [View<Message>] {
                     .flex1,
                     Columns(
                         model.sheet.selectedColumns.enumerated().compactMap { position, index in
-                            guard index >= 0 && index < model.sheet.columns.count else { return nil }
+                            guard index >= 0 && index < model.sheet.columns.count else {
+                                return nil
+                            }
                             let column = model.sheet.columns[index]
                             let columnView = column.render(model.sheet)
-                            return ZStack(renderColumnEditor(model, position) + [
-                                columnView.map { Message.sheet(Sheet.Message.column(index, $0)) }
-                            ])
-                    }
+                            return ZStack(
+                                renderColumnEditor(model, position) + [
+                                    Scroll(
+                                        columnView.map {
+                                            Message.sheet(Sheet.Message.column(index, $0))
+                                        }, .offset(y: model.offset)
+                                    ).border(
+                                        .single, .title(column.title.bold()), .alignment(.topLeft)
+                                    )
+
+                                ]
+                            )
+                        }
                     )
                 ),
                 (
@@ -155,14 +149,25 @@ func renderColumnEditor(_ model: Model, _ position: Int) -> [View<Message>] {
     let current = model.sheet.selectedColumns[position]
     if model.changeColumn == position {
         return [
-            OnLeftClick(Text("[x]").reversed(), Message.changeColumn(position)).compact().padding(right: 1).aligned(.topRight),
-            Box(Stack(.down, model.sheet.columns.enumerated().map { newIndex, column in
-                OnLeftClick(newIndex == current ? Text(column.title.bold()) : Text(column.title), Message.replaceColumn(at: position, with: newIndex))
-            }).background(view: Text(" "))).aligned(.topRight)
+            OnLeftClick(Text("[x]").reversed(), Message.changeColumn(position)).compact().padding(
+                right: 1
+            ).aligned(.topRight),
+            Box(
+                Stack(
+                    .down,
+                    model.sheet.columns.enumerated().map { newIndex, column in
+                        OnLeftClick(
+                            newIndex == current ? Text(column.title.bold()) : Text(column.title),
+                            Message.replaceColumn(at: position, with: newIndex))
+                    }
+                )
+            ).background(view: Text(" ")).aligned(.topRight),
         ]
-    }
-    else {
-        return [OnLeftClick(Text("[…]"), Message.changeColumn(position)).compact().padding(right: 1).aligned(.topRight)]
+    } else {
+        return [
+            OnLeftClick(Text("[…]"), Message.changeColumn(position)).compact().padding(right: 1)
+                .aligned(.topRight)
+        ]
     }
 }
 

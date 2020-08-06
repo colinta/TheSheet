@@ -84,5 +84,4 @@ extension Action: Codable {
         try container.encode(description.map(AttributedCoder.init), forKey: .description)
         try container.encode(isExpanded, forKey: .isExpanded)
     }
-
 }

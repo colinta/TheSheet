@@ -5,7 +5,9 @@
 import Ashen
 
 func SlotsView<Msg>(
-    title: Attributed, slots: [Slot], sorceryPoints: Int, toggle onChange: @escaping ((level: Int, current: Int)) -> Msg, burn onBurn: @escaping (Int) -> Msg, buy onBuy: @escaping (Int) -> Msg
+    title: Attributed, slots: [Slot], sorceryPoints: Int,
+    toggle onChange: @escaping ((level: Int, current: Int)) -> Msg,
+    burn onBurn: @escaping (Int) -> Msg, buy onBuy: @escaping (Int) -> Msg
 ) -> View<Msg> {
     let maxMax = slots.reduce(0) { memo, slot in
         max(memo, slot.max, slot.current)
@@ -28,7 +30,7 @@ func SlotsView<Msg>(
                                 return onChange((level: level, current: slot.current + delta))
                             })
                     } else {
-                        return Space()
+                        return Space().height(1)
                     }
                 })
         )
@@ -37,14 +39,21 @@ func SlotsView<Msg>(
         .down,
         slots.enumerated().map { level, slot in
             let canBurn = slot.current > 0
-            let canBuy = Slot.cost(ofLevel: level).map { sorceryPoints >= $0} ?? false
-            let burnText = "(\(Slot.points(forLevel: level)))🔥"
-            let buyText = "💰(\(Slot.cost(ofLevel: level) ?? 0))"
-            return Stack(.ltr, [
-                canBurn ? OnLeftClick(Text(burnText), onBurn(level)) : Text(burnText.foreground(.black)),
-                Space().width(1),
-                canBuy ? OnLeftClick(Text(buyText), onBuy(level)) : Text(buyText.foreground(.black))
-            ]).height(1)
+            let canBuy = Slot.cost(ofLevel: level).map { sorceryPoints >= $0 } ?? false
+            let burnText = "(\(Slot.points(forLevel: level)))Burn"
+            let buyText = "Buy(\(Slot.cost(ofLevel: level) ?? 0))"
+            return Stack(
+                .ltr,
+                [
+                    canBurn
+                        ? OnLeftClick(Text(burnText), onBurn(level))
+                        : Text(burnText.foreground(.black)),
+                    Space().width(1),
+                    canBuy
+                        ? OnLeftClick(Text(buyText), onBuy(level))
+                        : Text(buyText.foreground(.black)),
+                ]
+            ).height(1)
         })
     return Stack(
         .down,

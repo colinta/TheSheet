@@ -48,8 +48,6 @@ struct SheetColumn: Codable {
                     Repeating(Text("─".foreground(.black))).height(1),
                 ]
             }
-        ).border(
-            .single, .title(title.bold()), .alignment(.topLeft)
         )
     }
 }

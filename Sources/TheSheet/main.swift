@@ -31,10 +31,15 @@ func createSheet() -> Sheet {
                 controls: [
                     .pointsTracker(
                         Points(
-                            title: "Sorcery Points", current: 4, max: 4, shouldResetOnLongRest: true
+                            title: "Sorcery Points", current: 4, max: 4,
+                            type: .sorcery,
+                            shouldResetOnLongRest: true
                         )),
                     .pointsTracker(
-                        Points(title: "Ki Points", current: 3, max: 3, shouldResetOnLongRest: true)),
+                        Points(
+                            title: "Ki Points", current: 3, max: 3,
+                            type: .ki,
+                            shouldResetOnLongRest: true)),
                     .stats(
                         "Attack Stats",
                         [
@@ -101,7 +106,8 @@ func createSheet() -> Sheet {
                     .restButtons,
                     .pointsTracker(
                         Points(
-                            title: "Hit Points", current: 33, max: 33, shouldResetOnLongRest: true)),
+                            title: "Hit Points", current: 33, max: 33, type: .hitPoints,
+                            shouldResetOnLongRest: true)),
                 ]),
         ],
         formulas: [:]

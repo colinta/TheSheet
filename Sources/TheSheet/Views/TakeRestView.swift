@@ -5,7 +5,8 @@
 import Ashen
 
 func TakeRestView<Msg>(
-    _ onShort: @escaping @autoclosure () -> Msg, _ onLong: @escaping @autoclosure () -> Msg
+    _ onShort: @escaping @autoclosure SimpleEvent<Msg>,
+    _ onLong: @escaping @autoclosure SimpleEvent<Msg>
 ) -> View<Msg> {
     Stack(
         .down,

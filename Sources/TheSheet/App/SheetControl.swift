@@ -61,7 +61,7 @@ enum SheetControl {
         return (control, nil)
     }
 
-    func burnSlot(level: Int)-> Sheet.Mod? {
+    func burnSlot(level: Int) -> Sheet.Mod? {
         let newPoints = Slot.points(forLevel: level)
         return { sheet in
             var canBurn = false
@@ -70,16 +70,21 @@ enum SheetControl {
                     column.replace(
                         controls: column.controls.map { control in
                             if case let .pointsTracker(points) = control, points.isSorceryPoints {
-                                return .pointsTracker(points.replace(current: points.current + newPoints))
-                            }
-                            else if case let .slots(title, slots) = control, title == "Spell Slots" {
-                                return .slots(title, slots.enumerated().map { updateLevel, slot in
-                                    guard updateLevel == level, slot.current > 0 else { return slot }
-                                    canBurn = true
-                                    return slot.replace(current: slot.current - 1)
-                                })
-                            }
-                            else {
+                                return .pointsTracker(
+                                    points.replace(current: points.current + newPoints))
+                            } else if case let .slots(title, slots) = control,
+                                title == "Spell Slots"
+                            {
+                                return .slots(
+                                    title,
+                                    slots.enumerated().map { updateLevel, slot in
+                                        guard updateLevel == level, slot.current > 0 else {
+                                            return slot
+                                        }
+                                        canBurn = true
+                                        return slot.replace(current: slot.current - 1)
+                                    })
+                            } else {
                                 return control
                             }
                         })
@@ -88,7 +93,7 @@ enum SheetControl {
         }
     }
 
-    func buySlot(level: Int)-> Sheet.Mod? {
+    func buySlot(level: Int) -> Sheet.Mod? {
         guard let cost = Slot.cost(ofLevel: level) else { return nil }
         return { sheet in
             var canBuy = false
@@ -96,17 +101,22 @@ enum SheetControl {
                 columns: sheet.columns.map { column in
                     column.replace(
                         controls: column.controls.map { control in
-                            if case let .pointsTracker(points) = control, points.isSorceryPoints, points.current >= cost {
+                            if case let .pointsTracker(points) = control, points.isSorceryPoints,
+                                points.current >= cost
+                            {
                                 canBuy = true
-                                return .pointsTracker(points.replace(current: points.current - cost))
-                            }
-                            else if case let .slots(title, slots) = control, title == "Spell Slots" {
-                                return .slots(title, slots.enumerated().map { updateLevel, slot in
-                                    guard updateLevel == level else { return slot }
-                                    return slot.replace(current: slot.current + 1)
-                                })
-                            }
-                            else {
+                                return .pointsTracker(
+                                    points.replace(current: points.current - cost))
+                            } else if case let .slots(title, slots) = control,
+                                title == "Spell Slots"
+                            {
+                                return .slots(
+                                    title,
+                                    slots.enumerated().map { updateLevel, slot in
+                                        guard updateLevel == level else { return slot }
+                                        return slot.replace(current: slot.current + 1)
+                                    })
+                            } else {
                                 return control
                             }
                         })
@@ -151,7 +161,9 @@ enum SheetControl {
         case let .slots(title, slots):
             let sorceryPoints = sheet.columns.reduce(0) { memo, column in
                 column.controls.reduce(memo) { memo, control in
-                    guard case let .pointsTracker(points) = control, points.isSorceryPoints else { return memo }
+                    guard case let .pointsTracker(points) = control, points.isSorceryPoints else {
+                        return memo
+                    }
                     return points.current
                 }
             }
@@ -160,7 +172,7 @@ enum SheetControl {
                 toggle: { level, current in Message.updateSlots(level: level, current: current) },
                 burn: Message.burnSlot,
                 buy: Message.buySlot
-                )
+            )
         case let .pointsTracker(points):
             return PointsTracker(
                 points: points, onChange: { c, m in Message.updateCount(current: c, max: m) })

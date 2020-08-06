@@ -9,6 +9,9 @@
             "title" : "Sorcery Points",
             "current" : 4,
             "max" : 4,
+            "type" : {
+              "type" : "sorcery"
+            },
             "shouldResetOnLongRest" : true
           }
         },
@@ -18,6 +21,9 @@
             "title" : "Ki Points",
             "current" : 4,
             "max" : 4,
+            "type" : {
+              "type" : "ki"
+            },
             "shouldResetOnLongRest" : true
           }
         },
@@ -101,7 +107,7 @@
                 ]
               }
             ],
-            "isExpanded" : false
+            "isExpanded" : true
           }
         },
         {
@@ -167,7 +173,7 @@
                 "type" : "Bludgeoning"
               }
             ],
-            "isExpanded" : false
+            "isExpanded" : true
           }
         }
       ]
@@ -237,7 +243,7 @@
                 ]
               }
             ],
-            "isExpanded" : false
+            "isExpanded" : true
           }
         },
         {
@@ -272,7 +278,7 @@
                 ]
               }
             ],
-            "isExpanded" : false
+            "isExpanded" : true
           }
         },
         {
@@ -293,7 +299,7 @@
             "subactions" : [
 
             ],
-            "isExpanded" : false
+            "isExpanded" : true
           }
         },
         {
@@ -314,7 +320,7 @@
             "subactions" : [
 
             ],
-            "isExpanded" : false
+            "isExpanded" : true
           }
         },
         {
@@ -335,7 +341,7 @@
             "subactions" : [
 
             ],
-            "isExpanded" : false
+            "isExpanded" : true
           }
         },
         {
@@ -377,7 +383,7 @@
                 ]
               }
             ],
-            "isExpanded" : false
+            "isExpanded" : true
           }
         },
         {
@@ -412,7 +418,7 @@
                 ]
               }
             ],
-            "isExpanded" : false
+            "isExpanded" : true
           }
         },
         {
@@ -433,7 +439,7 @@
             "subactions" : [
 
             ],
-            "isExpanded" : false
+            "isExpanded" : true
           }
         },
         {
@@ -468,7 +474,7 @@
             "subactions" : [
 
             ],
-            "isExpanded" : false
+            "isExpanded" : true
           }
         },
         {
@@ -489,7 +495,7 @@
             "subactions" : [
 
             ],
-            "isExpanded" : false
+            "isExpanded" : true
           }
         }
       ]
@@ -506,6 +512,9 @@
             "title" : "Hit Points",
             "current" : 44,
             "max" : 44,
+            "type" : {
+              "type" : "hitPoints"
+            },
             "shouldResetOnLongRest" : true
           }
         }
