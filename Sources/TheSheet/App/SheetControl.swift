@@ -14,17 +14,19 @@ enum SheetControl {
         case updateSlots(level: Int, current: Int)
         case burnSlot(level: Int)
         case buySlot(level: Int)
-        case updateCount(current: Int, max: Int)
-        case takeRest(Rest)
-        case contractAction
+        case updatePoints(current: Int, max: Int?)
+        case collapseAction
         case expandAction
+        case takeRest(Rest)
     }
 
-    case restButtons
     case slots(String, [Slot])
     case pointsTracker(Points)
     case stats(String, [Stat])
+    case attributes([Attribute])
+    case skills([Skill])
     case action(Action)
+    case restButtons
 
     func take(rest: Rest) -> (SheetControl, Sheet.Mod?) {
         var control: SheetControl = self
@@ -52,8 +54,8 @@ enum SheetControl {
                         shouldResetOnLongRest: true)
                 })
         case let (.pointsTracker(points), .long):
-            if points.shouldResetOnLongRest {
-                control = .pointsTracker(points.replace(current: points.max))
+            if points.shouldResetOnLongRest, let pointsMax = points.max {
+                control = .pointsTracker(points.replace(current: pointsMax))
             }
         default:
             break
@@ -142,9 +144,9 @@ enum SheetControl {
             return (control, burnSlot(level: level))
         case let (.slots, .buySlot(level)):
             return (control, buySlot(level: level))
-        case let (.pointsTracker(points), .updateCount(current, max)):
+        case let (.pointsTracker(points), .updatePoints(current, max)):
             control = .pointsTracker(points.replace(current: current).replace(max: max))
-        case let (.action(action), .contractAction):
+        case let (.action(action), .collapseAction):
             control = .action(action.replace(isExpanded: false))
         case let (.action(action), .expandAction):
             control = .action(action.replace(isExpanded: true))
@@ -175,12 +177,16 @@ enum SheetControl {
             )
         case let .pointsTracker(points):
             return PointsTracker(
-                points: points, onChange: { c, m in Message.updateCount(current: c, max: m) })
+                points: points, onChange: { c, m in Message.updatePoints(current: c, max: m) })
         case let .action(action):
             return ActionView(
-                action, action.isExpanded ? Message.contractAction : Message.expandAction)
+                action, action.isExpanded ? Message.collapseAction : Message.expandAction)
         case let .stats(title, stats):
             return StatsView(title: title, stats: stats)
+        case let .attributes(attributes):
+            return AttributesView(attributes)
+        case let .skills(skills):
+            return SkillsView(skills)
         }
     }
 
@@ -197,6 +203,8 @@ extension SheetControl: Codable {
         case slots
         case points
         case stats
+        case attributes
+        case skills
         case action
     }
 
@@ -220,6 +228,12 @@ extension SheetControl: Codable {
         case "action":
             let action = try values.decode(Action.self, forKey: .action)
             self = .action(action)
+        case "attributes":
+            let attributes = try values.decode([Attribute].self, forKey: .attributes)
+            self = .attributes(attributes)
+        case "skills":
+            let skills = try values.decode([Skill].self, forKey: .skills)
+            self = .skills(skills)
         default:
             throw Error.decoding
         }
@@ -244,6 +258,12 @@ extension SheetControl: Codable {
         case let .action(action):
             try container.encode("action", forKey: .type)
             try container.encode(action, forKey: .action)
+        case let .attributes(attributes):
+            try container.encode("attributes", forKey: .type)
+            try container.encode(attributes, forKey: .attributes)
+        case let .skills(skills):
+            try container.encode("skills", forKey: .type)
+            try container.encode(skills, forKey: .skills)
         }
     }
 }

@@ -6,18 +6,17 @@ enum Message {
     case changeColumn(Int)
     case replaceColumn(at: Int, with: Int)
     case scroll(Int)
+    case setScrollSize(Int, Size, Rect)
     case reloadJSON
     case statusDidTimeout
     case saveJSON
     case quit
 }
 
-private let STATUS_TIMEOUT: TimeInterval = 3
-
 func initial(sheet: Sheet, fileURL: URL?) -> () -> Initial<Model, Message> {
     return {
         Initial(
-            Model(offset: 0, sheet: sheet, changeColumn: nil, fileURL: fileURL, status: nil))
+            Model(sheet: sheet, fileURL: fileURL))
     }
 }
 
@@ -40,6 +39,8 @@ func update(model: inout Model, message: Message) -> State<Model, Message> {
             return .model(model.replace(changeColumn: nil))
         }
         return .model(model.replace(changeColumn: index))
+    case let .setScrollSize(index, size, mask):
+        return .model(model.replace(column: index, scrollSize: size, mask: mask))
     case let .replaceColumn(oldIndex, columnIndex):
         guard columnIndex >= 0, columnIndex < model.sheet.columns.count else { return .noChange }
 
@@ -55,7 +56,15 @@ func update(model: inout Model, message: Message) -> State<Model, Message> {
                         }
                     })))
     case let .scroll(delta):
-        return .model(model.replace(offset: model.offset + delta))
+        guard
+            let maxOffset = model.columnScrollMaxOffsets.values.reduce(
+                nil as Int?,
+                { memo, height in
+                    max(memo ?? 0, height)
+                })
+        else { return .noChange }
+        let scrollOffset = max(0, min(model.scrollOffset + delta, maxOffset))
+        return .model(model.replace(scrollOffset: scrollOffset))
     case .reloadJSON:
         guard let fileURL = model.fileURL else {
             return showStatus(model: model, status: "No JSON file to reload")
@@ -105,6 +114,8 @@ private func _render(_ model: Model, status: String?) -> [View<Message>] {
     [
         OnKeyPress(key: .up, Message.scroll(-1)),
         OnKeyPress(key: .down, Message.scroll(1)),
+        OnKeyPress(key: .pageUp, Message.scroll(-25)),
+        OnKeyPress(key: .pageDown, Message.scroll(25)),
         OnKeyPress(key: .esc, Message.quit),
         OnKeyPress(key: .ctrl(.s), Message.saveJSON),
         OnKeyPress(key: .ctrl(.o), Message.reloadJSON),
@@ -126,7 +137,11 @@ private func _render(_ model: Model, status: String?) -> [View<Message>] {
                                     Scroll(
                                         columnView.map {
                                             Message.sheet(Sheet.Message.column(index, $0))
-                                        }, .offset(y: model.offset)
+                                        },
+                                        onResizeContent: { size, mask in
+                                            Message.setScrollSize(index, size, mask)
+                                        },
+                                        .offset(y: model.scrollOffset)
                                     ).border(
                                         .single, .title(column.title.bold()), .alignment(.topLeft)
                                     )

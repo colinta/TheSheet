@@ -4,7 +4,9 @@
 
 import Ashen
 
-func ActionView<Msg>(_ action: Action, _ onExpand: @escaping @autoclosure SimpleEvent<Msg>) -> View<Msg> {
+func ActionView<Msg>(_ action: Action, _ onExpand: @escaping @autoclosure SimpleEvent<Msg>) -> View<
+    Msg
+> {
     let view: View<Msg>
     if action.isExpanded {
         let actionStats: View<Msg>? = _ActionViewStats(action)

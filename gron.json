@@ -202,12 +202,6 @@
               "current" : 3,
               "max" : 3,
               "shouldResetOnLongRest" : true
-            },
-            {
-              "title" : "3",
-              "current" : 2,
-              "max" : 2,
-              "shouldResetOnLongRest" : true
             }
           ]
         },
@@ -517,6 +511,153 @@
             },
             "shouldResetOnLongRest" : true
           }
+        },
+        {
+          "type" : "pointsTracker",
+          "points" : {
+            "title" : "Inspiration",
+            "current" : 1,
+            "type" : {
+              "type" : "inspiration"
+            },
+            "shouldResetOnLongRest" : false
+          }
+        },
+        {
+          "type" : "attributes",
+          "attributes" : [
+            {
+              "title" : "Strength",
+              "score" : 12,
+              "modifier" : 1,
+              "save" : 1
+            },
+            {
+              "title" : "Dexterity",
+              "score" : 14,
+              "modifier" : 2,
+              "save" : 2
+            },
+            {
+              "title" : "Constitution",
+              "score" : 14,
+              "modifier" : 2,
+              "save" : 4
+            },
+            {
+              "title" : "Intelligence",
+              "score" : 8,
+              "modifier" : -1,
+              "save" : -1
+            },
+            {
+              "title" : "Wisdom",
+              "score" : 13,
+              "modifier" : 1,
+              "save" : 1
+            },
+            {
+              "title" : "Charisma",
+              "score" : 16,
+              "modifier" : 3,
+              "save" : 5
+            }
+          ]
+        },
+        {
+          "type" : "skills",
+          "skills" : [
+            {
+              "title" : "Acrobatis",
+              "isProficient" : false,
+              "modifier" : 2
+            },
+            {
+              "title" : "Animal Handling",
+              "isProficient" : false,
+              "modifier" : 1
+            },
+            {
+              "title" : "Arcana",
+              "isProficient" : true,
+              "modifier" : 1
+            },
+            {
+              "title" : "Athletics",
+              "isProficient" : false,
+              "modifier" : 1
+            },
+            {
+              "title" : "Deception",
+              "isProficient" : false,
+              "modifier" : 3
+            },
+            {
+              "title" : "History",
+              "isProficient" : false,
+              "modifier" : -1
+            },
+            {
+              "title" : "Insight",
+              "isProficient" : true,
+              "modifier" : 3
+            },
+            {
+              "title" : "Intimidation",
+              "isProficient" : true,
+              "modifier" : 5
+            },
+            {
+              "title" : "Investigation",
+              "isProficient" : false,
+              "modifier" : -1
+            },
+            {
+              "title" : "Medicine",
+              "isProficient" : false,
+              "modifier" : 1
+            },
+            {
+              "title" : "Nature",
+              "isProficient" : true,
+              "modifier" : 1
+            },
+            {
+              "title" : "Perception",
+              "isProficient" : false,
+              "modifier" : 1
+            },
+            {
+              "title" : "Performance",
+              "isProficient" : false,
+              "modifier" : 3
+            },
+            {
+              "title" : "Persuasion",
+              "isProficient" : false,
+              "modifier" : 3
+            },
+            {
+              "title" : "Religion",
+              "isProficient" : false,
+              "modifier" : -1
+            },
+            {
+              "title" : "Sleight of Hand",
+              "isProficient" : false,
+              "modifier" : 2
+            },
+            {
+              "title" : "Stealth",
+              "isProficient" : false,
+              "modifier" : 2
+            },
+            {
+              "title" : "Survival",
+              "isProficient" : false,
+              "modifier" : 1
+            }
+          ]
         }
       ]
     }

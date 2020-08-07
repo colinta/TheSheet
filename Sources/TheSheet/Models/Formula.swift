@@ -12,10 +12,7 @@ enum Formula {
         case let .const(i):
             return "\(i)"
         case let .modifier(i):
-            if i >= 0 {
-                return "+\(i)"
-            }
-            return "\(i)"
+            return i.toModString
         case let .string(str):
             return str
         }

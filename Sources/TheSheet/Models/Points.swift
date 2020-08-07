@@ -13,7 +13,7 @@ struct Points: Codable {
 
     let title: String
     let current: Int
-    let max: Int
+    let max: Int?
     let type: PointType
     let shouldResetOnLongRest: Bool
 
@@ -23,7 +23,7 @@ struct Points: Codable {
             shouldResetOnLongRest: shouldResetOnLongRest)
     }
 
-    func replace(max: Int) -> Points {
+    func replace(max: Int?) -> Points {
         Points(
             title: title, current: current, max: max, type: type,
             shouldResetOnLongRest: shouldResetOnLongRest)
