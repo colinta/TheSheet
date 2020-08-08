@@ -1,3 +1,7 @@
+////
+///  Program.swift
+//
+
 import Ashen
 import Foundation
 
@@ -7,6 +11,7 @@ enum Message {
     case replaceColumn(at: Int, with: Int)
     case scroll(Int)
     case setScrollSize(Int, Size, Rect)
+    case undo
     case reloadJSON
     case statusDidTimeout
     case saveJSON
@@ -65,6 +70,8 @@ func update(model: inout Model, message: Message) -> State<Model, Message> {
         else { return .noChange }
         let scrollOffset = max(0, min(model.scrollOffset + delta, maxOffset))
         return .model(model.replace(scrollOffset: scrollOffset))
+    case .undo:
+        return .model(model.undo())
     case .reloadJSON:
         guard let fileURL = model.fileURL else {
             return showStatus(model: model, status: "No JSON file to reload")
@@ -116,9 +123,11 @@ private func _render(_ model: Model, status: String?) -> [View<Message>] {
         OnKeyPress(key: .down, Message.scroll(1)),
         OnKeyPress(key: .pageUp, Message.scroll(-25)),
         OnKeyPress(key: .pageDown, Message.scroll(25)),
+        OnKeyPress(key: .space, Message.scroll(25)),
         OnKeyPress(key: .esc, Message.quit),
         OnKeyPress(key: .ctrl(.s), Message.saveJSON),
         OnKeyPress(key: .ctrl(.o), Message.reloadJSON),
+        OnKeyPress(key: .ctrl(.z), Message.undo),
         Flow(
             .down,
             [
@@ -137,7 +146,7 @@ private func _render(_ model: Model, status: String?) -> [View<Message>] {
                                     Scroll(
                                         columnView.map {
                                             Message.sheet(Sheet.Message.column(index, $0))
-                                        },
+                                        }.fitInParent(.width),
                                         onResizeContent: { size, mask in
                                             Message.setScrollSize(index, size, mask)
                                         },
@@ -153,7 +162,7 @@ private func _render(_ model: Model, status: String?) -> [View<Message>] {
                 ),
                 (
                     .fixed,
-                    MainButtons(status: status).height(1)
+                    MainButtons(model: model, status: status)
                 ),
             ]),
     ]
@@ -180,38 +189,47 @@ func renderColumnEditor(_ model: Model, _ position: Int) -> [View<Message>] {
         ]
     } else {
         return [
-            OnLeftClick(Text("[…]"), Message.changeColumn(position)).compact().padding(right: 1)
-                .aligned(.topRight)
+            OnLeftClick(Text("[…]"), Message.changeColumn(position)).compact().padding(
+                right: 1
+            ).aligned(.topRight)
         ]
     }
 }
 
-func MainButtons(status: String?) -> View<Message> {
-    Flow(
+func MainButtons(model: Model, status: String?) -> View<Message> {
+    let buttons: [View<Message>] = [
+        OnLeftClick(
+            Text("Undo".foreground(model.canUndo ? .none : .black))
+                .underlined()
+                .padding(left: 1, right: 1)
+                .border(.single), Message.undo, .isEnabled(model.canUndo)),
+        OnLeftClick(
+            Text("Reload")
+                .underlined()
+                .padding(left: 1, right: 1)
+                .border(.single), Message.reloadJSON),
+        OnLeftClick(
+            Text("Save")
+                .underlined()
+                .padding(left: 1, right: 1)
+                .border(.single),
+            Message.saveJSON),
+        OnLeftClick(
+            Text("Exit")
+                .underlined()
+                .padding(left: 1, right: 1)
+                .border(.single),
+            Message.quit),
+
+    ]
+    return Flow(
         .ltr,
         [
-            (.fixed, status.map { Text($0) } ?? Space()),
+            (.fixed, status.map { Text($0).aligned(.middleCenter) } ?? Space()),
             (.flex1, Space()),
-            (
-                .fixed,
-                OnLeftClick(
-                    Text("Reload JSON").padding(left: 1, right: 1).centered()
-                        .underlined(), Message.reloadJSON)
-            ),
-            (.fixed, Space().width(1)),
-            (
-                .fixed,
-                OnLeftClick(
-                    Text("Save").padding(left: 1, right: 1).centered().underlined(),
-                    Message.saveJSON)
-            ),
-            (.fixed, Space().width(1)),
-            (
-                .fixed,
-                OnLeftClick(
-                    Text("Exit").padding(left: 1, right: 1).centered().underlined(),
-                    Message.quit)
-            ),
         ]
+            + buttons.flatMap { button in
+                [(.fixed, button), (.fixed, Space().width(1))]
+            }
     )
 }

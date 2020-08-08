@@ -30,7 +30,7 @@ func PlusMinus<Msg>(
             (
                 .fixed,
                 OnClick(
-                    Text("[-]".bold().foreground(.red)),
+                    Text("[-]".foreground(.red)),
                     { button in
                         let amount: Int
                         if button == .left {
@@ -47,7 +47,7 @@ func PlusMinus<Msg>(
             (
                 .fixed,
                 OnClick(
-                    Text("[+]".bold().foreground(.green)),
+                    Text("[+]".foreground(.green)),
                     { button in
                         let amount: Int
                         if button == .left {

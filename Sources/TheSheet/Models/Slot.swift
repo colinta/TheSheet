@@ -12,6 +12,10 @@ struct Slot: Codable {
         Slot(title: title, current: current, max: max, shouldResetOnLongRest: shouldResetOnLongRest)
     }
 
+    func replace(max: Int) -> Slot {
+        Slot(title: title, current: current, max: max, shouldResetOnLongRest: shouldResetOnLongRest)
+    }
+
     func replace(shouldResetOnLongRest: Bool) -> Slot {
         Slot(title: title, current: current, max: max, shouldResetOnLongRest: shouldResetOnLongRest)
     }

@@ -71,18 +71,9 @@
         {
           "type" : "action",
           "action" : {
+            "isExpanded" : true,
             "title" : "Dagger",
-            "level" : null,
-            "description" : {
-              "spans" : [
-                {
-                  "string" : "Finesse, Light, Thrown (range 20\/60)",
-                  "attrs" : [
-
-                  ]
-                }
-              ]
-            },
+            "description" : "Finesse, Light, Thrown (range 20\/60)",
             "subactions" : [
               {
                 "check" : {
@@ -107,24 +98,15 @@
                 ]
               }
             ],
-            "isExpanded" : true
+            "shouldResetOnLongRest" : false
           }
         },
         {
           "type" : "action",
           "action" : {
+            "isExpanded" : true,
             "title" : "Quarterstaff",
-            "level" : null,
-            "description" : {
-              "spans" : [
-                {
-                  "string" : "Versatile",
-                  "attrs" : [
-
-                  ]
-                }
-              ]
-            },
+            "description" : "Versatile",
             "subactions" : [
               {
                 "check" : {
@@ -173,7 +155,58 @@
                 "type" : "Bludgeoning"
               }
             ],
-            "isExpanded" : true
+            "shouldResetOnLongRest" : false
+          }
+        },
+        {
+          "type" : "action",
+          "action" : {
+            "isExpanded" : true,
+            "uses" : 1,
+            "title" : "Breath Weapon",
+            "subactions" : [
+              {
+                "type" : "Cold",
+                "damage" : [
+                  {
+                    "type" : "dice",
+                    "value" : {
+                      "dice" : "2d6"
+                    }
+                  }
+                ]
+              }
+            ],
+            "description" : "Range: 15' cone\nAffected creatures roll Constitution save\nDC = 8 + Constitution Mod. + Proficiency Bonus",
+            "shouldResetOnLongRest" : true,
+            "remainingUses" : 1
+          }
+        },
+        {
+          "type" : "action",
+          "action" : {
+            "isExpanded" : true,
+            "uses" : 1,
+            "title" : "Hat of Wizardry",
+            "subactions" : [
+
+            ],
+            "description" : "Try to cast a wizard cantrip, make Arcana check. Once per long rest.",
+            "shouldResetOnLongRest" : true,
+            "remainingUses" : 1
+          }
+        },
+        {
+          "type" : "action",
+          "action" : {
+            "remainingUses" : 7,
+            "isExpanded" : true,
+            "title" : "Wand of Pyrotechnics",
+            "description" : "You can use an action to expend 1 of its charges and create a harmless burst of multicolored light at a point you can see up to 60 feet away. The burst of light is accompanied by a crackling noise that can be heard up to 300 feet away.\nThe wand regains 1d6 + 1 expended charges daily at dawn (max: 7).\nIf you expend the wand's last charge, roll a d20. On a 1, the wand erupts in a harmless pyrotechnic display and is destroyed.",
+            "subactions" : [
+
+            ],
+            "shouldResetOnLongRest" : false
           }
         }
       ]
@@ -181,7 +214,172 @@
     {
       "title" : "Inventory",
       "controls" : [
-
+        {
+          "type" : "inventory",
+          "inventory" : {
+            "title" : "Gold",
+            "quantity" : 140
+          }
+        },
+        {
+          "type" : "inventory",
+          "inventory" : {
+            "title" : "Silver",
+            "quantity" : 40
+          }
+        },
+        {
+          "type" : "inventory",
+          "inventory" : {
+            "title" : "Copper",
+            "quantity" : 15
+          }
+        },
+        {
+          "type" : "inventory",
+          "inventory" : {
+            "title" : "Quarterstaff"
+          }
+        },
+        {
+          "type" : "inventory",
+          "inventory" : {
+            "title" : "Daggers",
+            "quantity" : 2
+          }
+        },
+        {
+          "type" : "inventory",
+          "inventory" : {
+            "title" : "15g Wetshrooms\nbreath underwater?"
+          }
+        },
+        {
+          "type" : "inventory",
+          "inventory" : {
+            "title" : "Caltrops (bag of 20)"
+          }
+        },
+        {
+          "type" : "inventory",
+          "inventory" : {
+            "title" : "Chalk pieces",
+            "quantity" : 3
+          }
+        },
+        {
+          "type" : "inventory",
+          "inventory" : {
+            "title" : "Crowbar"
+          }
+        },
+        {
+          "type" : "inventory",
+          "inventory" : {
+            "title" : "Hammer"
+          }
+        },
+        {
+          "type" : "inventory",
+          "inventory" : {
+            "title" : "Pitons",
+            "quantity" : 10
+          }
+        },
+        {
+          "type" : "inventory",
+          "inventory" : {
+            "title" : "Lamp Oil"
+          }
+        },
+        {
+          "type" : "inventory",
+          "inventory" : {
+            "title" : "Loaves of Mushroom Bread",
+            "quantity" : 2
+          }
+        },
+        {
+          "type" : "inventory",
+          "inventory" : {
+            "title" : "Hempen Rope, 50'"
+          }
+        },
+        {
+          "type" : "inventory",
+          "inventory" : {
+            "title" : "Scroll \/ map case"
+          }
+        },
+        {
+          "type" : "inventory",
+          "inventory" : {
+            "title" : "Tinderbox"
+          }
+        },
+        {
+          "type" : "inventory",
+          "inventory" : {
+            "title" : "Torches",
+            "quantity" : 10
+          }
+        },
+        {
+          "type" : "inventory",
+          "inventory" : {
+            "title" : "Glass Vials",
+            "quantity" : 2
+          }
+        },
+        {
+          "type" : "inventory",
+          "inventory" : {
+            "title" : "Wine"
+          }
+        },
+        {
+          "type" : "inventory",
+          "inventory" : {
+            "title" : "Bell & String"
+          }
+        },
+        {
+          "type" : "inventory",
+          "inventory" : {
+            "title" : "Bottle of black ink"
+          }
+        },
+        {
+          "type" : "inventory",
+          "inventory" : {
+            "title" : "Letter opener"
+          }
+        },
+        {
+          "type" : "inventory",
+          "inventory" : {
+            "title" : "Letter from a dead colleague posing a question"
+          }
+        },
+        {
+          "type" : "inventory",
+          "inventory" : {
+            "title" : "Quill"
+          }
+        },
+        {
+          "type" : "inventory",
+          "inventory" : {
+            "title" : "Sacks",
+            "quantity" : 5
+          }
+        },
+        {
+          "type" : "inventory",
+          "inventory" : {
+            "title" : "Waterskin"
+          }
+        }
       ]
     },
     {
@@ -202,24 +400,22 @@
               "current" : 3,
               "max" : 3,
               "shouldResetOnLongRest" : true
+            },
+            {
+              "title" : "3",
+              "current" : 0,
+              "max" : 0,
+              "shouldResetOnLongRest" : true
             }
           ]
         },
         {
           "type" : "action",
           "action" : {
+            "isExpanded" : true,
             "title" : "Chill Touch",
             "level" : "Cantrip",
-            "description" : {
-              "spans" : [
-                {
-                  "string" : "Range: 120'\nOn a hit, target can't regain hit points. Hit undead: they have disadvantage on attack rolls. Hand clings to target.",
-                  "attrs" : [
-
-                  ]
-                }
-              ]
-            },
+            "description" : "Range: 120'\nOn a hit, target can't regain hit points. Hit undead: they have disadvantage on attack rolls. Hand clings to target.",
             "subactions" : [
               {
                 "check" : {
@@ -237,24 +433,16 @@
                 ]
               }
             ],
-            "isExpanded" : true
+            "shouldResetOnLongRest" : false
           }
         },
         {
           "type" : "action",
           "action" : {
+            "isExpanded" : true,
             "title" : "Frostbite",
             "level" : "Cantrip",
-            "description" : {
-              "spans" : [
-                {
-                  "string" : "Range: 60'\nOn failed CON save, takes 1d6 cold damage and disadvantage on next weapon attack",
-                  "attrs" : [
-
-                  ]
-                }
-              ]
-            },
+            "description" : "Range: 60'\nOn failed CON save, takes 1d6 cold damage and disadvantage on next weapon attack",
             "subactions" : [
               {
                 "check" : {
@@ -272,87 +460,55 @@
                 ]
               }
             ],
-            "isExpanded" : true
+            "shouldResetOnLongRest" : false
           }
         },
         {
           "type" : "action",
           "action" : {
+            "isExpanded" : true,
             "title" : "Mage Hand",
             "level" : "Cantrip",
-            "description" : {
-              "spans" : [
-                {
-                  "string" : "Range: 30' | Duration: 1 minute\nYou can use the hand to manipulate an object, open an unlocked door or container, stow or retrieve an item from an open container, or pour the contents out of a vial. You can move the hand up to 30 feet each time you use it.",
-                  "attrs" : [
-
-                  ]
-                }
-              ]
-            },
+            "description" : "Range: 30' | Duration: 1 minute\nYou can use the hand to manipulate an object, open an unlocked door or container, stow or retrieve an item from an open container, or pour the contents out of a vial. You can move the hand up to 30 feet each time you use it.",
             "subactions" : [
 
             ],
-            "isExpanded" : true
+            "shouldResetOnLongRest" : false
           }
         },
         {
           "type" : "action",
           "action" : {
+            "isExpanded" : true,
             "title" : "Minor Illusion",
             "level" : "Cantrip",
-            "description" : {
-              "spans" : [
-                {
-                  "string" : "Range: 30' | Duration: 1 minute\nYou create a sound or an image of an object within range that lasts for the duration, or until dismissed as an action. Volume of sound from whisper to scream, can be a voice, one repeating or many sounds. Image must fit in 5' cube. Image cannot create light, sound, touch, or smell. Successful INT (Investigation) check against spell save DC can reveal the illusion.",
-                  "attrs" : [
-
-                  ]
-                }
-              ]
-            },
+            "description" : "Range: 30' | Duration: 1 minute\nYou create a sound or an image of an object within range that lasts for the duration, or until dismissed as an action. Volume of sound from whisper to scream, can be a voice, one repeating or many sounds. Image must fit in 5' cube. Image cannot create light, sound, touch, or smell. Successful INT (Investigation) check against spell save DC can reveal the illusion.",
             "subactions" : [
 
             ],
-            "isExpanded" : true
+            "shouldResetOnLongRest" : false
           }
         },
         {
           "type" : "action",
           "action" : {
+            "isExpanded" : true,
             "title" : "Shape Water",
             "level" : "Cantrip",
-            "description" : {
-              "spans" : [
-                {
-                  "string" : "Range: 30' | Duration: 1 hour\nYou instantaneously move or otherwise change the flow of the water as you direct, up to 5 feet in any direction. This movement doesn’t have enough force to cause damage.\nYou cause the water to form into simple shapes and animate at your direction.\nYou change the water’s color or opacity.\nYou can freeze the water for the duration, provided that there are no creatures in it.",
-                  "attrs" : [
-
-                  ]
-                }
-              ]
-            },
+            "description" : "Range: 30' | Duration: 1 hour\nYou instantaneously move or otherwise change the flow of the water as you direct, up to 5 feet in any direction. This movement doesn’t have enough force to cause damage.\nYou cause the water to form into simple shapes and animate at your direction.\nYou change the water’s color or opacity.\nYou can freeze the water for the duration, provided that there are no creatures in it.",
             "subactions" : [
 
             ],
-            "isExpanded" : true
+            "shouldResetOnLongRest" : false
           }
         },
         {
           "type" : "action",
           "action" : {
+            "isExpanded" : true,
             "title" : "Magic Missile",
             "level" : "1",
-            "description" : {
-              "spans" : [
-                {
-                  "string" : "Range: 120'\nYou create darts of magical force, each dart deals the rolled force damage to a creature that you can see in range.\nUsing higher level spell slots, one more dart for each level >1.",
-                  "attrs" : [
-
-                  ]
-                }
-              ]
-            },
+            "description" : "Range: 120'\nYou create darts of magical force, each dart deals the rolled force damage to a creature that you can see in range.\nUsing higher level spell slots, one more dart for each level >1.",
             "subactions" : [
               {
                 "check" : {
@@ -377,24 +533,16 @@
                 ]
               }
             ],
-            "isExpanded" : true
+            "shouldResetOnLongRest" : false
           }
         },
         {
           "type" : "action",
           "action" : {
+            "isExpanded" : true,
             "title" : "Ice Spear",
             "level" : "2",
-            "description" : {
-              "spans" : [
-                {
-                  "string" : "Range: 120'\nYou create three spears of ice and hurl them at targets within range. You can hurl them at one target or several.\nMake a ranged spell attack for each spear. On a hit, the target takes 2d6 cold damage.\nUsing higher level spell slots, one more spear for each level >2.",
-                  "attrs" : [
-
-                  ]
-                }
-              ]
-            },
+            "description" : "Range: 120'\nYou create three spears of ice and hurl them at targets within range. You can hurl them at one target or several.\nMake a ranged spell attack for each spear. On a hit, the target takes 2d6 cold damage.\nUsing higher level spell slots, one more spear for each level >2.",
             "subactions" : [
               {
                 "check" : {
@@ -412,84 +560,46 @@
                 ]
               }
             ],
-            "isExpanded" : true
+            "shouldResetOnLongRest" : false
           }
         },
         {
           "type" : "action",
           "action" : {
+            "isExpanded" : true,
             "title" : "Invisibility",
             "level" : "2",
-            "description" : {
-              "spans" : [
-                {
-                  "string" : "Range: Touch | Duration: Concentration, 1 hour\nA creature you touch becomes invisible until the spell ends. Anything the target is wearing or carrying is invisible as long as it is on the target’s person. The spell ends for a target that attacks or casts a spell.\nUsing higher level spell slots, you can target one additional creature for each level >2.",
-                  "attrs" : [
-
-                  ]
-                }
-              ]
-            },
+            "description" : "Range: Touch | Duration: Concentration, 1 hour\nA creature you touch becomes invisible until the spell ends. Anything the target is wearing or carrying is invisible as long as it is on the target’s person. The spell ends for a target that attacks or casts a spell.\nUsing higher level spell slots, you can target one additional creature for each level >2.",
             "subactions" : [
 
             ],
-            "isExpanded" : true
+            "shouldResetOnLongRest" : false
           }
         },
         {
           "type" : "action",
           "action" : {
+            "isExpanded" : true,
             "title" : "Mirror Image",
             "level" : "2",
-            "description" : {
-              "spans" : [
-                {
-                  "string" : "Three illusory duplicates appear in your space. Each time a creature targets you, roll a d20.\n",
-                  "attrs" : [
-
-                  ]
-                },
-                {
-                  "string" : "Duplicates",
-                  "attrs" : [
-                    {
-                      "attr" : "underline"
-                    }
-                  ]
-                },
-                {
-                  "string" : ": AC=10+DEX, destroyed immediately on any successful hit, ignore area damage and effects.\n\n3: Roll 6+ on d20 to target a duplicate\n2: 8+\n1: 11+",
-                  "attrs" : [
-
-                  ]
-                }
-              ]
-            },
+            "description" : "Three illusory duplicates appear in your space. Each time a creature targets you, roll a d20.\n",
             "subactions" : [
 
             ],
-            "isExpanded" : true
+            "shouldResetOnLongRest" : false
           }
         },
         {
           "type" : "action",
           "action" : {
+            "isExpanded" : true,
             "title" : "Misty Step",
             "level" : "2",
-            "description" : {
-              "spans" : [
-                {
-                  "string" : "Briefly surrounded by silvery mist, you teleport up to 30 feet to an unoccupied space that you can see.",
-                  "attrs" : [
-
-                  ]
-                }
-              ]
-            },
+            "description" : "Briefly surrounded by silvery mist, you teleport up to 30 feet to an unoccupied space that you can see.",
             "subactions" : [
 
             ],
-            "isExpanded" : true
+            "shouldResetOnLongRest" : false
           }
         }
       ]
@@ -527,40 +637,40 @@
           "type" : "attributes",
           "attributes" : [
             {
+              "abbreviation" : "STR",
+              "isProficient" : false,
               "title" : "Strength",
-              "score" : 12,
-              "modifier" : 1,
-              "save" : 1
+              "score" : 12
             },
             {
+              "abbreviation" : "DEX",
+              "isProficient" : false,
               "title" : "Dexterity",
-              "score" : 14,
-              "modifier" : 2,
-              "save" : 2
+              "score" : 14
             },
             {
+              "abbreviation" : "CON",
+              "isProficient" : true,
               "title" : "Constitution",
-              "score" : 14,
-              "modifier" : 2,
-              "save" : 4
+              "score" : 14
             },
             {
+              "abbreviation" : "INT",
+              "isProficient" : false,
               "title" : "Intelligence",
-              "score" : 8,
-              "modifier" : -1,
-              "save" : -1
+              "score" : 8
             },
             {
+              "abbreviation" : "WIS",
+              "isProficient" : false,
               "title" : "Wisdom",
-              "score" : 13,
-              "modifier" : 1,
-              "save" : 1
+              "score" : 13
             },
             {
+              "abbreviation" : "CHA",
+              "isProficient" : true,
               "title" : "Charisma",
-              "score" : 16,
-              "modifier" : 3,
-              "save" : 5
+              "score" : 16
             }
           ]
         },
@@ -568,96 +678,132 @@
           "type" : "skills",
           "skills" : [
             {
-              "title" : "Acrobatis",
-              "isProficient" : false,
-              "modifier" : 2
-            },
-            {
-              "title" : "Animal Handling",
-              "isProficient" : false,
-              "modifier" : 1
-            },
-            {
-              "title" : "Arcana",
-              "isProficient" : true,
-              "modifier" : 1
-            },
-            {
               "title" : "Athletics",
-              "isProficient" : false,
-              "modifier" : 1
+              "basedOn" : "STR",
+              "isProficient" : false
             },
             {
-              "title" : "Deception",
-              "isProficient" : false,
-              "modifier" : 3
-            },
-            {
-              "title" : "History",
-              "isProficient" : false,
-              "modifier" : -1
-            },
-            {
-              "title" : "Insight",
-              "isProficient" : true,
-              "modifier" : 3
-            },
-            {
-              "title" : "Intimidation",
-              "isProficient" : true,
-              "modifier" : 5
-            },
-            {
-              "title" : "Investigation",
-              "isProficient" : false,
-              "modifier" : -1
-            },
-            {
-              "title" : "Medicine",
-              "isProficient" : false,
-              "modifier" : 1
-            },
-            {
-              "title" : "Nature",
-              "isProficient" : true,
-              "modifier" : 1
-            },
-            {
-              "title" : "Perception",
-              "isProficient" : false,
-              "modifier" : 1
-            },
-            {
-              "title" : "Performance",
-              "isProficient" : false,
-              "modifier" : 3
-            },
-            {
-              "title" : "Persuasion",
-              "isProficient" : false,
-              "modifier" : 3
-            },
-            {
-              "title" : "Religion",
-              "isProficient" : false,
-              "modifier" : -1
+              "title" : "Acrobatics",
+              "basedOn" : "DEX",
+              "isProficient" : false
             },
             {
               "title" : "Sleight of Hand",
-              "isProficient" : false,
-              "modifier" : 2
+              "basedOn" : "DEX",
+              "isProficient" : false
             },
             {
               "title" : "Stealth",
-              "isProficient" : false,
-              "modifier" : 2
+              "basedOn" : "DEX",
+              "isProficient" : false
+            },
+            {
+              "title" : "Arcana",
+              "basedOn" : "INT",
+              "isProficient" : true
+            },
+            {
+              "title" : "History",
+              "basedOn" : "INT",
+              "isProficient" : false
+            },
+            {
+              "title" : "Investigation",
+              "basedOn" : "INT",
+              "isProficient" : false
+            },
+            {
+              "title" : "Nature",
+              "basedOn" : "INT",
+              "isProficient" : true
+            },
+            {
+              "title" : "Religion",
+              "basedOn" : "INT",
+              "isProficient" : false
+            },
+            {
+              "title" : "Animal Handling",
+              "basedOn" : "WIS",
+              "isProficient" : false
+            },
+            {
+              "title" : "Insight",
+              "basedOn" : "WIS",
+              "isProficient" : true
+            },
+            {
+              "title" : "Medicine",
+              "basedOn" : "WIS",
+              "isProficient" : false
+            },
+            {
+              "title" : "Perception",
+              "basedOn" : "WIS",
+              "isProficient" : false
             },
             {
               "title" : "Survival",
-              "isProficient" : false,
-              "modifier" : 1
+              "basedOn" : "WIS",
+              "isProficient" : false
+            },
+            {
+              "title" : "Deception",
+              "basedOn" : "CHA",
+              "isProficient" : false
+            },
+            {
+              "title" : "Intimidation",
+              "basedOn" : "CHA",
+              "isProficient" : true
+            },
+            {
+              "title" : "Performance",
+              "basedOn" : "CHA",
+              "isProficient" : false
+            },
+            {
+              "title" : "Persuasion",
+              "basedOn" : "CHA",
+              "isProficient" : false
             }
           ]
+        },
+        {
+          "type" : "action",
+          "action" : {
+            "isExpanded" : true,
+            "title" : "Draconic Bloodline",
+            "description" : "Double Proficiency Bonus to Charisma when talking with Dragons",
+            "subactions" : [
+
+            ],
+            "shouldResetOnLongRest" : false
+          }
+        },
+        {
+          "type" : "action",
+          "action" : {
+            "isExpanded" : true,
+            "title" : "Researcher",
+            "description" : "When you attempt to learn or recall lore, you usually know where the information can be found.",
+            "subactions" : [
+
+            ],
+            "shouldResetOnLongRest" : false
+          }
+        },
+        {
+          "type" : "action",
+          "action" : {
+            "isExpanded" : true,
+            "title" : "Languages",
+            "description" : "Common\nDraconic\nSylvan\nGiant",
+            "subactions" : [
+
+            ],
+            "shouldResetOnLongRest" : false
+          }
         }
       ]
     }

@@ -62,8 +62,8 @@ extension Dice: Codable {
         } else if dice.contains("d") {
             let parts = dice.split(separator: "d", maxSplits: 2)
             let n = Int(parts[0]) ?? 1
-            let d = decode(String(parts[1]))
-            return .n(n, d)
+            let d = Int(parts[1]) ?? 1
+            return .n(n, .d(d))
         } else {
             return .d(1)
         }

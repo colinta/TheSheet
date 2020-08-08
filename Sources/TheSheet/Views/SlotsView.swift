@@ -6,8 +6,9 @@ import Ashen
 
 func SlotsView<Msg>(
     title: Attributed, slots: [Slot], sorceryPoints: Int,
-    toggle onChange: @escaping ((level: Int, current: Int)) -> Msg,
-    burn onBurn: @escaping (Int) -> Msg, buy onBuy: @escaping (Int) -> Msg
+    onToggle: @escaping ((level: Int, current: Int)) -> Msg,
+    onChangeMax: @escaping (Int, Int) -> Msg,
+    onBurn: @escaping (Int) -> Msg, onBuy: @escaping (Int) -> Msg
 ) -> View<Msg> {
     let maxMax = slots.reduce(0) { memo, slot in
         max(memo, slot.max, slot.current)
@@ -27,7 +28,7 @@ func SlotsView<Msg>(
                         return SlotCell(
                             isUsed: slot.current <= column,
                             { delta in
-                                return onChange((level: level, current: slot.current + delta))
+                                return onToggle((level: level, current: slot.current + delta))
                             })
                     } else {
                         return Space().height(1)
@@ -38,20 +39,24 @@ func SlotsView<Msg>(
     let labels: View<Msg> = Stack(
         .down,
         slots.enumerated().map { level, slot in
+            let burnPoints = Slot.points(forLevel: level)
+            let buyPoints = Slot.cost(ofLevel: level)
             let canBurn = slot.current > 0
-            let canBuy = Slot.cost(ofLevel: level).map { sorceryPoints >= $0 } ?? false
-            let burnText = "(\(Slot.points(forLevel: level)))Burn"
-            let buyText = "Buy(\(Slot.cost(ofLevel: level) ?? 0))"
+            let canBuy = buyPoints.map { sorceryPoints >= $0 } ?? false
+            let increaseMax = OnLeftClick(
+                Text("[+]".foreground(.green)), onChangeMax(level, slot.max + 1))
+            let decreaseMax =
+                slot.max > 0
+                ? OnLeftClick(Text("[-]".foreground(.red)), onChangeMax(level, slot.max - 1))
+                : Text("[-]".foreground(.black))
             return Stack(
                 .ltr,
                 [
-                    canBurn
-                        ? OnLeftClick(Text(burnText), onBurn(level))
-                        : Text(burnText.foreground(.black)),
+                    BuyCell(canBuy, buyPoints, onBuy(level)),
                     Space().width(1),
-                    canBuy
-                        ? OnLeftClick(Text(buyText), onBuy(level))
-                        : Text(buyText.foreground(.black)),
+                    BurnCell(canBurn, burnPoints, onBurn(level)),
+                    Space().width(1),
+                    decreaseMax, increaseMax,
                 ]
             ).height(1)
         })
@@ -71,8 +76,27 @@ func SlotsView<Msg>(
         ])
 }
 
-func SlotCell<Msg>(isUsed: Bool, _ onChange: @escaping (Int) -> Msg) -> View<Msg> {
+func SlotCell<Msg>(isUsed: Bool, _ onToggle: @escaping (Int) -> Msg) -> View<Msg> {
     OnLeftClick(
         Text("[\(isUsed ? "○" : "●")]".foreground(isUsed ? .none : .blue)),
-        onChange(isUsed ? 1 : -1))
+        onToggle(isUsed ? 1 : -1))
+}
+
+func BurnCell<Msg>(
+    _ canBurn: Bool, _ burnPoints: Int, _ onBurn: @escaping @autoclosure SimpleEvent<Msg>
+) -> View<Msg> {
+    let burnText = "Burn(\(burnPoints))"
+    return canBurn
+        ? OnLeftClick(Text(burnText.foreground(.yellow)), onBurn())
+        : Text(burnText.foreground(.black))
+}
+func BuyCell<Msg>(
+    _ canBuy: Bool, _ buyPoints: Int?, _ onBuy: @escaping @autoclosure SimpleEvent<Msg>
+) -> View<Msg> {
+    guard let buyPoints = buyPoints else { return Space() }
+    let buyText = "Buy(\(buyPoints))"
+    return canBuy
+        ? OnLeftClick(Text(buyText.foreground(.blue)), onBuy())
+        : Text(buyText.foreground(.black))
+
 }

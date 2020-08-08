@@ -11,13 +11,18 @@ enum SheetControl {
     }
 
     enum Message {
-        case updateSlots(level: Int, current: Int)
+        case updateSlotCurrent(level: Int, current: Int)
+        case updateSlotMax(level: Int, max: Int)
         case burnSlot(level: Int)
         case buySlot(level: Int)
         case updatePoints(current: Int, max: Int?)
         case collapseAction
         case expandAction
+        case changeQuantity(delta: Int)
+        case changeAttribute(index: Int, delta: Int)
+        case resetActionUses
         case takeRest(Rest)
+        case removeControl
     }
 
     case slots(String, [Slot])
@@ -26,6 +31,7 @@ enum SheetControl {
     case attributes([Attribute])
     case skills([Skill])
     case action(Action)
+    case inventory(Inventory)
     case restButtons
 
     func take(rest: Rest) -> (SheetControl, Sheet.Mod?) {
@@ -56,6 +62,10 @@ enum SheetControl {
         case let (.pointsTracker(points), .long):
             if points.shouldResetOnLongRest, let pointsMax = points.max {
                 control = .pointsTracker(points.replace(current: pointsMax))
+            }
+        case let (.action(action), .long):
+            if action.shouldResetOnLongRest, let uses = action.uses {
+                control = .action(action.replace(remainingUses: uses))
             }
         default:
             break
@@ -133,12 +143,27 @@ enum SheetControl {
         switch (self, message) {
         case let (.restButtons, .takeRest(type)):
             return take(rest: type)
-        case let (.slots(title, slots), .updateSlots(updateLevel, current)):
+        case let (.slots(title, slots), .updateSlotCurrent(updateLevel, newCurrent)):
             control = .slots(
                 title,
                 slots.enumerated().map { level, slot in
-                    guard level == updateLevel else { return slot }
-                    return slot.replace(current: current)
+                    guard level == updateLevel, newCurrent != slot.current else { return slot }
+                    return slot.replace(current: newCurrent)
+                })
+        case let (.slots(title, slots), .updateSlotMax(updateLevel, newMax)):
+            control = .slots(
+                title,
+                slots.enumerated().map { level, slot in
+                    guard level == updateLevel, newMax >= 0, newMax != slot.max else { return slot }
+                    let newCurrent: Int
+                    if newMax > slot.max, slot.current == slot.max {
+                        newCurrent = slot.current + 1
+                    } else if slot.current > 0, slot.current == slot.max {
+                        newCurrent = max(0, slot.current - 1)
+                    } else {
+                        newCurrent = slot.current
+                    }
+                    return slot.replace(max: newMax).replace(current: newCurrent)
                 })
         case let (.slots, .burnSlot(level)):
             return (control, burnSlot(level: level))
@@ -150,6 +175,22 @@ enum SheetControl {
             control = .action(action.replace(isExpanded: false))
         case let (.action(action), .expandAction):
             control = .action(action.replace(isExpanded: true))
+        case let (.attributes(attributes), .changeAttribute(changeIndex, delta)):
+            guard changeIndex >= 0, changeIndex < attributes.count else { break }
+            control = .attributes(
+                attributes.enumerated().map { index, attribute in
+                    guard index == changeIndex else { return attribute }
+                    return attribute.replace(score: attribute.score + delta)
+                })
+        case let (.action(action), .changeQuantity(delta)):
+            guard let remainingUses = action.remainingUses else { break }
+            control = .action(action.replace(remainingUses: max(0, remainingUses + delta)))
+        case let (.action(action), .resetActionUses):
+            guard let uses = action.uses else { break }
+            control = .action(action.replace(remainingUses: uses))
+        case let (.inventory(inventory), .changeQuantity(delta)):
+            guard let quantity = inventory.quantity else { break }
+            control = .inventory(inventory.replace(quantity: max(0, quantity + delta)))
         default:
             break
         }
@@ -171,22 +212,29 @@ enum SheetControl {
             }
             return SlotsView(
                 title: title, slots: slots, sorceryPoints: sorceryPoints,
-                toggle: { level, current in Message.updateSlots(level: level, current: current) },
-                burn: Message.burnSlot,
-                buy: Message.buySlot
+                onToggle: Message.updateSlotCurrent,
+                onChangeMax: Message.updateSlotMax,
+                onBurn: Message.burnSlot,
+                onBuy: Message.buySlot
             )
         case let .pointsTracker(points):
             return PointsTracker(
                 points: points, onChange: { c, m in Message.updatePoints(current: c, max: m) })
         case let .action(action):
             return ActionView(
-                action, action.isExpanded ? Message.collapseAction : Message.expandAction)
+                action,
+                onExpand: action.isExpanded ? Message.collapseAction : Message.expandAction,
+                onChange: Message.changeQuantity,
+                onResetUses: Message.resetActionUses)
         case let .stats(title, stats):
             return StatsView(title: title, stats: stats)
         case let .attributes(attributes):
-            return AttributesView(attributes)
+            return AttributesView(attributes, onChange: Message.changeAttribute)
         case let .skills(skills):
-            return SkillsView(skills)
+            return SkillsView(skills.map { $0.resolve(sheet) })
+        case let .inventory(inventory):
+            return InventoryView(
+                inventory, onChange: Message.changeQuantity, onRemove: Message.removeControl)
         }
     }
 
@@ -206,6 +254,7 @@ extension SheetControl: Codable {
         case attributes
         case skills
         case action
+        case inventory
     }
 
     init(from decoder: Decoder) throws {
@@ -234,6 +283,9 @@ extension SheetControl: Codable {
         case "skills":
             let skills = try values.decode([Skill].self, forKey: .skills)
             self = .skills(skills)
+        case "inventory":
+            let inventory = try values.decode(Inventory.self, forKey: .inventory)
+            self = .inventory(inventory)
         default:
             throw Error.decoding
         }
@@ -264,6 +316,9 @@ extension SheetControl: Codable {
         case let .skills(skills):
             try container.encode("skills", forKey: .type)
             try container.encode(skills, forKey: .skills)
+        case let .inventory(inventory):
+            try container.encode("inventory", forKey: .type)
+            try container.encode(inventory, forKey: .inventory)
         }
     }
 }

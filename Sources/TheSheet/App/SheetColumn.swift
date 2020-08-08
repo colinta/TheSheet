@@ -26,6 +26,13 @@ struct SheetColumn: Codable {
 
     func update(_ message: Message) -> (SheetColumn, Sheet.Mod?) {
         switch message {
+        case let .control(changeIndex, .removeControl):
+            let controls = self.controls.enumerated().compactMap {
+                (index, control) -> SheetControl? in
+                guard index == changeIndex else { return control }
+                return nil
+            }
+            return (replace(controls: controls), nil)
         case let .control(changeIndex, message):
             var mod: Sheet.Mod? = nil
             let controls = self.controls.enumerated().map { (index, control) -> SheetControl in
@@ -34,8 +41,7 @@ struct SheetColumn: Codable {
                 mod = newMod
                 return newControl
             }
-            let column = replace(controls: controls)
-            return (column, mod)
+            return (replace(controls: controls), mod)
         }
     }
 
@@ -44,7 +50,8 @@ struct SheetColumn: Codable {
             .down,
             controls.enumerated().flatMap { index, control in
                 [
-                    control.render(sheet).map { SheetColumn.Message.control(index, $0) },
+                    control.render(sheet).map { SheetColumn.Message.control(index, $0) }
+                        .matchParent(.width),
                     Repeating(Text("─".foreground(.black))).height(1),
                 ]
             }
