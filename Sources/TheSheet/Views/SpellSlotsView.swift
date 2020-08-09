@@ -1,21 +1,21 @@
 ////
-///  SlotsView.swift
+///  SpellSlotsView.swift
 //
 
 import Ashen
 
-func SlotsView<Msg>(
-    title: Attributed, slots: [Slot], sorceryPoints: Int,
+func SpellSlotsView<Msg>(
+    title: Attributed, spellSlots: [SpellSlot], sorceryPoints: Int,
     onToggle: @escaping ((slotIndex: Int, current: Int)) -> Msg,
     onChangeMax: @escaping (Int, Int) -> Msg,
     onBurn: @escaping (Int) -> Msg, onBuy: @escaping (Int) -> Msg
 ) -> View<Msg> {
-    let maxMax = slots.reduce(0) { memo, slot in
+    let maxMax = spellSlots.reduce(0) { memo, slot in
         max(memo, slot.max, slot.current)
     }
     let titles: View<Msg> = Stack(
         .down,
-        slots.map { slot in
+        spellSlots.map { slot in
             Text(slot.title).bold().padding(left: 1, right: 1).height(1)
         })
     let columns: [(FlowSize, View<Msg>)] = (0..<maxMax).map { column in
@@ -23,7 +23,7 @@ func SlotsView<Msg>(
             .fixed,
             Stack(
                 .down,
-                slots.enumerated().map { slotIndex, slot in
+                spellSlots.enumerated().map { slotIndex, slot in
                     if max(slot.max, slot.current) > column {
                         return SlotCell(
                             isUsed: slot.current <= column,
@@ -39,13 +39,16 @@ func SlotsView<Msg>(
     }
     let labels: View<Msg> = Stack(
         .down,
-        slots.enumerated().map { slotIndex, slot in
-            let burnPoints = Slot.points(forLevel: slotIndex + 1)
-            let buyPoints = Slot.cost(ofLevel: slotIndex + 1)
+        spellSlots.enumerated().map { slotIndex, slot in
+            let burnPoints = SpellSlot.points(forLevel: slotIndex + 1)
+            let buyPoints = SpellSlot.cost(ofLevel: slotIndex + 1)
             let canBurn = slot.current > 0
-            let canBuy = buyPoints.map { sorceryPoints >= $0 } ?? false
-            let increaseMax = OnLeftClick(
-                Text("[+]".foreground(.green)), onChangeMax(slotIndex, slot.max + 1))
+            let canBuy = slot.max > 0 && buyPoints.map { sorceryPoints >= $0 } ?? false
+            let increaseMax =
+                (Int(slot.title) ?? 0) < 9
+                ? OnLeftClick(
+                    Text("[+]".foreground(.green)), onChangeMax(slotIndex, slot.max + 1))
+                : Text("[+]".foreground(.black))
             let decreaseMax =
                 slot.max > 0
                 ? OnLeftClick(Text("[-]".foreground(.red)), onChangeMax(slotIndex, slot.max - 1))
@@ -94,7 +97,7 @@ func BurnCell<Msg>(
 func BuyCell<Msg>(
     _ canBuy: Bool, _ buyPoints: Int?, _ onBuy: @escaping @autoclosure SimpleEvent<Msg>
 ) -> View<Msg> {
-    guard let buyPoints = buyPoints else { return Space() }
+    guard let buyPoints = buyPoints else { return Space().width(6) }
     let buyText = "Buy(\(buyPoints))"
     return canBuy
         ? OnLeftClick(Text(buyText.foreground(.blue)), onBuy())

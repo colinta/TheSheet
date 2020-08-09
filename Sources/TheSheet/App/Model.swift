@@ -15,6 +15,7 @@ struct Model {
     let fileURL: URL?
     let changeColumn: Int?
     let editColumn: Int?
+    let addingToColumn: Int?
     let scrollOffset: Int
     let columnScrollMaxOffsets: [Int: Int]
     let status: Status?
@@ -24,6 +25,7 @@ struct Model {
     init(
         sheet: Sheet, undoSheets: [Sheet] = [], fileURL: URL? = nil, changeColumn: Int? = nil,
         editColumn: Int? = nil,
+        addingToColumn: Int? = nil,
         scrollOffset: Int = 0,
         columnScrollMaxOffsets: [Int: Int] = [:], status: Status? = nil
     ) {
@@ -32,6 +34,7 @@ struct Model {
         self.fileURL = fileURL
         self.changeColumn = changeColumn
         self.editColumn = editColumn
+        self.addingToColumn = addingToColumn
         self.scrollOffset = scrollOffset
         self.columnScrollMaxOffsets = columnScrollMaxOffsets
         self.status = status
@@ -42,8 +45,9 @@ struct Model {
         var undoSheets = self.undoSheets
         let sheet = undoSheets.removeLast()
         return Model(
-            sheet: sheet, undoSheets: undoSheets, fileURL: fileURL, changeColumn: changeColumn,
-            editColumn: editColumn,
+            sheet: sheet, undoSheets: undoSheets, fileURL: fileURL,
+            changeColumn: nil, editColumn: nil,
+            addingToColumn: nil,
             scrollOffset: scrollOffset,
             columnScrollMaxOffsets: columnScrollMaxOffsets,
             status: status)
@@ -52,7 +56,7 @@ struct Model {
     func replace(sheet: Sheet) -> Model {
         Model(
             sheet: sheet, undoSheets: undoSheets + [self.sheet], fileURL: fileURL,
-            changeColumn: changeColumn, editColumn: editColumn, scrollOffset: scrollOffset,
+            changeColumn: nil, editColumn: nil, addingToColumn: nil, scrollOffset: scrollOffset,
             columnScrollMaxOffsets: columnScrollMaxOffsets,
             status: status)
     }
@@ -60,7 +64,7 @@ struct Model {
     func replace(scrollOffset: Int) -> Model {
         Model(
             sheet: sheet, undoSheets: undoSheets, fileURL: fileURL, changeColumn: changeColumn,
-            editColumn: editColumn,
+            editColumn: editColumn, addingToColumn: addingToColumn,
             scrollOffset: scrollOffset,
             columnScrollMaxOffsets: columnScrollMaxOffsets,
             status: status)
@@ -69,7 +73,7 @@ struct Model {
     func replace(changeColumn: Int?) -> Model {
         Model(
             sheet: sheet, undoSheets: undoSheets, fileURL: fileURL, changeColumn: changeColumn,
-            editColumn: nil,
+            editColumn: nil, addingToColumn: nil,
             scrollOffset: scrollOffset,
             columnScrollMaxOffsets: columnScrollMaxOffsets,
             status: status)
@@ -78,7 +82,16 @@ struct Model {
     func replace(editColumn: Int?) -> Model {
         Model(
             sheet: sheet, undoSheets: undoSheets, fileURL: fileURL, changeColumn: nil,
-            editColumn: editColumn,
+            editColumn: editColumn, addingToColumn: nil,
+            scrollOffset: scrollOffset,
+            columnScrollMaxOffsets: columnScrollMaxOffsets,
+            status: status)
+    }
+
+    func replace(addingToColumn: Int?) -> Model {
+        Model(
+            sheet: sheet, undoSheets: undoSheets, fileURL: fileURL, changeColumn: nil,
+            editColumn: nil, addingToColumn: addingToColumn,
             scrollOffset: scrollOffset,
             columnScrollMaxOffsets: columnScrollMaxOffsets,
             status: status)
@@ -86,10 +99,10 @@ struct Model {
 
     func replace(column: Int, scrollViewport: LocalViewport) -> Model {
         var columnScrollMaxOffsets = self.columnScrollMaxOffsets
-        columnScrollMaxOffsets[column] = scrollViewport.size.height - scrollViewport.mask.height
+        columnScrollMaxOffsets[column] = scrollViewport.size.height - scrollViewport.visible.height
         return Model(
             sheet: sheet, undoSheets: undoSheets, fileURL: fileURL, changeColumn: changeColumn,
-            editColumn: editColumn,
+            editColumn: editColumn, addingToColumn: addingToColumn,
             scrollOffset: scrollOffset,
             columnScrollMaxOffsets: columnScrollMaxOffsets,
             status: status)
@@ -98,7 +111,7 @@ struct Model {
     func replace(status: Status?) -> Model {
         Model(
             sheet: sheet, undoSheets: undoSheets, fileURL: fileURL, changeColumn: changeColumn,
-            editColumn: editColumn,
+            editColumn: editColumn, addingToColumn: addingToColumn,
             scrollOffset: scrollOffset,
             columnScrollMaxOffsets: columnScrollMaxOffsets,
             status: status)
@@ -107,7 +120,7 @@ struct Model {
     func replace(status: String) -> Model {
         Model(
             sheet: sheet, undoSheets: undoSheets, fileURL: fileURL, changeColumn: changeColumn,
-            editColumn: editColumn,
+            editColumn: editColumn, addingToColumn: addingToColumn,
             scrollOffset: scrollOffset,
             columnScrollMaxOffsets: columnScrollMaxOffsets,
             status: (msg: status, timeout: Date().timeIntervalSince1970 + STATUS_TIMEOUT))

@@ -385,28 +385,23 @@
       "title" : "Spells",
       "controls" : [
         {
-          "type" : "slots",
-          "title" : "Spell Slots",
-          "slots" : [
-            {
-              "title" : "1",
-              "current" : 4,
-              "max" : 4,
-              "shouldResetOnLongRest" : true
-            },
-            {
-              "title" : "2",
-              "current" : 3,
-              "max" : 3,
-              "shouldResetOnLongRest" : true
-            },
-            {
-              "title" : "3",
-              "current" : 0,
-              "max" : 0,
-              "shouldResetOnLongRest" : true
-            }
-          ]
+          "type" : "spellSlots",
+          "spellSlots" : {
+            "title" : "Spell Slots",
+            "slots" : [
+              {
+                "title" : "1",
+                "current" : 4,
+                "max" : 4
+              },
+              {
+                "title" : "2",
+                "current" : 3,
+                "max" : 3
+              }
+            ],
+            "shouldResetOnLongRest" : true
+          }
         },
         {
           "type" : "action",

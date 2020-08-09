@@ -8,7 +8,8 @@ import Foundation
 enum Message {
     case sheet(Sheet.Message)
     case changeColumn(Int)
-    case editColumn(Int)
+    case editColumn(Int?)
+    case addControl(Int?)
     case replaceColumn(at: Int, with: Int)
     case scroll(Int)
     case setScrollSize(Int, LocalViewport)
@@ -38,6 +39,8 @@ func showStatus(model: Model, status: String?) -> State<Model, Message> {
 
 func update(model: inout Model, message: Message) -> State<Model, Message> {
     switch message {
+    case .sheet(.column(_, .stopEditing)):
+        return .model(model.replace(editColumn: nil))
     case let .sheet(message):
         return .model(model.replace(sheet: model.sheet.update(message)))
     case let .changeColumn(index):
@@ -50,6 +53,8 @@ func update(model: inout Model, message: Message) -> State<Model, Message> {
             return .model(model.replace(editColumn: nil))
         }
         return .model(model.replace(editColumn: index))
+    case let .addControl(index):
+        return .model(model.replace(addingToColumn: index))
     case let .setScrollSize(index, scrollViewport):
         return .model(model.replace(column: index, scrollViewport: scrollViewport))
     case let .replaceColumn(oldIndex, columnIndex):
@@ -119,12 +124,12 @@ func update(model: inout Model, message: Message) -> State<Model, Message> {
     }
 }
 
-func render(model: Model, size: Size) -> [View<Message>] {
+func render(model: Model) -> [View<Message>] {
     _render(model, status: model.status.map { $0.0 })
 }
 
 private func _render(_ model: Model, status: String?) -> [View<Message>] {
-    [
+    ([
         OnKeyPress(key: .up, Message.scroll(-1)),
         OnKeyPress(key: .down, Message.scroll(1)),
         OnKeyPress(key: .pageUp, Message.scroll(-25)),
@@ -134,7 +139,7 @@ private func _render(_ model: Model, status: String?) -> [View<Message>] {
         OnKeyPress(key: .ctrl(.s), Message.saveJSON),
         OnKeyPress(key: .ctrl(.o), Message.reloadJSON),
         OnKeyPress(key: .ctrl(.z), Message.undo),
-        OnMouseWheel(Space(), Message.scroll),
+        model.addingToColumn == nil ? OnMouseWheel(Space(), Message.scroll) : nil,
         Flow(
             .down,
             [
@@ -150,21 +155,21 @@ private func _render(_ model: Model, status: String?) -> [View<Message>] {
                             let columnView = column.render(
                                 model.sheet, isEditing: model.editColumn == position)
                             return ZStack(
-                                renderColumnEditor(model, position) + [
-                                        Scroll(
-                                            columnView.map {
-                                                Message.sheet(Sheet.Message.column(index, $0))
-                                            }.fitInContainer(.width),
-                                            onResizeContent: { scrollViewport in
-                                                Message.setScrollSize(index, scrollViewport)
-                                            },
-                                            .offset(y: model.scrollOffset)
-                                        ).border(
-                                            .single, .title(column.title.bold()),
-                                            .alignment(.topLeft)
-                                        )
+                                [
+                                    Scroll(
+                                        columnView.map {
+                                            Message.sheet(Sheet.Message.column(index, $0))
+                                        }.fitInContainer(.width),
+                                        onResizeContent: { scrollViewport in
+                                            Message.setScrollSize(index, scrollViewport)
+                                        },
+                                        .offset(y: model.scrollOffset)
+                                    ).border(
+                                        .single, .title(column.title.bold()),
+                                        .alignment(.topLeft)
+                                    )
 
-                                ]
+                                ] + renderColumnEditor(model, position)
                             )
                         }
                     )
@@ -174,7 +179,20 @@ private func _render(_ model: Model, status: String?) -> [View<Message>] {
                     MainButtons(model: model, status: status)
                 ),
             ]),
-    ]
+        model.addingToColumn != nil ? renderControlEditor() : nil,
+    ] as [View<Message>?]).compactMap { $0 }
+}
+
+func renderControlEditor() -> View<Message> {
+    ZStack([
+        IgnoreMouse(),
+        OnLeftClick(
+            Space().modifyCharacters { pt, size, c in
+                return AttributedCharacter(
+                    character: AttributedCharacter.null.character, attributes: []
+                ).styled(.foreground(.black)).styled(.background(.none))
+            }, Message.addControl(nil), .highlight(false)),
+    ])
 }
 
 func renderColumnEditor(_ model: Model, _ position: Int) -> [View<Message>] {
@@ -182,9 +200,6 @@ func renderColumnEditor(_ model: Model, _ position: Int) -> [View<Message>] {
     let current = model.sheet.selectedColumns[position]
     if model.changeColumn == position {
         return [
-            OnLeftClick(Text("[x]").reversed(), Message.changeColumn(position)).compact().padding(
-                right: 1
-            ).aligned(.topRight),
             Box(
                 Stack(
                     .down,
@@ -195,24 +210,28 @@ func renderColumnEditor(_ model: Model, _ position: Int) -> [View<Message>] {
                     }
                 )
             ).background(view: Text(" ")).aligned(.topRight),
+            OnLeftClick(Text("[x]").reversed(), Message.changeColumn(position)).compact().padding(
+                right: 1
+            ).aligned(.topRight),
         ]
     } else {
         let isEditing = model.editColumn == position
+        let isAdding = model.addingToColumn == position
         return [
             Stack(
                 .rtl,
                 [
                     OnLeftClick(
                         Text("[…]"), Message.changeColumn(position)
-                    ).compact().padding(
-                        right: 1
-                    ).aligned(.topRight),
+                    ).padding(right: 1).compact(),
                     OnLeftClick(
                         Text("[Edit]".styled(isEditing ? .reverse : .none)),
                         Message.editColumn(position)
-                    ).compact().padding(
-                        right: 1
-                    ).aligned(.topRight),
+                    ).padding(right: 1).compact(),
+                    OnLeftClick(
+                        Text("[Add]".styled(isAdding ? .reverse : .none)),
+                        Message.addControl(position)
+                    ).padding(right: 1).compact(),
                 ])
 
         ]

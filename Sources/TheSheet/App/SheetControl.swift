@@ -25,7 +25,7 @@ enum SheetControl {
         case removeControl
     }
 
-    case slots(String, [Slot])
+    case spellSlots(SpellSlots)
     case pointsTracker(Points)
     case stats(String, [Stat])
     case attributes([Attribute])
@@ -33,6 +33,25 @@ enum SheetControl {
     case action(Action)
     case inventory(Inventory)
     case restButtons
+
+    static var allControls: [(String, SheetControl)] = [
+        (
+            "Spell Slots",
+            .spellSlots(SpellSlots(title: "Spell Slots", slots: [], shouldResetOnLongRest: true))
+        ),
+        (
+            "Points Tracker (Hit Points, Ki, …)",
+            .pointsTracker(
+                Points(
+                    title: "", current: 0, max: nil, type: .many([]), shouldResetOnLongRest: false))
+        ),
+        ("Attributes (Strength, Charisma, …)", .attributes([])),
+        ("Skills (Acrobatics, Stealth, …)", .skills([])),
+        ("Stats (Armor, Attack, …)", .stats("", [])),
+        ("Action (Weapon, Spell)", .action(Action(title: ""))),
+        ("Inventory", .inventory(Inventory(title: "", quantity: nil))),
+        ("Take a Short or Long Rest", .restButtons),
+    ]
 
     func take(rest: Rest) -> (SheetControl, Sheet.Mod?) {
         var control: SheetControl = self
@@ -50,15 +69,14 @@ enum SheetControl {
                         })
                 }
             )
-        case let (.slots(title, slots), .long):
-            control = .slots(
-                title,
-                slots.map { slot in
-                    guard slot.shouldResetOnLongRest else { return slot }
-                    return Slot(
-                        title: slot.title, current: slot.max, max: slot.max,
-                        shouldResetOnLongRest: true)
-                })
+        case let (.spellSlots(spellSlots), .long):
+            guard spellSlots.shouldResetOnLongRest else { break }
+            control = .spellSlots(
+                spellSlots.replace(
+                    slots: spellSlots.slots.map { slot in
+                        return SpellSlot(
+                            title: slot.title, current: slot.max, max: slot.max)
+                    }))
         case let (.pointsTracker(points), .long):
             if points.shouldResetOnLongRest, let pointsMax = points.max {
                 control = .pointsTracker(points.replace(current: pointsMax))
@@ -74,7 +92,7 @@ enum SheetControl {
     }
 
     func burnSlot(slotIndex: Int) -> Sheet.Mod? {
-        let newPoints = Slot.points(forLevel: slotIndex + 1)
+        let newPoints = SpellSlot.points(forLevel: slotIndex + 1)
         return { sheet in
             var canBurn = false
             let newSheet = sheet.replace(
@@ -84,18 +102,18 @@ enum SheetControl {
                             if case let .pointsTracker(points) = control, points.isSorceryPoints {
                                 return .pointsTracker(
                                     points.replace(current: points.current + newPoints))
-                            } else if case let .slots(title, slots) = control,
-                                title == "Spell Slots"
-                            {
-                                return .slots(
-                                    title,
-                                    slots.enumerated().map { updateSlotIndex, slot in
-                                        guard updateSlotIndex == slotIndex, slot.current > 0 else {
-                                            return slot
-                                        }
-                                        canBurn = true
-                                        return slot.replace(current: slot.current - 1)
-                                    })
+                            } else if case let .spellSlots(spellSlots) = control {
+                                return .spellSlots(
+                                    spellSlots.replace(
+                                        slots: spellSlots.slots.enumerated().map {
+                                            updateSlotIndex, slot in
+                                            guard updateSlotIndex == slotIndex, slot.current > 0
+                                            else {
+                                                return slot
+                                            }
+                                            canBurn = true
+                                            return slot.replace(current: slot.current - 1)
+                                        }))
                             } else {
                                 return control
                             }
@@ -106,7 +124,7 @@ enum SheetControl {
     }
 
     func buySlot(slotIndex: Int) -> Sheet.Mod? {
-        guard let cost = Slot.cost(ofLevel: slotIndex + 1) else { return nil }
+        guard let cost = SpellSlot.cost(ofLevel: slotIndex + 1) else { return nil }
         return { sheet in
             var canBuy = false
             let newSheet = sheet.replace(
@@ -119,15 +137,14 @@ enum SheetControl {
                                 canBuy = true
                                 return .pointsTracker(
                                     points.replace(current: points.current - cost))
-                            } else if case let .slots(title, slots) = control,
-                                title == "Spell Slots"
-                            {
-                                return .slots(
-                                    title,
-                                    slots.enumerated().map { updateSlotIndex, slot in
-                                        guard updateSlotIndex == slotIndex else { return slot }
-                                        return slot.replace(current: slot.current + 1)
-                                    })
+                            } else if case let .spellSlots(spellSlots) = control {
+                                return .spellSlots(
+                                    spellSlots.replace(
+                                        slots: spellSlots.slots.enumerated().map {
+                                            updateSlotIndex, slot in
+                                            guard updateSlotIndex == slotIndex else { return slot }
+                                            return slot.replace(current: slot.current + 1)
+                                        }))
                             } else {
                                 return control
                             }
@@ -143,22 +160,29 @@ enum SheetControl {
         switch (self, message) {
         case let (.restButtons, .takeRest(type)):
             return take(rest: type)
-        case let (.slots(title, slots), .updateSlotCurrent(updateSlotIndex, newCurrent)):
-            control = .slots(
-                title,
-                slots.enumerated().map { slotIndex, slot in
-                    guard slotIndex == updateSlotIndex, newCurrent != slot.current else {
-                        return slot
-                    }
-                    return slot.replace(current: newCurrent)
-                })
-        case let (.slots(title, slots), .updateSlotMax(updateSlotIndex, newMax)):
-            control = .slots(
-                title,
-                slots.enumerated().map { slotIndex, slot in
+        case let (.spellSlots(spellSlots), .updateSlotCurrent(updateSlotIndex, newCurrent)):
+            control = .spellSlots(
+                spellSlots.replace(
+                    slots: spellSlots.slots.enumerated().map { slotIndex, slot in
+                        guard slotIndex == updateSlotIndex, newCurrent != slot.current else {
+                            return slot
+                        }
+                        return slot.replace(current: newCurrent)
+                    }))
+        case let (.spellSlots(spellSlots), .updateSlotMax(updateSlotIndex, newMax)):
+            let modifiedSpellSlots: [SpellSlot]
+            if newMax > 0, updateSlotIndex == spellSlots.slots.count,
+                let last = spellSlots.slots.last, last.max > 0, let lastLevel = Int(last.title),
+                lastLevel < 9
+            {
+                modifiedSpellSlots =
+                    spellSlots.slots + [SpellSlot(title: "\(lastLevel + 1)", current: 1, max: 1)]
+            } else {
+                modifiedSpellSlots = spellSlots.slots.enumerated().map { slotIndex, slot in
                     guard slotIndex == updateSlotIndex, newMax >= 0, newMax != slot.max else {
                         return slot
                     }
+
                     let newCurrent: Int
                     if newMax > slot.max, slot.current == slot.max {
                         newCurrent = slot.current + 1
@@ -168,10 +192,13 @@ enum SheetControl {
                         newCurrent = slot.current
                     }
                     return slot.replace(max: newMax).replace(current: newCurrent)
-                })
-        case let (.slots, .burnSlot(slotIndex)):
+                }
+            }
+
+            control = .spellSlots(spellSlots.replace(slots: modifiedSpellSlots))
+        case let (.spellSlots, .burnSlot(slotIndex)):
             return (control, burnSlot(slotIndex: slotIndex))
-        case let (.slots, .buySlot(slotIndex)):
+        case let (.spellSlots, .buySlot(slotIndex)):
             return (control, buySlot(slotIndex: slotIndex))
         case let (.pointsTracker(points), .updatePoints(current, max)):
             control = .pointsTracker(points.replace(current: current).replace(max: max))
@@ -205,7 +232,7 @@ enum SheetControl {
         switch self {
         case .restButtons:
             return TakeRestView(Message.takeRest(.short), Message.takeRest(.long))
-        case let .slots(title, slots):
+        case let .spellSlots(spellSlots):
             let sorceryPoints = sheet.columns.reduce(0) { memo, column in
                 column.controls.reduce(memo) { memo, control in
                     guard case let .pointsTracker(points) = control, points.isSorceryPoints else {
@@ -214,8 +241,18 @@ enum SheetControl {
                     return points.current
                 }
             }
-            return SlotsView(
-                title: title, slots: slots, sorceryPoints: sorceryPoints,
+            let modifiedSpellSlots: [SpellSlot]
+            if let last = spellSlots.slots.last, last.max > 0, last.max < 9,
+                let lastLevel = Int(last.title)
+            {
+                modifiedSpellSlots =
+                    spellSlots.slots + [SpellSlot(title: "\(lastLevel + 1)", current: 0, max: 0)]
+            } else {
+                modifiedSpellSlots = spellSlots.slots
+            }
+            return SpellSlotsView(
+                title: spellSlots.title, spellSlots: modifiedSpellSlots,
+                sorceryPoints: sorceryPoints,
                 onToggle: Message.updateSlotCurrent,
                 onChangeMax: Message.updateSlotMax,
                 onBurn: Message.burnSlot,
@@ -252,7 +289,7 @@ extension SheetControl: Codable {
     enum CodingKeys: String, CodingKey {
         case type
         case title
-        case slots
+        case spellSlots
         case points
         case stats
         case attributes
@@ -267,10 +304,9 @@ extension SheetControl: Codable {
         switch type {
         case "restButtons":
             self = .restButtons
-        case "slots":
-            let title = try values.decode(String.self, forKey: .title)
-            let slots = try values.decode([Slot].self, forKey: .slots)
-            self = .slots(title, slots)
+        case "spellSlots":
+            let spellSlots = try values.decode(SpellSlots.self, forKey: .spellSlots)
+            self = .spellSlots(spellSlots)
         case "pointsTracker":
             let points = try values.decode(Points.self, forKey: .points)
             self = .pointsTracker(points)
@@ -300,10 +336,9 @@ extension SheetControl: Codable {
         switch self {
         case .restButtons:
             try container.encode("restButtons", forKey: .type)
-        case let .slots(title, slots):
-            try container.encode("slots", forKey: .type)
-            try container.encode(title, forKey: .title)
-            try container.encode(slots, forKey: .slots)
+        case let .spellSlots(spellSlots):
+            try container.encode("spellSlots", forKey: .type)
+            try container.encode(spellSlots, forKey: .spellSlots)
         case let .pointsTracker(points):
             try container.encode("pointsTracker", forKey: .type)
             try container.encode(points, forKey: .points)

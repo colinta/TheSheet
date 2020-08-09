@@ -74,13 +74,14 @@ func createSheet() -> Sheet {
             SheetColumn(
                 title: "Spells",
                 controls: [
-                    .slots(
-                        "Spell Slots",
-                        [
-                            Slot(title: "1", current: 4, max: 4, shouldResetOnLongRest: true),
-                            Slot(title: "2", current: 3, max: 3, shouldResetOnLongRest: true),
-                            Slot(title: "3", current: 1, max: 1, shouldResetOnLongRest: true),
-                        ]),
+                    .spellSlots(
+                        SpellSlots(
+                            title: "Spell Slots",
+                            slots: [
+                                SpellSlot(title: "1", current: 4, max: 4),
+                                SpellSlot(title: "2", current: 3, max: 3),
+                                SpellSlot(title: "3", current: 1, max: 1),
+                            ], shouldResetOnLongRest: true)),
                     .action(
                         Action(
                             title: "Chill Touch",
