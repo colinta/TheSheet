@@ -8,9 +8,10 @@ import Foundation
 enum Message {
     case sheet(Sheet.Message)
     case changeColumn(Int)
+    case editColumn(Int)
     case replaceColumn(at: Int, with: Int)
     case scroll(Int)
-    case setScrollSize(Int, Size, Rect)
+    case setScrollSize(Int, LocalViewport)
     case undo
     case reloadJSON
     case statusDidTimeout
@@ -40,12 +41,17 @@ func update(model: inout Model, message: Message) -> State<Model, Message> {
     case let .sheet(message):
         return .model(model.replace(sheet: model.sheet.update(message)))
     case let .changeColumn(index):
-        if model.changeColumn == index {
+        guard model.changeColumn != index else {
             return .model(model.replace(changeColumn: nil))
         }
         return .model(model.replace(changeColumn: index))
-    case let .setScrollSize(index, size, mask):
-        return .model(model.replace(column: index, scrollSize: size, mask: mask))
+    case let .editColumn(index):
+        guard model.editColumn != index else {
+            return .model(model.replace(editColumn: nil))
+        }
+        return .model(model.replace(editColumn: index))
+    case let .setScrollSize(index, scrollViewport):
+        return .model(model.replace(column: index, scrollViewport: scrollViewport))
     case let .replaceColumn(oldIndex, columnIndex):
         guard columnIndex >= 0, columnIndex < model.sheet.columns.count else { return .noChange }
 
@@ -128,6 +134,7 @@ private func _render(_ model: Model, status: String?) -> [View<Message>] {
         OnKeyPress(key: .ctrl(.s), Message.saveJSON),
         OnKeyPress(key: .ctrl(.o), Message.reloadJSON),
         OnKeyPress(key: .ctrl(.z), Message.undo),
+        OnMouseWheel(Space(), Message.scroll),
         Flow(
             .down,
             [
@@ -140,20 +147,22 @@ private func _render(_ model: Model, status: String?) -> [View<Message>] {
                                 return nil
                             }
                             let column = model.sheet.columns[index]
-                            let columnView = column.render(model.sheet)
+                            let columnView = column.render(
+                                model.sheet, isEditing: model.editColumn == position)
                             return ZStack(
                                 renderColumnEditor(model, position) + [
-                                    Scroll(
-                                        columnView.map {
-                                            Message.sheet(Sheet.Message.column(index, $0))
-                                        }.fitInParent(.width),
-                                        onResizeContent: { size, mask in
-                                            Message.setScrollSize(index, size, mask)
-                                        },
-                                        .offset(y: model.scrollOffset)
-                                    ).border(
-                                        .single, .title(column.title.bold()), .alignment(.topLeft)
-                                    )
+                                        Scroll(
+                                            columnView.map {
+                                                Message.sheet(Sheet.Message.column(index, $0))
+                                            }.fitInContainer(.width),
+                                            onResizeContent: { scrollViewport in
+                                                Message.setScrollSize(index, scrollViewport)
+                                            },
+                                            .offset(y: model.scrollOffset)
+                                        ).border(
+                                            .single, .title(column.title.bold()),
+                                            .alignment(.topLeft)
+                                        )
 
                                 ]
                             )
@@ -188,10 +197,24 @@ func renderColumnEditor(_ model: Model, _ position: Int) -> [View<Message>] {
             ).background(view: Text(" ")).aligned(.topRight),
         ]
     } else {
+        let isEditing = model.editColumn == position
         return [
-            OnLeftClick(Text("[…]"), Message.changeColumn(position)).compact().padding(
-                right: 1
-            ).aligned(.topRight)
+            Stack(
+                .rtl,
+                [
+                    OnLeftClick(
+                        Text("[…]"), Message.changeColumn(position)
+                    ).compact().padding(
+                        right: 1
+                    ).aligned(.topRight),
+                    OnLeftClick(
+                        Text("[Edit]".styled(isEditing ? .reverse : .none)),
+                        Message.editColumn(position)
+                    ).compact().padding(
+                        right: 1
+                    ).aligned(.topRight),
+                ])
+
         ]
     }
 }

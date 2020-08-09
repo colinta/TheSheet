@@ -45,16 +45,61 @@ struct SheetColumn: Codable {
         }
     }
 
-    func render(_ sheet: Sheet) -> View<SheetColumn.Message> {
+    func render(_ sheet: Sheet, isEditing: Bool) -> View<SheetColumn.Message> {
         Stack(
             .down,
-            controls.enumerated().flatMap { index, control in
-                [
-                    control.render(sheet).map { SheetColumn.Message.control(index, $0) }
-                        .matchParent(.width),
+            controls.enumerated().flatMap { index, control -> [View<SheetColumn.Message>] in
+                let controlView = control.render(sheet).map {
+                    SheetColumn.Message.control(index, $0)
+                }
+                .matchContainer(.width)
+                let editableControlView: View<SheetColumn.Message>
+                if isEditing {
+                    editableControlView = ZStack([
+                        editingControls(index: index),
+                        controlView,
+                    ])
+                } else {
+                    editableControlView = controlView
+                }
+
+                return [
+                    editableControlView,
                     Repeating(Text("─".foreground(.black))).height(1),
                 ]
             }
         )
+    }
+
+    private func editingControls(index: Int) -> View<SheetColumn.Message> {
+        Flow(
+            .ltr,
+            [
+                (
+                    .fixed,
+                    Text("  ↑  ".background(.cyan)).aligned(.middleRight).background(
+                        view: Text(" ".background(.cyan)))
+                ),
+                (.fixed, ClaimMouse(Repeating(Text(" "))).width(1)),
+                (
+                    .fixed,
+                    Text("  ↓  ".background(.cyan)).aligned(.middleRight).background(
+                        view: Text(" ".background(.cyan)))
+                ),
+                (.flex1, ClaimMouse(Space())),
+                (
+                    .fixed,
+                    Text(" Edit ".background(.blue)).aligned(.middleRight).background(
+                        view: Text(" ".background(.blue)))
+                ),
+                (.fixed, ClaimMouse(Repeating(Text(" "))).width(1)),
+                (
+                    .fixed,
+                    OnLeftClick(
+                        Text("  X  ".background(.red)).aligned(.middleRight).background(
+                            view: Text(" ".background(.red))),
+                        Message.control(index, .removeControl))
+                ),
+            ])
     }
 }

@@ -6,7 +6,7 @@ import Ashen
 
 func SlotsView<Msg>(
     title: Attributed, slots: [Slot], sorceryPoints: Int,
-    onToggle: @escaping ((level: Int, current: Int)) -> Msg,
+    onToggle: @escaping ((slotIndex: Int, current: Int)) -> Msg,
     onChangeMax: @escaping (Int, Int) -> Msg,
     onBurn: @escaping (Int) -> Msg, onBuy: @escaping (Int) -> Msg
 ) -> View<Msg> {
@@ -23,12 +23,13 @@ func SlotsView<Msg>(
             .fixed,
             Stack(
                 .down,
-                slots.enumerated().map { level, slot in
+                slots.enumerated().map { slotIndex, slot in
                     if max(slot.max, slot.current) > column {
                         return SlotCell(
                             isUsed: slot.current <= column,
                             { delta in
-                                return onToggle((level: level, current: slot.current + delta))
+                                return onToggle(
+                                    (slotIndex: slotIndex, current: slot.current + delta))
                             })
                     } else {
                         return Space().height(1)
@@ -38,23 +39,23 @@ func SlotsView<Msg>(
     }
     let labels: View<Msg> = Stack(
         .down,
-        slots.enumerated().map { level, slot in
-            let burnPoints = Slot.points(forLevel: level)
-            let buyPoints = Slot.cost(ofLevel: level)
+        slots.enumerated().map { slotIndex, slot in
+            let burnPoints = Slot.points(forLevel: slotIndex + 1)
+            let buyPoints = Slot.cost(ofLevel: slotIndex + 1)
             let canBurn = slot.current > 0
             let canBuy = buyPoints.map { sorceryPoints >= $0 } ?? false
             let increaseMax = OnLeftClick(
-                Text("[+]".foreground(.green)), onChangeMax(level, slot.max + 1))
+                Text("[+]".foreground(.green)), onChangeMax(slotIndex, slot.max + 1))
             let decreaseMax =
                 slot.max > 0
-                ? OnLeftClick(Text("[-]".foreground(.red)), onChangeMax(level, slot.max - 1))
+                ? OnLeftClick(Text("[-]".foreground(.red)), onChangeMax(slotIndex, slot.max - 1))
                 : Text("[-]".foreground(.black))
             return Stack(
                 .ltr,
                 [
-                    BuyCell(canBuy, buyPoints, onBuy(level)),
+                    BuyCell(canBuy, buyPoints, onBuy(slotIndex)),
                     Space().width(1),
-                    BurnCell(canBurn, burnPoints, onBurn(level)),
+                    BurnCell(canBurn, burnPoints, onBurn(slotIndex)),
                     Space().width(1),
                     decreaseMax, increaseMax,
                 ]

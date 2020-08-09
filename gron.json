@@ -106,7 +106,6 @@
           "action" : {
             "isExpanded" : true,
             "title" : "Quarterstaff",
-            "description" : "Versatile",
             "subactions" : [
               {
                 "check" : {
@@ -814,6 +813,6 @@
   "selectedColumns" : [
     0,
     2,
-    3
+    1
   ]
 }

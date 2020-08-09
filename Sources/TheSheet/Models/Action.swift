@@ -88,7 +88,7 @@ extension Action: Codable {
         title = try values.decode(String.self, forKey: .title)
         level = try? values.decode(String?.self, forKey: .level)
         subactions = try values.decode([Sub].self, forKey: .subactions)
-        description = try values.decode(String?.self, forKey: .description)
+        description = try? values.decode(String.self, forKey: .description)
         isExpanded = try values.decode(Bool.self, forKey: .isExpanded)
         self.uses = try? values.decode(Int.self, forKey: .uses)
         self.remainingUses = try? values.decode(Int.self, forKey: .remainingUses)

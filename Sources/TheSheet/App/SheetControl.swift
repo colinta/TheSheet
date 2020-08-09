@@ -11,10 +11,10 @@ enum SheetControl {
     }
 
     enum Message {
-        case updateSlotCurrent(level: Int, current: Int)
-        case updateSlotMax(level: Int, max: Int)
-        case burnSlot(level: Int)
-        case buySlot(level: Int)
+        case updateSlotCurrent(slotIndex: Int, current: Int)
+        case updateSlotMax(slotIndex: Int, max: Int)
+        case burnSlot(slotIndex: Int)
+        case buySlot(slotIndex: Int)
         case updatePoints(current: Int, max: Int?)
         case collapseAction
         case expandAction
@@ -73,8 +73,8 @@ enum SheetControl {
         return (control, nil)
     }
 
-    func burnSlot(level: Int) -> Sheet.Mod? {
-        let newPoints = Slot.points(forLevel: level)
+    func burnSlot(slotIndex: Int) -> Sheet.Mod? {
+        let newPoints = Slot.points(forLevel: slotIndex + 1)
         return { sheet in
             var canBurn = false
             let newSheet = sheet.replace(
@@ -89,8 +89,8 @@ enum SheetControl {
                             {
                                 return .slots(
                                     title,
-                                    slots.enumerated().map { updateLevel, slot in
-                                        guard updateLevel == level, slot.current > 0 else {
+                                    slots.enumerated().map { updateSlotIndex, slot in
+                                        guard updateSlotIndex == slotIndex, slot.current > 0 else {
                                             return slot
                                         }
                                         canBurn = true
@@ -105,8 +105,8 @@ enum SheetControl {
         }
     }
 
-    func buySlot(level: Int) -> Sheet.Mod? {
-        guard let cost = Slot.cost(ofLevel: level) else { return nil }
+    func buySlot(slotIndex: Int) -> Sheet.Mod? {
+        guard let cost = Slot.cost(ofLevel: slotIndex + 1) else { return nil }
         return { sheet in
             var canBuy = false
             let newSheet = sheet.replace(
@@ -124,8 +124,8 @@ enum SheetControl {
                             {
                                 return .slots(
                                     title,
-                                    slots.enumerated().map { updateLevel, slot in
-                                        guard updateLevel == level else { return slot }
+                                    slots.enumerated().map { updateSlotIndex, slot in
+                                        guard updateSlotIndex == slotIndex else { return slot }
                                         return slot.replace(current: slot.current + 1)
                                     })
                             } else {
@@ -143,18 +143,22 @@ enum SheetControl {
         switch (self, message) {
         case let (.restButtons, .takeRest(type)):
             return take(rest: type)
-        case let (.slots(title, slots), .updateSlotCurrent(updateLevel, newCurrent)):
+        case let (.slots(title, slots), .updateSlotCurrent(updateSlotIndex, newCurrent)):
             control = .slots(
                 title,
-                slots.enumerated().map { level, slot in
-                    guard level == updateLevel, newCurrent != slot.current else { return slot }
+                slots.enumerated().map { slotIndex, slot in
+                    guard slotIndex == updateSlotIndex, newCurrent != slot.current else {
+                        return slot
+                    }
                     return slot.replace(current: newCurrent)
                 })
-        case let (.slots(title, slots), .updateSlotMax(updateLevel, newMax)):
+        case let (.slots(title, slots), .updateSlotMax(updateSlotIndex, newMax)):
             control = .slots(
                 title,
-                slots.enumerated().map { level, slot in
-                    guard level == updateLevel, newMax >= 0, newMax != slot.max else { return slot }
+                slots.enumerated().map { slotIndex, slot in
+                    guard slotIndex == updateSlotIndex, newMax >= 0, newMax != slot.max else {
+                        return slot
+                    }
                     let newCurrent: Int
                     if newMax > slot.max, slot.current == slot.max {
                         newCurrent = slot.current + 1
@@ -165,10 +169,10 @@ enum SheetControl {
                     }
                     return slot.replace(max: newMax).replace(current: newCurrent)
                 })
-        case let (.slots, .burnSlot(level)):
-            return (control, burnSlot(level: level))
-        case let (.slots, .buySlot(level)):
-            return (control, buySlot(level: level))
+        case let (.slots, .burnSlot(slotIndex)):
+            return (control, burnSlot(slotIndex: slotIndex))
+        case let (.slots, .buySlot(slotIndex)):
+            return (control, buySlot(slotIndex: slotIndex))
         case let (.pointsTracker(points), .updatePoints(current, max)):
             control = .pointsTracker(points.replace(current: current).replace(max: max))
         case let (.action(action), .collapseAction):

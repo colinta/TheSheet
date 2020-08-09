@@ -14,6 +14,7 @@ struct Model {
     let undoSheets: [Sheet]
     let fileURL: URL?
     let changeColumn: Int?
+    let editColumn: Int?
     let scrollOffset: Int
     let columnScrollMaxOffsets: [Int: Int]
     let status: Status?
@@ -22,6 +23,7 @@ struct Model {
 
     init(
         sheet: Sheet, undoSheets: [Sheet] = [], fileURL: URL? = nil, changeColumn: Int? = nil,
+        editColumn: Int? = nil,
         scrollOffset: Int = 0,
         columnScrollMaxOffsets: [Int: Int] = [:], status: Status? = nil
     ) {
@@ -29,6 +31,7 @@ struct Model {
         self.undoSheets = undoSheets
         self.fileURL = fileURL
         self.changeColumn = changeColumn
+        self.editColumn = editColumn
         self.scrollOffset = scrollOffset
         self.columnScrollMaxOffsets = columnScrollMaxOffsets
         self.status = status
@@ -40,6 +43,7 @@ struct Model {
         let sheet = undoSheets.removeLast()
         return Model(
             sheet: sheet, undoSheets: undoSheets, fileURL: fileURL, changeColumn: changeColumn,
+            editColumn: editColumn,
             scrollOffset: scrollOffset,
             columnScrollMaxOffsets: columnScrollMaxOffsets,
             status: status)
@@ -48,7 +52,7 @@ struct Model {
     func replace(sheet: Sheet) -> Model {
         Model(
             sheet: sheet, undoSheets: undoSheets + [self.sheet], fileURL: fileURL,
-            changeColumn: changeColumn, scrollOffset: scrollOffset,
+            changeColumn: changeColumn, editColumn: editColumn, scrollOffset: scrollOffset,
             columnScrollMaxOffsets: columnScrollMaxOffsets,
             status: status)
     }
@@ -56,6 +60,7 @@ struct Model {
     func replace(scrollOffset: Int) -> Model {
         Model(
             sheet: sheet, undoSheets: undoSheets, fileURL: fileURL, changeColumn: changeColumn,
+            editColumn: editColumn,
             scrollOffset: scrollOffset,
             columnScrollMaxOffsets: columnScrollMaxOffsets,
             status: status)
@@ -64,16 +69,27 @@ struct Model {
     func replace(changeColumn: Int?) -> Model {
         Model(
             sheet: sheet, undoSheets: undoSheets, fileURL: fileURL, changeColumn: changeColumn,
+            editColumn: nil,
             scrollOffset: scrollOffset,
             columnScrollMaxOffsets: columnScrollMaxOffsets,
             status: status)
     }
 
-    func replace(column: Int, scrollSize: Size, mask: Rect) -> Model {
+    func replace(editColumn: Int?) -> Model {
+        Model(
+            sheet: sheet, undoSheets: undoSheets, fileURL: fileURL, changeColumn: nil,
+            editColumn: editColumn,
+            scrollOffset: scrollOffset,
+            columnScrollMaxOffsets: columnScrollMaxOffsets,
+            status: status)
+    }
+
+    func replace(column: Int, scrollViewport: LocalViewport) -> Model {
         var columnScrollMaxOffsets = self.columnScrollMaxOffsets
-        columnScrollMaxOffsets[column] = scrollSize.height - mask.height
+        columnScrollMaxOffsets[column] = scrollViewport.size.height - scrollViewport.mask.height
         return Model(
             sheet: sheet, undoSheets: undoSheets, fileURL: fileURL, changeColumn: changeColumn,
+            editColumn: editColumn,
             scrollOffset: scrollOffset,
             columnScrollMaxOffsets: columnScrollMaxOffsets,
             status: status)
@@ -82,6 +98,7 @@ struct Model {
     func replace(status: Status?) -> Model {
         Model(
             sheet: sheet, undoSheets: undoSheets, fileURL: fileURL, changeColumn: changeColumn,
+            editColumn: editColumn,
             scrollOffset: scrollOffset,
             columnScrollMaxOffsets: columnScrollMaxOffsets,
             status: status)
@@ -90,6 +107,7 @@ struct Model {
     func replace(status: String) -> Model {
         Model(
             sheet: sheet, undoSheets: undoSheets, fileURL: fileURL, changeColumn: changeColumn,
+            editColumn: editColumn,
             scrollOffset: scrollOffset,
             columnScrollMaxOffsets: columnScrollMaxOffsets,
             status: (msg: status, timeout: Date().timeIntervalSince1970 + STATUS_TIMEOUT))

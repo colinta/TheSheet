@@ -21,20 +21,20 @@ struct Slot: Codable {
     }
 
     static func points(forLevel level: Int) -> Int {
-        return level + 1
+        return level
     }
 
     static func cost(ofLevel level: Int) -> Int? {
         switch level {
-        case 0:
-            return 2
         case 1:
-            return 3
+            return 2
         case 2:
-            return 5
+            return 3
         case 3:
-            return 6
+            return 5
         case 4:
+            return 6
+        case 5:
             return 7
         default:
             return nil

@@ -22,7 +22,7 @@ func ActionView<Msg>(
                         Text("↑↑↑").bold().aligned(.topRight), onExpand()),
                     Text(action.title.bold()).centered().underlined(),
                     action.level.map { Text($0) } ?? Space()
-                ).matchParent(.width)
+                ).matchContainer(.width)
             ] + expandedViews)
     } else {
         view = Stack(
@@ -33,7 +33,7 @@ func ActionView<Msg>(
                         Text("↓↓↓").bold().aligned(.topRight), onExpand()),
                     Text(action.title.bold()).centered().underlined(),
                     action.level.map { Text($0) } ?? Space()
-                ).matchParent(.width)
+                ).matchContainer(.width)
             ])
     }
     return view.border(.single)
@@ -114,8 +114,9 @@ func _ActionViewType<Msg>(_ type: String) -> View<Msg> {
 func _ActionViewDescription<Msg>(_ description: String, _ onChange: @escaping () -> Msg) -> View<
     Msg
 > {
-    Input(description, onChange: { _ in onChange() }, .isMultiline(true), .wrap(true)).fitInParent(
-        .width)
+    Input(description, onChange: { _ in onChange() }, .isMultiline(true), .wrap(true))
+        .fitInContainer(
+            .width)
 }
 func _ActionViewUses<Msg>(
     uses: Int?, remainingUses: Int, _ onChange: @escaping (Int) -> Msg,
