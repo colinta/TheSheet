@@ -489,7 +489,7 @@
             "isExpanded" : true,
             "title" : "Shape Water",
             "level" : "Cantrip",
-            "description" : "Range: 30' | Duration: 1 hour\nYou instantaneously move or otherwise change the flow of the water as you direct, up to 5 feet in any direction. This movement doesn’t have enough force to cause damage.\nYou cause the water to form into simple shapes and animate at your direction.\nYou change the water’s color or opacity.\nYou can freeze the water for the duration, provided that there are no creatures in it.",
+            "description" : "Range: 30' | Duration: 1 hour\nYou can manipulate up to a 5' cube of water in range:\n- You can instantaneously move or change the flow of the water as you direct, up to 5 feet in any direction.\n- You cause the water to form into simple shapes and animate at your direction (1hr).\n- You change the water’s color or opacity (1hr).\n- You can freeze the water provided there are no creatures in it (1hr).",
             "subactions" : [
 
             ],
