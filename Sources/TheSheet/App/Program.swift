@@ -197,8 +197,33 @@ func renderControlEditor() -> View<Message> {
 
 func renderColumnEditor(_ model: Model, _ position: Int) -> [View<Message>] {
     guard model.sheet.columns.count > model.sheet.selectedColumns.count else { return [] }
+
     let current = model.sheet.selectedColumns[position]
-    if model.changeColumn == position {
+    let isChanging = model.changeColumn == position
+    let isEditing = model.editColumn == position
+    let isAdding = model.addingToColumn == position
+
+    let changeButton = OnLeftClick(
+        Text("[…]".styled(isEditing ? .reverse : .none)), Message.changeColumn(position)
+    ).padding(right: 1).compact()
+    let editButton = OnLeftClick(
+        Text("[Edit]".styled(isEditing ? .reverse : .none)),
+        Message.editColumn(position)
+    ).padding(right: 1).compact()
+    let addButton = OnLeftClick(
+        Text("[Add]".styled(isAdding ? .reverse : .none)),
+        Message.addControl(position)
+    ).padding(right: 1).compact()
+
+    let buttons = Stack(
+        .rtl,
+        [
+            changeButton,
+            editButton,
+            addButton,
+        ]
+    )
+    if isChanging {
         return [
             Box(
                 Stack(
@@ -210,29 +235,11 @@ func renderColumnEditor(_ model: Model, _ position: Int) -> [View<Message>] {
                     }
                 )
             ).background(view: Text(" ")).aligned(.topRight),
-            OnLeftClick(Text("[x]").reversed(), Message.changeColumn(position)).compact().padding(
-                right: 1
-            ).aligned(.topRight),
+            buttons,
         ]
     } else {
-        let isEditing = model.editColumn == position
-        let isAdding = model.addingToColumn == position
         return [
-            Stack(
-                .rtl,
-                [
-                    OnLeftClick(
-                        Text("[…]"), Message.changeColumn(position)
-                    ).padding(right: 1).compact(),
-                    OnLeftClick(
-                        Text("[Edit]".styled(isEditing ? .reverse : .none)),
-                        Message.editColumn(position)
-                    ).padding(right: 1).compact(),
-                    OnLeftClick(
-                        Text("[Add]".styled(isAdding ? .reverse : .none)),
-                        Message.addControl(position)
-                    ).padding(right: 1).compact(),
-                ])
+            buttons
 
         ]
     }
