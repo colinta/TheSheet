@@ -152,25 +152,7 @@ private func _render(_ model: Model, status: String?) -> [View<Message>] {
                                 return nil
                             }
                             let column = model.sheet.columns[index]
-                            let columnView = column.render(
-                                model.sheet, isEditing: model.editColumn == position)
-                            return ZStack(
-                                [
-                                    Scroll(
-                                        columnView.map {
-                                            Message.sheet(Sheet.Message.column(index, $0))
-                                        }.fitInContainer(.width),
-                                        onResizeContent: { scrollViewport in
-                                            Message.setScrollSize(index, scrollViewport)
-                                        },
-                                        .offset(y: model.scrollOffset)
-                                    ).border(
-                                        .single, .title(column.title.bold()),
-                                        .alignment(.topLeft)
-                                    )
-
-                                ] + renderColumnEditor(model, position)
-                            )
+                            return renderColumn(model, column, position: position, index: index)
                         }
                     )
                 ),
@@ -181,6 +163,28 @@ private func _render(_ model: Model, status: String?) -> [View<Message>] {
             ]),
         model.addingToColumn != nil ? renderControlEditor() : nil,
     ] as [View<Message>?]).compactMap { $0 }
+}
+
+func renderColumn(_ model: Model, _ column: SheetColumn, position: Int, index: Int) -> View<Message> {
+    let columnView = column.render(
+        model.sheet, isEditing: model.editColumn == position)
+    return ZStack(
+        [
+            Scroll(
+                columnView.map {
+                    Message.sheet(Sheet.Message.column(index, $0))
+                }.fitInContainer(.width),
+                onResizeContent: { scrollViewport in
+                    Message.setScrollSize(index, scrollViewport)
+                },
+                .offset(y: model.scrollOffset)
+            ).border(
+                .single, .title(column.title.bold()),
+                .alignment(.topLeft)
+            )
+
+        ] + renderColumnEditor(model, position)
+    )
 }
 
 func renderControlEditor() -> View<Message> {
