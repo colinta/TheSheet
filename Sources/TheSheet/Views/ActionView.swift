@@ -79,7 +79,7 @@ func _ActionViewStats<Msg>(
     }
 
     if let description = action.description, !description.attributedCharacters.isEmpty {
-        let actionDescription: View<Msg> = _ActionViewDescription(description, onResetUses)
+        let actionDescription: View<Msg> = _ActionViewDescription(description)
         actionViews.append(actionDescription)
     }
 
@@ -111,10 +111,10 @@ func _ActionViewDamage<Msg>(_ damage: [Roll]) -> View<Msg> {
 func _ActionViewType<Msg>(_ type: String) -> View<Msg> {
     StatView(Stat(title: "Type", value: .string(type)))
 }
-func _ActionViewDescription<Msg>(_ description: String, _ onChange: @escaping () -> Msg) -> View<
+func _ActionViewDescription<Msg>(_ description: String) -> View<
     Msg
 > {
-    Input(description, onChange: { _ in onChange() }, .isMultiline(true), .wrap(true))
+    Text(description, .wrap(true))
         .fitInContainer(
             .width)
 }
