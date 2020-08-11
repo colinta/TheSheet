@@ -11,7 +11,7 @@ enum Roll {
         case let .dice(dice):
             return dice.toReadableRoll
         case let .formula(formula):
-            return sheet.eval(formula).toReadable
+            return Formula.eval(sheet, formula).toReadable
         }
     }
 }

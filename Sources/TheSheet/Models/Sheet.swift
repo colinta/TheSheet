@@ -11,15 +11,28 @@ struct Sheet {
 
     typealias Mod = (Sheet) -> Sheet
 
-    let selectedColumns: [Int]
+    let columnsOrder: [Int]
+    let visibleColumns: Int
     let columns: [SheetColumn]
     let formulas: Formula.Lookup
     private var formulaMemo: [String: Formula.Value] = [:]
 
-    init(selectedColumns: [Int], columns: [SheetColumn]) {
-        self.selectedColumns = selectedColumns
+    init(columnsOrder: [Int], visibleColumns: Int, columns: [SheetColumn]) {
+        self.columnsOrder = Sheet.fixColumns(columnsOrder, count: columns.count)
+        self.visibleColumns = visibleColumns
         self.columns = columns
         self.formulas = Sheet.formulas(columns)
+    }
+
+    static private func fixColumns(_ columnsOrder: [Int], count: Int) -> [Int] {
+        var missingColumns: [Int] = Array(0..<count)
+        let fixedColumns = columnsOrder.reduce([Int]()) { memo, index in
+            guard !memo.contains(index) else { return memo }
+            missingColumns = missingColumns.filter { $0 != index }
+            return memo + [index]
+        }
+
+        return fixedColumns + missingColumns
     }
 
     static private func formulas(_ columns: [SheetColumn]) -> Formula.Lookup {
@@ -28,44 +41,16 @@ struct Sheet {
         }
     }
 
-    func eval(_ formula: Formula, _ dontRecur: [String] = []) -> Formula.Value {
-        switch formula {
-        case let .integer(i):
-            return .integer(i)
-        case let .bool(i):
-            return .bool(i)
-        case let .string(str):
-            return .string(str)
-        case let .modifier(formula):
-            let result = eval(formula, dontRecur)
-            switch result {
-            case let .integer(i):
-                return .modifier(i)
-            default:
-                return result
-            }
-        case let .variable(name):
-            guard !dontRecur.contains(name),
-                let formula = formulas[name]
-            else {
-                return .undefined
-            }
-            return eval(formula, dontRecur + [name])
-        case let .add(formulas):
-            return Formula.reduce(formulas, self, +)
-        case let .max(formulas):
-            return Formula.reduce(formulas, self, Swift.max)
-        case let .min(formulas):
-            return Formula.reduce(formulas, self, Swift.min)
-        }
+    func replace(columnsOrder: [Int]) -> Sheet {
+        Sheet(columnsOrder: columnsOrder, visibleColumns: visibleColumns, columns: columns)
     }
 
-    func replace(selectedColumns: [Int]) -> Sheet {
-        Sheet(selectedColumns: selectedColumns, columns: columns)
+    func replace(visibleColumns: Int) -> Sheet {
+        Sheet(columnsOrder: columnsOrder, visibleColumns: visibleColumns, columns: columns)
     }
 
     func replace(columns: [SheetColumn]) -> Sheet {
-        Sheet(selectedColumns: selectedColumns, columns: columns)
+        Sheet(columnsOrder: columnsOrder, visibleColumns: visibleColumns, columns: columns)
     }
 
     static func mapControls(_ map: @escaping (SheetControl) -> SheetControl) -> (Sheet) -> Sheet {
@@ -100,20 +85,27 @@ struct Sheet {
 
 extension Sheet: Codable {
     enum CodingKeys: String, CodingKey {
-        case selectedColumns
+        case columnsOrder
+        case visibleColumns
         case columns
     }
 
     init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
-        selectedColumns = try values.decode([Int].self, forKey: .selectedColumns)
-        columns = try values.decode([SheetColumn].self, forKey: .columns)
+        let savedOrder = try values.decode([Int].self, forKey: .columnsOrder)
+        let columns = try values.decode([SheetColumn].self, forKey: .columns)
+        let fixedColumns = Sheet.fixColumns(savedOrder, count: columns.count)
+
+        columnsOrder = fixedColumns
+        self.columns = columns
+        visibleColumns = try values.decode(Int.self, forKey: .visibleColumns)
         formulas = Sheet.formulas(columns)
     }
 
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(selectedColumns, forKey: .selectedColumns)
+        try container.encode(columnsOrder, forKey: .columnsOrder)
+        try container.encode(visibleColumns, forKey: .visibleColumns)
         try container.encode(columns, forKey: .columns)
     }
 }

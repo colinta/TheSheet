@@ -11,8 +11,7 @@ struct Skill: Codable {
         ResolvedSkill(
             skill: self,
             modifierString:
-                sheet
-                .eval(.modifier(.variable(basedOn + ".Mod")))
+                Formula.eval(sheet, .modifier(.variable(basedOn + ".Mod")))
                 .toReadable)
     }
 }

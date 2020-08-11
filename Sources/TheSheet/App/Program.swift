@@ -63,7 +63,7 @@ func update(model: inout Model, message: Message) -> State<Model, Message> {
         return .model(
             model.replace(
                 sheet: model.sheet.replace(
-                    selectedColumns: model.sheet.selectedColumns.enumerated().map {
+                    columnsOrder: model.sheet.columnsOrder.enumerated().map {
                         position, index in
                         if position == oldIndex {
                             return columnIndex
@@ -158,7 +158,7 @@ private func _render(_ model: Model, status: String?) -> [View<Message>] {
                 (
                     .flex1,
                     Columns(
-                        model.sheet.selectedColumns.enumerated().compactMap { position, index in
+                        model.sheet.columnsOrder[model.firstVisibleColumn..<(model.sheet.visibleColumns + model.firstVisibleColumn)].enumerated().compactMap { position, index in
                             guard index >= 0 && index < model.sheet.columns.count else {
                                 return nil
                             }
@@ -213,9 +213,9 @@ func renderControlEditor() -> View<Message> {
 }
 
 func renderColumnEditor(_ model: Model, _ position: Int) -> [View<Message>] {
-    guard model.sheet.columns.count > model.sheet.selectedColumns.count else { return [] }
+    guard model.sheet.columns.count > model.sheet.visibleColumns else { return [] }
 
-    let current = model.sheet.selectedColumns[position]
+    let current = model.sheet.columnsOrder[position]
     let isChanging = model.changeColumn == position
     let isEditing = model.editColumn == position
     let isAdding = model.addingToColumn == position

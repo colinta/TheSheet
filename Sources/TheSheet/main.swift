@@ -20,11 +20,12 @@ private func main() throws {
             ), update, render))
 }
 
-try! main()
+try main()
 
 func createSheet() -> Sheet {
     Sheet(
-        selectedColumns: [0, 1, 2, 3],
+        columnsOrder: [0, 1, 2],
+        visibleColumns: 3,
         columns: [
             SheetColumn(
                 title: "Actions",

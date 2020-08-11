@@ -849,7 +849,7 @@
           "ability" : {
             "title" : "Languages",
             "isExpanded" : true,
-            "description" : "Common\nDraconic\nSylvan\nGiant"
+            "description" : "• Common\n• Draconic\n• Sylvan\n• Giant"
           }
         },
         {
@@ -870,11 +870,33 @@
           "formulas" : [
             {
               "proficiencyBonus" : {
-                "type" : "modifier",
-                "value" : {
-                  "type" : "integer",
-                  "value" : 2
-                }
+                "type" : "add",
+                "value" : [
+                  {
+                    "type" : "ceil",
+                    "value" : {
+                      "type" : "divide",
+                      "lhs" : {
+                        "type" : "variable",
+                        "value" : "level"
+                      },
+                      "rhs" : {
+                        "type" : "integer",
+                        "value" : 4
+                      }
+                    }
+                  },
+                  {
+                    "type" : "integer",
+                    "value" : 1
+                  }
+                ]
+              }
+            },
+            {
+              "level" : {
+                "type" : "integer",
+                "value" : 3
               }
             },
             {
@@ -948,10 +970,13 @@
       ]
     }
   ],
-  "selectedColumns" : [
+  "columnsOrder" : [
     0,
     2,
     3,
-    4
-  ]
+    4,
+    5,
+    1
+  ],
+  "visibleColumns" : 4
 }
