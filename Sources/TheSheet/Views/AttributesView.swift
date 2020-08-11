@@ -70,7 +70,7 @@ func AttributeView<Msg>(_ attribute: Attribute, onChange: @escaping (Int) -> Msg
                             Stack(
                                 .down,
                                 [
-                                    Text(attribute.save(proficiency: 2).toModString).centered()
+                                    Text(attribute.save(proficiencyBonus: 2).toModString).centered()
                                         .underlined(),
                                     Text("Save"),
                                 ]),

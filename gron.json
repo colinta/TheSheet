@@ -4,66 +4,42 @@
       "title" : "Actions",
       "controls" : [
         {
-          "type" : "pointsTracker",
-          "points" : {
-            "title" : "Sorcery Points",
-            "current" : 4,
-            "max" : 4,
-            "type" : {
-              "type" : "sorcery"
-            },
-            "shouldResetOnLongRest" : true
-          }
-        },
-        {
-          "type" : "pointsTracker",
-          "points" : {
-            "title" : "Ki Points",
-            "current" : 4,
-            "max" : 4,
-            "type" : {
-              "type" : "ki"
-            },
-            "shouldResetOnLongRest" : true
-          }
-        },
-        {
           "type" : "stats",
           "title" : "Attack Stats",
           "stats" : [
             {
               "title" : "A.C.",
               "value" : {
-                "type" : "const",
-                "value" : 15
+                "type" : "variable",
+                "value" : "armorClass"
               }
             },
             {
               "title" : "Prof.",
               "value" : {
-                "type" : "modifier",
-                "value" : 2
+                "type" : "variable",
+                "value" : "proficiencyBonus"
               }
             },
             {
               "title" : "Str",
               "value" : {
-                "type" : "modifier",
-                "value" : 1
+                "type" : "variable",
+                "value" : "STR.Mod"
               }
             },
             {
               "title" : "Dex",
               "value" : {
-                "type" : "modifier",
-                "value" : 2
+                "type" : "variable",
+                "value" : "DEX.Mod"
               }
             },
             {
               "title" : "Spell",
               "value" : {
-                "type" : "modifier",
-                "value" : 5
+                "type" : "variable",
+                "value" : "spellAttack"
               }
             }
           ]
@@ -71,14 +47,23 @@
         {
           "type" : "action",
           "action" : {
-            "isExpanded" : true,
+            "shouldResetOnLongRest" : false,
             "title" : "Dagger",
             "description" : "Finesse, Light, Thrown (range 20\/60)",
             "subactions" : [
               {
                 "check" : {
-                  "type" : "modifier",
-                  "value" : 3
+                  "type" : "add",
+                  "value" : [
+                    {
+                      "type" : "variable",
+                      "value" : "attackBonus"
+                    },
+                    {
+                      "type" : "variable",
+                      "value" : "proficiencyBonus"
+                    }
+                  ]
                 },
                 "type" : "Piercing",
                 "damage" : [
@@ -91,26 +76,35 @@
                   {
                     "type" : "formula",
                     "value" : {
-                      "type" : "modifier",
+                      "type" : "integer",
                       "value" : 1
                     }
                   }
                 ]
               }
             ],
-            "shouldResetOnLongRest" : false
+            "isExpanded" : true
           }
         },
         {
           "type" : "action",
           "action" : {
-            "isExpanded" : true,
+            "shouldResetOnLongRest" : false,
             "title" : "Quarterstaff",
             "subactions" : [
               {
                 "check" : {
-                  "type" : "modifier",
-                  "value" : 3
+                  "type" : "add",
+                  "value" : [
+                    {
+                      "type" : "variable",
+                      "value" : "attackBonus"
+                    },
+                    {
+                      "type" : "variable",
+                      "value" : "proficiencyBonus"
+                    }
+                  ]
                 },
                 "damage" : [
                   {
@@ -122,7 +116,7 @@
                   {
                     "type" : "formula",
                     "value" : {
-                      "type" : "modifier",
+                      "type" : "integer",
                       "value" : 1
                     }
                   }
@@ -132,8 +126,17 @@
               },
               {
                 "check" : {
-                  "type" : "modifier",
-                  "value" : 3
+                  "type" : "add",
+                  "value" : [
+                    {
+                      "type" : "variable",
+                      "value" : "attackBonus"
+                    },
+                    {
+                      "type" : "variable",
+                      "value" : "proficiencyBonus"
+                    }
+                  ]
                 },
                 "damage" : [
                   {
@@ -145,7 +148,7 @@
                   {
                     "type" : "formula",
                     "value" : {
-                      "type" : "modifier",
+                      "type" : "integer",
                       "value" : 1
                     }
                   }
@@ -154,7 +157,7 @@
                 "type" : "Bludgeoning"
               }
             ],
-            "shouldResetOnLongRest" : false
+            "isExpanded" : true
           }
         },
         {
@@ -176,8 +179,8 @@
                 ]
               }
             ],
-            "description" : "Range: 15' cone\nAffected creatures roll Constitution save\nDC = 8 + Constitution Mod. + Proficiency Bonus",
             "shouldResetOnLongRest" : true,
+            "description" : "Range: 15' cone\nAffected creatures roll Constitution save\nDC = 8 + Constitution Mod. + Proficiency Bonus",
             "remainingUses" : 1
           }
         },
@@ -190,22 +193,23 @@
             "subactions" : [
 
             ],
-            "description" : "Try to cast a wizard cantrip, make Arcana check. Once per long rest.",
             "shouldResetOnLongRest" : true,
+            "description" : "Try to cast a wizard cantrip, make Arcana check. Once per long rest.",
             "remainingUses" : 1
           }
         },
         {
           "type" : "action",
           "action" : {
-            "remainingUses" : 7,
             "isExpanded" : true,
+            "maxUses" : 7,
             "title" : "Wand of Pyrotechnics",
-            "description" : "You can use an action to expend 1 of its charges and create a harmless burst of multicolored light at a point you can see up to 60 feet away. The burst of light is accompanied by a crackling noise that can be heard up to 300 feet away.\nThe wand regains 1d6 + 1 expended charges daily at dawn (max: 7).\nIf you expend the wand's last charge, roll a d20. On a 1, the wand erupts in a harmless pyrotechnic display and is destroyed.",
             "subactions" : [
 
             ],
-            "shouldResetOnLongRest" : false
+            "shouldResetOnLongRest" : false,
+            "description" : "You can use an action to expend 1 of its charges and create a harmless burst of multicolored light at a point you can see up to 60 feet away. The burst of light is accompanied by a crackling noise that can be heard up to 300 feet away.\nThe wand regains 1d6 + 1 expended charges daily at dawn (max: 7).\nIf you expend the wand's last charge, roll a d20. On a 1, the wand erupts in a harmless pyrotechnic display and is destroyed.",
+            "remainingUses" : 7
           }
         }
       ]
@@ -406,7 +410,7 @@
         {
           "type" : "action",
           "action" : {
-            "isExpanded" : true,
+            "shouldResetOnLongRest" : false,
             "title" : "Chill Touch",
             "level" : "Cantrip",
             "description" : "Range: 120'\nOn a hit, target can't regain hit points. Hit undead: they have disadvantage on attack rolls. Hand clings to target.",
@@ -414,7 +418,10 @@
               {
                 "check" : {
                   "type" : "modifier",
-                  "value" : 5
+                  "value" : {
+                    "type" : "integer",
+                    "value" : 5
+                  }
                 },
                 "type" : "Necrotic",
                 "damage" : [
@@ -427,13 +434,13 @@
                 ]
               }
             ],
-            "shouldResetOnLongRest" : false
+            "isExpanded" : true
           }
         },
         {
           "type" : "action",
           "action" : {
-            "isExpanded" : true,
+            "shouldResetOnLongRest" : false,
             "title" : "Frostbite",
             "level" : "Cantrip",
             "description" : "Range: 60'\nOn failed CON save, takes 1d6 cold damage and disadvantage on next weapon attack",
@@ -441,7 +448,10 @@
               {
                 "check" : {
                   "type" : "modifier",
-                  "value" : 5
+                  "value" : {
+                    "type" : "integer",
+                    "value" : 5
+                  }
                 },
                 "type" : "Cold",
                 "damage" : [
@@ -454,52 +464,52 @@
                 ]
               }
             ],
-            "shouldResetOnLongRest" : false
+            "isExpanded" : true
           }
         },
         {
           "type" : "action",
           "action" : {
-            "isExpanded" : true,
+            "shouldResetOnLongRest" : false,
             "title" : "Mage Hand",
             "level" : "Cantrip",
             "description" : "Range: 30' | Duration: 1 minute\nYou can use the hand to manipulate an object, open an unlocked door or container, stow or retrieve an item from an open container, or pour the contents out of a vial. You can move the hand up to 30 feet each time you use it.",
             "subactions" : [
 
             ],
-            "shouldResetOnLongRest" : false
+            "isExpanded" : true
           }
         },
         {
           "type" : "action",
           "action" : {
-            "isExpanded" : true,
+            "shouldResetOnLongRest" : false,
             "title" : "Minor Illusion",
             "level" : "Cantrip",
             "description" : "Range: 30' | Duration: 1 minute\nYou create a sound or an image of an object within range that lasts for the duration, or until dismissed as an action. Volume of sound from whisper to scream, can be a voice, one repeating or many sounds. Image must fit in 5' cube. Image cannot create light, sound, touch, or smell. Successful INT (Investigation) check against spell save DC can reveal the illusion.",
             "subactions" : [
 
             ],
-            "shouldResetOnLongRest" : false
+            "isExpanded" : true
           }
         },
         {
           "type" : "action",
           "action" : {
-            "isExpanded" : true,
+            "shouldResetOnLongRest" : false,
             "title" : "Shape Water",
             "level" : "Cantrip",
             "description" : "Range: 30' | Duration: 1 hour\nYou can manipulate up to a 5' cube of water in range:\n- You can instantaneously move or change the flow of the water as you direct, up to 5 feet in any direction.\n- You cause the water to form into simple shapes and animate at your direction (1hr).\n- You change the water’s color or opacity (1hr).\n- You can freeze the water provided there are no creatures in it (1hr).",
             "subactions" : [
 
             ],
-            "shouldResetOnLongRest" : false
+            "isExpanded" : true
           }
         },
         {
           "type" : "action",
           "action" : {
-            "isExpanded" : true,
+            "shouldResetOnLongRest" : false,
             "title" : "Magic Missile",
             "level" : "1",
             "description" : "Range: 120'\nYou create darts of magical force, each dart deals the rolled force damage to a creature that you can see in range.\nUsing higher level spell slots, one more dart for each level >1.",
@@ -507,7 +517,10 @@
               {
                 "check" : {
                   "type" : "modifier",
-                  "value" : 5
+                  "value" : {
+                    "type" : "integer",
+                    "value" : 5
+                  }
                 },
                 "type" : "Force",
                 "damage" : [
@@ -520,20 +533,20 @@
                   {
                     "type" : "formula",
                     "value" : {
-                      "type" : "modifier",
+                      "type" : "integer",
                       "value" : 1
                     }
                   }
                 ]
               }
             ],
-            "shouldResetOnLongRest" : false
+            "isExpanded" : true
           }
         },
         {
           "type" : "action",
           "action" : {
-            "isExpanded" : true,
+            "shouldResetOnLongRest" : false,
             "title" : "Ice Spear",
             "level" : "2",
             "description" : "Range: 120'\nYou create three spears of ice and hurl them at targets within range. You can hurl them at one target or several.\nMake a ranged spell attack for each spear. On a hit, the target takes 2d6 cold damage.\nUsing higher level spell slots, one more spear for each level >2.",
@@ -541,7 +554,10 @@
               {
                 "check" : {
                   "type" : "modifier",
-                  "value" : 5
+                  "value" : {
+                    "type" : "integer",
+                    "value" : 5
+                  }
                 },
                 "type" : "Cold",
                 "damage" : [
@@ -554,46 +570,46 @@
                 ]
               }
             ],
-            "shouldResetOnLongRest" : false
+            "isExpanded" : true
           }
         },
         {
           "type" : "action",
           "action" : {
-            "isExpanded" : true,
+            "shouldResetOnLongRest" : false,
             "title" : "Invisibility",
             "level" : "2",
             "description" : "Range: Touch | Duration: Concentration, 1 hour\nA creature you touch becomes invisible until the spell ends. Anything the target is wearing or carrying is invisible as long as it is on the target’s person. The spell ends for a target that attacks or casts a spell.\nUsing higher level spell slots, you can target one additional creature for each level >2.",
             "subactions" : [
 
             ],
-            "shouldResetOnLongRest" : false
+            "isExpanded" : true
           }
         },
         {
           "type" : "action",
           "action" : {
-            "isExpanded" : true,
+            "shouldResetOnLongRest" : false,
             "title" : "Mirror Image",
             "level" : "2",
             "description" : "Three illusory duplicates appear in your space. Each time a creature targets you, roll a d20.\n",
             "subactions" : [
 
             ],
-            "shouldResetOnLongRest" : false
+            "isExpanded" : true
           }
         },
         {
           "type" : "action",
           "action" : {
-            "isExpanded" : true,
+            "shouldResetOnLongRest" : false,
             "title" : "Misty Step",
             "level" : "2",
             "description" : "Briefly surrounded by silvery mist, you teleport up to 30 feet to an unoccupied space that you can see.",
             "subactions" : [
 
             ],
-            "shouldResetOnLongRest" : false
+            "isExpanded" : true
           }
         }
       ]
@@ -602,7 +618,45 @@
       "title" : "Stats",
       "controls" : [
         {
-          "type" : "restButtons"
+          "type" : "attributes",
+          "attributes" : [
+            {
+              "isProficient" : false,
+              "title" : "Strength",
+              "variableName" : "STR",
+              "score" : 12
+            },
+            {
+              "isProficient" : false,
+              "title" : "Dexterity",
+              "variableName" : "DEX",
+              "score" : 14
+            },
+            {
+              "isProficient" : true,
+              "title" : "Constitution",
+              "variableName" : "CON",
+              "score" : 14
+            },
+            {
+              "isProficient" : false,
+              "title" : "Intelligence",
+              "variableName" : "INT",
+              "score" : 8
+            },
+            {
+              "isProficient" : false,
+              "title" : "Wisdom",
+              "variableName" : "WIS",
+              "score" : 13
+            },
+            {
+              "isProficient" : true,
+              "title" : "Charisma",
+              "variableName" : "CHA",
+              "score" : 16
+            }
+          ]
         },
         {
           "type" : "pointsTracker",
@@ -619,6 +673,30 @@
         {
           "type" : "pointsTracker",
           "points" : {
+            "title" : "Sorcery Points",
+            "current" : 4,
+            "max" : 4,
+            "type" : {
+              "type" : "sorcery"
+            },
+            "shouldResetOnLongRest" : true
+          }
+        },
+        {
+          "type" : "pointsTracker",
+          "points" : {
+            "title" : "Ki Points",
+            "current" : 4,
+            "max" : 4,
+            "type" : {
+              "type" : "ki"
+            },
+            "shouldResetOnLongRest" : true
+          }
+        },
+        {
+          "type" : "pointsTracker",
+          "points" : {
             "title" : "Inspiration",
             "current" : 1,
             "type" : {
@@ -626,47 +704,6 @@
             },
             "shouldResetOnLongRest" : false
           }
-        },
-        {
-          "type" : "attributes",
-          "attributes" : [
-            {
-              "abbreviation" : "STR",
-              "isProficient" : false,
-              "title" : "Strength",
-              "score" : 12
-            },
-            {
-              "abbreviation" : "DEX",
-              "isProficient" : false,
-              "title" : "Dexterity",
-              "score" : 14
-            },
-            {
-              "abbreviation" : "CON",
-              "isProficient" : true,
-              "title" : "Constitution",
-              "score" : 14
-            },
-            {
-              "abbreviation" : "INT",
-              "isProficient" : false,
-              "title" : "Intelligence",
-              "score" : 8
-            },
-            {
-              "abbreviation" : "WIS",
-              "isProficient" : false,
-              "title" : "Wisdom",
-              "score" : 13
-            },
-            {
-              "abbreviation" : "CHA",
-              "isProficient" : true,
-              "title" : "Charisma",
-              "score" : 16
-            }
-          ]
         },
         {
           "type" : "skills",
@@ -762,52 +799,159 @@
               "isProficient" : false
             }
           ]
+        }
+      ]
+    },
+    {
+      "title" : "Abilities",
+      "controls" : [
+        {
+          "type" : "restButtons"
         },
         {
-          "type" : "action",
-          "action" : {
-            "isExpanded" : true,
-            "title" : "Draconic Bloodline",
-            "description" : "Double Proficiency Bonus to Charisma when talking with Dragons",
-            "subactions" : [
-
-            ],
-            "shouldResetOnLongRest" : false
+          "type" : "ability",
+          "ability" : {
+            "title" : "Quickened Spell",
+            "uses" : {
+              "type" : {
+                "type" : "sorcery"
+              },
+              "amount" : 2
+            },
+            "description" : "When you Cast a Spell that has a Casting Time of 1 action, you can spend 2 sorcery points to change the Casting Time to 1 Bonus Action for this casting.",
+            "isExpanded" : true
           }
         },
         {
-          "type" : "action",
-          "action" : {
-            "isExpanded" : true,
+          "type" : "ability",
+          "ability" : {
+            "title" : "Subtle Spell",
+            "uses" : {
+              "type" : {
+                "type" : "sorcery"
+              },
+              "amount" : 1
+            },
+            "description" : "When you Cast a Spell, you can spend 1 sorcery point to cast it without any somatic or verbal Components.",
+            "isExpanded" : true
+          }
+        },
+        {
+          "type" : "ability",
+          "ability" : {
             "title" : "Researcher",
-            "description" : "When you attempt to learn or recall lore, you usually know where the information can be found.",
-            "subactions" : [
-
-            ],
-            "shouldResetOnLongRest" : false
+            "isExpanded" : true,
+            "description" : "When you attempt to learn or recall lore, you usually know where the information can be found."
           }
         },
         {
-          "type" : "action",
-          "action" : {
-            "isExpanded" : true,
+          "type" : "ability",
+          "ability" : {
             "title" : "Languages",
-            "description" : "Common\nDraconic\nSylvan\nGiant",
-            "subactions" : [
-
-            ],
-            "shouldResetOnLongRest" : false
+            "isExpanded" : true,
+            "description" : "Common\nDraconic\nSylvan\nGiant"
           }
+        },
+        {
+          "type" : "ability",
+          "ability" : {
+            "title" : "Draconic Bloodline",
+            "isExpanded" : true,
+            "description" : "Double Proficiency Bonus to Charisma when talking with Dragons"
+          }
+        }
+      ]
+    },
+    {
+      "title" : "Formulas",
+      "controls" : [
+        {
+          "type" : "formulas",
+          "formulas" : [
+            {
+              "proficiencyBonus" : {
+                "type" : "modifier",
+                "value" : {
+                  "type" : "integer",
+                  "value" : 2
+                }
+              }
+            },
+            {
+              "attackBonus" : {
+                "type" : "variable",
+                "value" : "STR.Mod"
+              }
+            },
+            {
+              "defaultArmor" : {
+                "type" : "add",
+                "value" : [
+                  {
+                    "type" : "integer",
+                    "value" : 10
+                  },
+                  {
+                    "type" : "variable",
+                    "value" : "DEX.Mod"
+                  }
+                ]
+              }
+            },
+            {
+              "draconicArmor" : {
+                "type" : "add",
+                "value" : [
+                  {
+                    "type" : "integer",
+                    "value" : 13
+                  },
+                  {
+                    "type" : "variable",
+                    "value" : "DEX.Mod"
+                  }
+                ]
+              }
+            },
+            {
+              "armorClass" : {
+                "type" : "max",
+                "value" : [
+                  {
+                    "type" : "variable",
+                    "value" : "defaultArmor"
+                  },
+                  {
+                    "type" : "variable",
+                    "value" : "draconicArmor"
+                  }
+                ]
+              }
+            },
+            {
+              "spellAttack" : {
+                "type" : "add",
+                "value" : [
+                  {
+                    "type" : "variable",
+                    "value" : "CHA.Mod"
+                  },
+                  {
+                    "type" : "variable",
+                    "value" : "proficiencyBonus"
+                  }
+                ]
+              }
+            }
+          ]
         }
       ]
     }
   ],
-  "formulas" : {
-
-  },
   "selectedColumns" : [
     0,
     2,
-    1
+    3,
+    4
   ]
 }

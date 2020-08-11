@@ -8,24 +8,18 @@ struct Skill: Codable {
     let isProficient: Bool
 
     func resolve(_ sheet: Sheet) -> ResolvedSkill {
-        var modifierString = ""
-        for column in sheet.columns {
-            for control in column.controls {
-                guard case let .attributes(attributes) = control else { continue }
-                for attribute in attributes {
-                    guard attribute.abbreviation == basedOn else { continue }
-                    modifierString = attribute.modifier.toModString
-                    break
-                }
-            }
-        }
-        return ResolvedSkill(skill: self, modifier: modifierString)
+        ResolvedSkill(
+            skill: self,
+            modifierString:
+                sheet
+                .eval(.modifier(.variable(basedOn + ".Mod")))
+                .toReadable)
     }
 }
 
 struct ResolvedSkill {
     let skill: Skill
-    let modifier: String
+    let modifierString: String
 
     var title: String { skill.title }
     var basedOn: String { skill.basedOn }

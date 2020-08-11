@@ -43,16 +43,17 @@ func createSheet() -> Sheet {
                     .stats(
                         "Attack Stats",
                         [
-                            Stat(title: "A.C.", value: .const(15)),
-                            Stat(title: "Prof.", value: .modifier(2)),
-                            Stat(title: "Str", value: .modifier(1)),
-                            Stat(title: "Dex", value: .modifier(2)),
-                            Stat(title: "Spell", value: .modifier(5)),
+                            Stat(title: "A.C.", value: .integer(15)),
+                            Stat(title: "Prof.", value: .modifier(.integer(2))),
+                            Stat(title: "Str", value: .modifier(.integer(1))),
+                            Stat(title: "Dex", value: .modifier(.integer(2))),
+                            Stat(title: "Spell", value: .modifier(.integer(5))),
                         ]),
                     .action(
                         Action(
-                            title: "Dagger", check: .modifier(3),
-                            damage: [.dice(.d4), .formula(.modifier(1))], type: "piercing",
+                            title: "Dagger", check: .modifier(.integer(3)),
+                            damage: [.dice(.d4), .formula(.modifier(.integer(1)))],
+                            type: "piercing",
                             description: "Finesse, Light, Thrown (range 20/60)")),
                     .action(
                         Action(
@@ -60,13 +61,13 @@ func createSheet() -> Sheet {
                             subactions: [
                                 Action.Sub(
                                     title: "One Handed",
-                                    check: .modifier(3),
-                                    damage: [.dice(.d6), .formula(.modifier(1))],
+                                    check: .modifier(.integer(3)),
+                                    damage: [.dice(.d6), .formula(.modifier(.integer(1)))],
                                     type: "bludgeoning"),
                                 Action.Sub(
                                     title: "Two Handed",
-                                    check: .modifier(3),
-                                    damage: [.dice(.d8), .formula(.modifier(1))],
+                                    check: .modifier(.integer(3)),
+                                    damage: [.dice(.d8), .formula(.modifier(.integer(1)))],
                                     type: "bludgeoning"),
                             ], description: "Versatile"
                         )),
@@ -86,7 +87,7 @@ func createSheet() -> Sheet {
                         Action(
                             title: "Chill Touch",
                             level: "Cantrip",
-                            check: .modifier(5),
+                            check: .modifier(.integer(5)),
                             damage: [.dice(.d8)],
                             type: "necrotic",
                             description:
@@ -110,7 +111,6 @@ func createSheet() -> Sheet {
                             title: "Hit Points", current: 33, max: 33, type: .hitPoints,
                             shouldResetOnLongRest: true)),
                 ]),
-        ],
-        formulas: [:]
+        ]
     )
 }

@@ -13,6 +13,9 @@ struct SheetColumn: Codable {
 
     let title: String
     var controls: [SheetControl]
+    var formulas: Formula.Lookup {
+        Formula.mergeAll(controls.map(\.formulas))
+    }
 
     func replace(title: String) -> SheetColumn {
         SheetColumn(

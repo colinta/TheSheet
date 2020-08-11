@@ -4,7 +4,7 @@
 
 import Ashen
 
-func StatsView<Msg>(title: String, stats: [Stat]) -> View<Msg> {
+func StatsView<Msg>(title: String, stats: [Stat], sheet: Sheet) -> View<Msg> {
     Stack(
         .down,
         [
@@ -13,8 +13,17 @@ func StatsView<Msg>(title: String, stats: [Stat]) -> View<Msg> {
                 .ltr,
                 [(.fixed, Space().width(1))]
                     + stats.flatMap { stat in
-                        [(.flex1, StatView(stat)), (.fixed, Space().width(1))]
+                        [(.flex1, StatView(stat, sheet: sheet)), (.fixed, Space().width(1))]
                     }),
             Space().height(1),
+        ])
+}
+
+func StatView<Msg>(_ stat: Stat, sheet: Sheet) -> View<Msg> {
+    Stack(
+        .down,
+        [
+            Text(sheet.eval(stat.value).toReadable).centered().underlined(),
+            Text(stat.title).centered(),
         ])
 }

@@ -16,8 +16,7 @@ enum SheetControl {
         case burnSlot(slotIndex: Int)
         case buySlot(slotIndex: Int)
         case updatePoints(current: Int, max: Int?)
-        case collapseAction
-        case expandAction
+        case toggleExpanded
         case changeQuantity(delta: Int)
         case changeAttribute(index: Int, delta: Int)
         case resetActionUses
@@ -25,19 +24,50 @@ enum SheetControl {
         case removeControl
     }
 
+    case inventory(Inventory)
+    case action(Action)
+    case ability(Ability)
     case spellSlots(SpellSlots)
     case pointsTracker(Points)
-    case stats(String, [Stat])
     case attributes([Attribute])
     case skills([Skill])
-    case action(Action)
-    case inventory(Inventory)
+    case stats(String, [Stat])
     case restButtons
+    case formulas([(String, Formula)])
+
+    var formulas: Formula.Lookup {
+        switch self {
+        case let .attributes(attributes):
+            return Formula.mergeAll(
+                attributes.map { attribute in
+                    [
+                        attribute.variableName: .integer(attribute.score),
+                        "\(attribute.variableName).Mod": .modifier(.integer(attribute.modifier)),
+                    ] as Formula.Lookup
+                })
+        case let .stats(_, stats):
+            return Formula.mergeAll(stats.map { $0.formulas })
+        case let .formulas(formulas):
+            let val = formulas.reduce(Formula.Lookup()) { memo, variable_formula in
+                let (variable, formula) = variable_formula
+                return Formula.merge(memo, with: [variable: formula])
+            }
+            return val
+        default:
+            return [:]
+        }
+    }
 
     static var allControls: [(String, SheetControl)] = [
+        ("Inventory", .inventory(Inventory(title: "", quantity: nil))),
+        ("Action (Weapon, Spell)", .action(Action(title: ""))),
         (
             "Spell Slots",
             .spellSlots(SpellSlots(title: "Spell Slots", slots: [], shouldResetOnLongRest: true))
+        ),
+        (
+            "Ability",
+            .ability(Ability(title: "", description: ""))
         ),
         (
             "Points Tracker (Hit Points, Ki, …)",
@@ -48,127 +78,38 @@ enum SheetControl {
         ("Attributes (Strength, Charisma, …)", .attributes([])),
         ("Skills (Acrobatics, Stealth, …)", .skills([])),
         ("Stats (Armor, Attack, …)", .stats("", [])),
-        ("Action (Weapon, Spell)", .action(Action(title: ""))),
-        ("Inventory", .inventory(Inventory(title: "", quantity: nil))),
         ("Take a Short or Long Rest", .restButtons),
+        ("Formulas", .formulas([])),
     ]
-
-    func take(rest: Rest) -> (SheetControl, Sheet.Mod?) {
-        var control: SheetControl = self
-        switch (self, rest) {
-        case let (.restButtons, rest):
-            return (
-                .restButtons,
-                { sheet in
-                    sheet.replace(
-                        columns: sheet.columns.map { column in
-                            column.replace(
-                                controls: column.controls.map { control in
-                                    control.take(rest: rest).0
-                                })
-                        })
-                }
-            )
-        case let (.spellSlots(spellSlots), .long):
-            guard spellSlots.shouldResetOnLongRest else { break }
-            control = .spellSlots(
-                spellSlots.replace(
-                    slots: spellSlots.slots.map { slot in
-                        return SpellSlot(
-                            title: slot.title, current: slot.max, max: slot.max)
-                    }))
-        case let (.pointsTracker(points), .long):
-            if points.shouldResetOnLongRest, let pointsMax = points.max {
-                control = .pointsTracker(points.replace(current: pointsMax))
-            }
-        case let (.action(action), .long):
-            if action.shouldResetOnLongRest, let uses = action.uses {
-                control = .action(action.replace(remainingUses: uses))
-            }
-        default:
-            break
-        }
-        return (control, nil)
-    }
-
-    func burnSlot(slotIndex: Int) -> Sheet.Mod? {
-        let newPoints = SpellSlot.points(forLevel: slotIndex + 1)
-        return { sheet in
-            var canBurn = false
-            let newSheet = sheet.replace(
-                columns: sheet.columns.map { column in
-                    column.replace(
-                        controls: column.controls.map { control in
-                            if case let .pointsTracker(points) = control, points.isSorceryPoints {
-                                return .pointsTracker(
-                                    points.replace(current: points.current + newPoints))
-                            } else if case let .spellSlots(spellSlots) = control {
-                                return .spellSlots(
-                                    spellSlots.replace(
-                                        slots: spellSlots.slots.enumerated().map {
-                                            updateSlotIndex, slot in
-                                            guard updateSlotIndex == slotIndex, slot.current > 0
-                                            else {
-                                                return slot
-                                            }
-                                            canBurn = true
-                                            return slot.replace(current: slot.current - 1)
-                                        }))
-                            } else {
-                                return control
-                            }
-                        })
-                })
-            return canBurn ? newSheet : sheet
-        }
-    }
-
-    func buySlot(slotIndex: Int) -> Sheet.Mod? {
-        guard let cost = SpellSlot.cost(ofLevel: slotIndex + 1) else { return nil }
-        return { sheet in
-            var canBuy = false
-            let newSheet = sheet.replace(
-                columns: sheet.columns.map { column in
-                    column.replace(
-                        controls: column.controls.map { control in
-                            if case let .pointsTracker(points) = control, points.isSorceryPoints,
-                                points.current >= cost
-                            {
-                                canBuy = true
-                                return .pointsTracker(
-                                    points.replace(current: points.current - cost))
-                            } else if case let .spellSlots(spellSlots) = control {
-                                return .spellSlots(
-                                    spellSlots.replace(
-                                        slots: spellSlots.slots.enumerated().map {
-                                            updateSlotIndex, slot in
-                                            guard updateSlotIndex == slotIndex else { return slot }
-                                            return slot.replace(current: slot.current + 1)
-                                        }))
-                            } else {
-                                return control
-                            }
-                        })
-                })
-            return canBuy ? newSheet : sheet
-        }
-    }
 
     func update(_ message: Message) -> (SheetControl, Sheet.Mod?) {
         var control: SheetControl = self
 
         switch (self, message) {
-        case let (.restButtons, .takeRest(type)):
-            return take(rest: type)
+        case let (.inventory(inventory), .changeQuantity(delta)):
+            guard let quantity = inventory.quantity else { break }
+            control = .inventory(inventory.replace(quantity: max(0, quantity + delta)))
+        case let (.action(action), .toggleExpanded):
+            control = .action(action.replace(isExpanded: !action.isExpanded))
+        case let (.action(action), .changeQuantity(delta)):
+            guard let remainingUses = action.remainingUses else { break }
+            control = .action(action.replace(remainingUses: max(0, remainingUses + delta)))
+        case let (.action(action), .resetActionUses):
+            guard let uses = action.uses else { break }
+            control = .action(action.replace(remainingUses: uses))
+        case let (.ability(ability), .toggleExpanded):
+            control = .ability(ability.replace(isExpanded: !ability.isExpanded))
+        case let (.ability(ability), .changeQuantity(delta)):
+            guard let uses = ability.uses else { break }
+            return (.ability(ability), SheetControl.spend(type: uses.type, amount: delta))
         case let (.spellSlots(spellSlots), .updateSlotCurrent(updateSlotIndex, newCurrent)):
-            control = .spellSlots(
-                spellSlots.replace(
-                    slots: spellSlots.slots.enumerated().map { slotIndex, slot in
-                        guard slotIndex == updateSlotIndex, newCurrent != slot.current else {
-                            return slot
-                        }
-                        return slot.replace(current: newCurrent)
-                    }))
+            let newSlots = spellSlots.slots.enumerated().map { slotIndex, slot -> SpellSlot in
+                guard slotIndex == updateSlotIndex, newCurrent != slot.current else {
+                    return slot
+                }
+                return slot.replace(current: newCurrent)
+            }
+            control = .spellSlots(spellSlots.replace(slots: newSlots))
         case let (.spellSlots(spellSlots), .updateSlotMax(updateSlotIndex, newMax)):
             let modifiedSpellSlots: [SpellSlot]
             if newMax > 0, updateSlotIndex == spellSlots.slots.count,
@@ -197,15 +138,11 @@ enum SheetControl {
 
             control = .spellSlots(spellSlots.replace(slots: modifiedSpellSlots))
         case let (.spellSlots, .burnSlot(slotIndex)):
-            return (control, burnSlot(slotIndex: slotIndex))
+            return (control, SheetControl.burnSlot(slotIndex: slotIndex))
         case let (.spellSlots, .buySlot(slotIndex)):
-            return (control, buySlot(slotIndex: slotIndex))
+            return (control, SheetControl.buySlot(slotIndex: slotIndex))
         case let (.pointsTracker(points), .updatePoints(current, max)):
             control = .pointsTracker(points.replace(current: current).replace(max: max))
-        case let (.action(action), .collapseAction):
-            control = .action(action.replace(isExpanded: false))
-        case let (.action(action), .expandAction):
-            control = .action(action.replace(isExpanded: true))
         case let (.attributes(attributes), .changeAttribute(changeIndex, delta)):
             guard changeIndex >= 0, changeIndex < attributes.count else { break }
             control = .attributes(
@@ -213,15 +150,13 @@ enum SheetControl {
                     guard index == changeIndex else { return attribute }
                     return attribute.replace(score: attribute.score + delta)
                 })
-        case let (.action(action), .changeQuantity(delta)):
-            guard let remainingUses = action.remainingUses else { break }
-            control = .action(action.replace(remainingUses: max(0, remainingUses + delta)))
-        case let (.action(action), .resetActionUses):
-            guard let uses = action.uses else { break }
-            control = .action(action.replace(remainingUses: uses))
-        case let (.inventory(inventory), .changeQuantity(delta)):
-            guard let quantity = inventory.quantity else { break }
-            control = .inventory(inventory.replace(quantity: max(0, quantity + delta)))
+        case let (.restButtons, .takeRest(type)):
+            return (
+                .restButtons,
+                Sheet.mapControls { control in
+                    control.take(rest: type)
+                }
+            )
         default:
             break
         }
@@ -230,12 +165,22 @@ enum SheetControl {
 
     func render(_ sheet: Sheet) -> View<Message> {
         switch self {
-        case .restButtons:
-            return TakeRestView(Message.takeRest(.short), Message.takeRest(.long))
+        case let .inventory(inventory):
+            return InventoryView(
+                inventory, onChange: Message.changeQuantity, onRemove: Message.removeControl)
+        case let .action(action):
+            return ActionView(
+                action, sheet: sheet,
+                onExpand: Message.toggleExpanded,
+                onChange: Message.changeQuantity,
+                onResetUses: Message.resetActionUses)
+        case let .ability(ability):
+            return AbilityView(
+                ability, onExpand: Message.toggleExpanded, onChange: Message.changeQuantity)
         case let .spellSlots(spellSlots):
             let sorceryPoints = sheet.columns.reduce(0) { memo, column in
                 column.controls.reduce(memo) { memo, control in
-                    guard case let .pointsTracker(points) = control, points.isSorceryPoints else {
+                    guard case let .pointsTracker(points) = control, points.is(.sorcery) else {
                         return memo
                     }
                     return points.current
@@ -261,21 +206,16 @@ enum SheetControl {
         case let .pointsTracker(points):
             return PointsTracker(
                 points: points, onChange: { c, m in Message.updatePoints(current: c, max: m) })
-        case let .action(action):
-            return ActionView(
-                action,
-                onExpand: action.isExpanded ? Message.collapseAction : Message.expandAction,
-                onChange: Message.changeQuantity,
-                onResetUses: Message.resetActionUses)
         case let .stats(title, stats):
-            return StatsView(title: title, stats: stats)
+            return StatsView(title: title, stats: stats, sheet: sheet)
         case let .attributes(attributes):
             return AttributesView(attributes, onChange: Message.changeAttribute)
         case let .skills(skills):
             return SkillsView(skills.map { $0.resolve(sheet) })
-        case let .inventory(inventory):
-            return InventoryView(
-                inventory, onChange: Message.changeQuantity, onRemove: Message.removeControl)
+        case let .formulas(formulas):
+            return FormulasView(formulas)
+        case .restButtons:
+            return TakeRestView(Message.takeRest(.short), Message.takeRest(.long))
         }
     }
 
@@ -289,43 +229,54 @@ extension SheetControl: Codable {
     enum CodingKeys: String, CodingKey {
         case type
         case title
+        case inventory
+        case action
+        case ability
         case spellSlots
         case points
-        case stats
         case attributes
         case skills
-        case action
-        case inventory
+        case stats
+        case formulas
     }
 
     init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
         let type = try values.decode(String.self, forKey: .type)
         switch type {
-        case "restButtons":
-            self = .restButtons
+        case "inventory":
+            let inventory = try values.decode(Inventory.self, forKey: .inventory)
+            self = .inventory(inventory)
+        case "action":
+            let action = try values.decode(Action.self, forKey: .action)
+            self = .action(action)
+        case "ability":
+            let ability = try values.decode(Ability.self, forKey: .ability)
+            self = .ability(ability)
         case "spellSlots":
             let spellSlots = try values.decode(SpellSlots.self, forKey: .spellSlots)
             self = .spellSlots(spellSlots)
         case "pointsTracker":
             let points = try values.decode(Points.self, forKey: .points)
             self = .pointsTracker(points)
-        case "stats":
-            let title = try values.decode(String.self, forKey: .title)
-            let stats = try values.decode([Stat].self, forKey: .stats)
-            self = .stats(title, stats)
-        case "action":
-            let action = try values.decode(Action.self, forKey: .action)
-            self = .action(action)
         case "attributes":
             let attributes = try values.decode([Attribute].self, forKey: .attributes)
             self = .attributes(attributes)
         case "skills":
             let skills = try values.decode([Skill].self, forKey: .skills)
             self = .skills(skills)
-        case "inventory":
-            let inventory = try values.decode(Inventory.self, forKey: .inventory)
-            self = .inventory(inventory)
+        case "stats":
+            let title = try values.decode(String.self, forKey: .title)
+            let stats = try values.decode([Stat].self, forKey: .stats)
+            self = .stats(title, stats)
+        case "restButtons":
+            self = .restButtons
+        case "formulas":
+            let formulas = try values.decode([[String: Formula]].self, forKey: .formulas)
+            self = .formulas(
+                formulas.flatMap { dict in
+                    dict.map { ($0, $1) }
+                })
         default:
             throw Error.decoding
         }
@@ -334,30 +285,129 @@ extension SheetControl: Codable {
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         switch self {
-        case .restButtons:
-            try container.encode("restButtons", forKey: .type)
+        case let .inventory(inventory):
+            try container.encode("inventory", forKey: .type)
+            try container.encode(inventory, forKey: .inventory)
+        case let .action(action):
+            try container.encode("action", forKey: .type)
+            try container.encode(action, forKey: .action)
+        case let .ability(ability):
+            try container.encode("ability", forKey: .type)
+            try container.encode(ability, forKey: .ability)
         case let .spellSlots(spellSlots):
             try container.encode("spellSlots", forKey: .type)
             try container.encode(spellSlots, forKey: .spellSlots)
         case let .pointsTracker(points):
             try container.encode("pointsTracker", forKey: .type)
             try container.encode(points, forKey: .points)
-        case let .stats(title, stats):
-            try container.encode("stats", forKey: .type)
-            try container.encode(title, forKey: .title)
-            try container.encode(stats, forKey: .stats)
-        case let .action(action):
-            try container.encode("action", forKey: .type)
-            try container.encode(action, forKey: .action)
         case let .attributes(attributes):
             try container.encode("attributes", forKey: .type)
             try container.encode(attributes, forKey: .attributes)
         case let .skills(skills):
             try container.encode("skills", forKey: .type)
             try container.encode(skills, forKey: .skills)
-        case let .inventory(inventory):
-            try container.encode("inventory", forKey: .type)
-            try container.encode(inventory, forKey: .inventory)
+        case let .stats(title, stats):
+            try container.encode("stats", forKey: .type)
+            try container.encode(title, forKey: .title)
+            try container.encode(stats, forKey: .stats)
+        case .restButtons:
+            try container.encode("restButtons", forKey: .type)
+        case let .formulas(formulas):
+            try container.encode("formulas", forKey: .type)
+            try container.encode(
+                formulas.map { (key, value) in
+                    [key: value]
+                }, forKey: .formulas)
         }
     }
+}
+extension SheetControl {
+    private func take(rest: Rest) -> SheetControl {
+        var control: SheetControl = self
+        switch (self, rest) {
+        case let (.spellSlots(spellSlots), .long):
+            guard spellSlots.shouldResetOnLongRest else { break }
+            control = .spellSlots(
+                spellSlots.replace(
+                    slots: spellSlots.slots.map { slot in
+                        return SpellSlot(
+                            title: slot.title, current: slot.max, max: slot.max)
+                    }))
+        case let (.pointsTracker(points), .long):
+            guard points.shouldResetOnLongRest, let pointsMax = points.max else { break }
+            control = .pointsTracker(points.replace(current: pointsMax))
+        case let (.action(action), .long):
+            guard action.shouldResetOnLongRest, let uses = action.uses else { break }
+            control = .action(action.replace(remainingUses: uses))
+        default:
+            break
+        }
+        return control
+    }
+
+    private static func burnSlot(slotIndex: Int) -> Sheet.Mod {
+        let newPoints = SpellSlot.points(forLevel: slotIndex + 1)
+        return { sheet in
+            var canBurn = false
+            return sheet.mapControls { control in
+                guard case let .spellSlots(spellSlots) = control else { return control }
+                return .spellSlots(
+                    spellSlots.replace(
+                        slots: spellSlots.slots.enumerated().map {
+                            updateSlotIndex, slot in
+                            guard updateSlotIndex == slotIndex, slot.current > 0
+                            else {
+                                return slot
+                            }
+                            canBurn = true
+                            return slot.replace(current: slot.current - 1)
+                        }))
+            }.mapControls { control in
+                guard canBurn, case let .pointsTracker(points) = control, points.is(.sorcery) else {
+                    return control
+                }
+                return .pointsTracker(
+                    points.replace(current: points.current + newPoints))
+            }
+        }
+    }
+
+    private static func buySlot(slotIndex: Int) -> Sheet.Mod? {
+        guard let cost = SpellSlot.cost(ofLevel: slotIndex + 1) else { return nil }
+        return { sheet in
+            var canBuy = false
+            return sheet.mapControls { control in
+                guard case let .pointsTracker(points) = control,
+                    points.is(.sorcery),
+                    points.current >= cost
+                else { return control }
+                canBuy = true
+                return .pointsTracker(
+                    points.replace(current: points.current - cost))
+            }.mapControls { control in
+                guard canBuy, case let .spellSlots(spellSlots) = control else { return control }
+                return .spellSlots(
+                    spellSlots.replace(
+                        slots: spellSlots.slots.enumerated().map {
+                            updateSlotIndex, slot in
+                            guard updateSlotIndex == slotIndex else { return slot }
+                            return slot.replace(current: slot.current + 1)
+                        }))
+            }
+        }
+    }
+
+    private static func spend(type pointsType: Points.PointType, amount: Int) -> Sheet.Mod {
+        return { sheet in
+            sheet.mapControls { control in
+                guard case let .pointsTracker(points) = control,
+                    points.is(pointsType),
+                    points.current >= amount
+                else { return control }
+                return .pointsTracker(
+                    points.replace(current: points.current - amount))
+            }
+        }
+    }
+
 }

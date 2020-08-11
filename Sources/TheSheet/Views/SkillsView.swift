@@ -16,7 +16,8 @@ func SkillView<Msg>(_ skill: ResolvedSkill) -> View<Msg> {
         .ltr,
         [
             skill.isProficient ? Text(" ◼ ") : Text(" ◦ "),
-            Text("\(skill.modifier) "),
+            Text(skill.modifierString),
+            Text(" "),
             Text(skill.basedOn),
             Text(" "),
             Text(skill.title),

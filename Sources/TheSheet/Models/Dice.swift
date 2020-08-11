@@ -20,8 +20,8 @@ indirect enum Dice {
 
     var toReadableRoll: String {
         switch self {
-        case let .d(d):
-            return "1d\(d)"
+        case .d:
+            return "1\(toReadable)"
         case let .n(n, d):
             return "\(n)\(d.toReadable)"
         }

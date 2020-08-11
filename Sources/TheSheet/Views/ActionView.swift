@@ -5,49 +5,44 @@
 import Ashen
 
 func ActionView<Msg>(
-    _ action: Action, onExpand: @escaping @autoclosure SimpleEvent<Msg>,
+    _ action: Action, sheet: Sheet, onExpand: @escaping @autoclosure SimpleEvent<Msg>,
     onChange: @escaping (Int) -> Msg, onResetUses: @escaping @autoclosure SimpleEvent<Msg>
 ) -> View<
     Msg
 > {
-    let view: View<Msg>
+    let expandedViews: [View<Msg>]
+    let buttonText: String
     if action.isExpanded {
-        let actionStats: View<Msg>? = _ActionViewStats(action, onChange, onResetUses())
-        let expandedViews: [View<Msg>] = actionStats.map { [$0] } ?? []
-        view = Stack(
-            .down,
-            [
-                ZStack(
-                    OnLeftClick(
-                        Text("↑↑↑").bold().aligned(.topRight), onExpand()),
-                    Text(action.title.bold()).centered().underlined(),
-                    action.level.map { Text($0) } ?? Space()
-                ).matchContainer(.width)
-            ] + expandedViews)
+        let actionStats: View<Msg>? = _ActionStatsView(
+            action, sheet: sheet, onChange, onResetUses())
+        expandedViews = actionStats.map { [$0] } ?? []
+        buttonText = "↑↑↑"
     } else {
-        view = Stack(
-            .down,
-            [
-                ZStack(
-                    OnLeftClick(
-                        Text("↓↓↓").bold().aligned(.topRight), onExpand()),
-                    Text(action.title.bold()).centered().underlined(),
-                    action.level.map { Text($0) } ?? Space()
-                ).matchContainer(.width)
-            ])
+        buttonText = "↓↓↓"
+        expandedViews = []
     }
-    return view.border(.single)
+    return Stack(
+        .down,
+        [
+            ZStack(
+                _ActionLevelView(action.level),
+                _ActionTitleView(action.title),
+                OnLeftClick(
+                    Text(buttonText).bold().aligned(.topRight), onExpand())
+            ).matchContainer(.width)
+        ] + expandedViews
+    ).border(.single)
 }
 
-func _ActionViewStats<Msg>(
-    _ action: Action, _ onChange: @escaping (Int) -> Msg,
+func _ActionStatsView<Msg>(
+    _ action: Action, sheet: Sheet, _ onChange: @escaping (Int) -> Msg,
     _ onResetUses: @escaping @autoclosure SimpleEvent<Msg>
 ) -> View<Msg>? {
     var actionViews = action.subactions.reduce([View<Msg>]()) { views, sub in
         let statViews: [View<Msg>] = [
-            sub.check.map(_ActionViewCheck) as View<Msg>?,
-            sub.damage.isEmpty ? nil : _ActionViewDamage(sub.damage),
-            sub.type.map(_ActionViewType),
+            sub.check.map({ _ActionCheckView($0, sheet: sheet) }) as View<Msg>?,
+            sub.damage.isEmpty ? nil : _ActionDamageView(sub.damage, sheet: sheet),
+            sub.type.map({ _ActionTypeView($0, sheet: sheet) }),
         ].compactMap { $0 }
 
         if statViews.isEmpty {
@@ -78,15 +73,15 @@ func _ActionViewStats<Msg>(
         }
     }
 
-    if let description = action.description, !description.attributedCharacters.isEmpty {
-        let actionDescription: View<Msg> = _ActionViewDescription(description)
+    if let description = action.description, !description.isEmpty {
+        let actionDescription: View<Msg> = _ActionDescriptionView(description)
         actionViews.append(actionDescription)
     }
 
     if let remainingUses = action.remainingUses {
-        let actionChanges: View<Msg> = _ActionViewUses(
-            uses: action.uses, remainingUses: remainingUses, onChange, onResetUses())
-        actionViews.append(actionChanges)
+        let actionUses: View<Msg> = _ActionUsesView(
+            action: action, remainingUses: remainingUses, onChange, onResetUses())
+        actionViews.append(actionUses)
     }
 
     guard !actionViews.isEmpty else { return nil }
@@ -101,33 +96,42 @@ func _ActionViewStats<Msg>(
         })
 }
 
-func _ActionViewCheck<Msg>(_ check: Formula) -> View<Msg> {
-    StatView(Stat(title: "Check", value: check))
+func _ActionTitleView<Msg>(_ title: String) -> View<Msg> {
+    Text(title.bold()).centered().underlined()
 }
-func _ActionViewDamage<Msg>(_ damage: [Roll]) -> View<Msg> {
+func _ActionLevelView<Msg>(_ level: String?) -> View<Msg> {
+    level.map { Text($0) } ?? Space()
+}
+func _ActionCheckView<Msg>(_ check: Formula, sheet: Sheet) -> View<Msg> {
+    StatView(Stat(title: "Check", value: check), sheet: sheet)
+}
+func _ActionDamageView<Msg>(_ damage: [Roll], sheet: Sheet) -> View<Msg> {
     StatView(
-        Stat(title: "Damage", value: .string(damage.map { $0.toReadable }.joined(separator: "+"))))
+        Stat(
+            title: "Damage",
+            value: .string(damage.map { $0.toReadable(sheet) }.joined(separator: "+"))),
+        sheet: sheet)
 }
-func _ActionViewType<Msg>(_ type: String) -> View<Msg> {
-    StatView(Stat(title: "Type", value: .string(type)))
+func _ActionTypeView<Msg>(_ type: String, sheet: Sheet) -> View<Msg> {
+    StatView(Stat(title: "Type", value: .string(type)), sheet: sheet)
 }
-func _ActionViewDescription<Msg>(_ description: String) -> View<
+func _ActionDescriptionView<Msg>(_ description: String) -> View<
     Msg
 > {
     Text(description, .wrap(true))
-        .fitInContainer(
-            .width)
+        .fitInContainer(.width)
 }
-func _ActionViewUses<Msg>(
-    uses: Int?, remainingUses: Int, _ onChange: @escaping (Int) -> Msg,
+func _ActionUsesView<Msg>(
+    action: Action, remainingUses: Int, _ onChange: @escaping (Int) -> Msg,
     _ onResetUses: @escaping @autoclosure SimpleEvent<Msg>
 ) -> View<Msg> {
     let remaining: View<Msg>
-    if let uses = uses {
+    if let uses = action.uses {
         remaining = Text(" \(remainingUses) of \(uses) remaining")
     } else {
         remaining = Text(" \(remainingUses) remaining")
     }
+    let canAdd: Bool = action.maxUses.map { remainingUses < $0 } ?? true
     return Flow(
         .ltr,
         [
@@ -138,11 +142,13 @@ func _ActionViewUses<Msg>(
             ),
             (.fixed, remaining),
             (.flex1, Space()),
-            (.fixed, OnLeftClick(Text("+Add"), onChange(1))),
+            (.fixed, canAdd
+                ? OnLeftClick(Text("+Add".foreground(.green)), onChange(1))
+                : Text("+Add".foreground(.black))),
         ]
-            + (uses != nil
+            + (action.uses != nil
                 ? [
                     (.fixed, Space().width(1)),
-                    (.fixed, OnLeftClick(Text("[Reset]"), onResetUses())),
+                    (.fixed, OnLeftClick(Text("[Reset]".foreground(.blue)), onResetUses())),
                 ] : []))
 }

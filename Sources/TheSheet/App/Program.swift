@@ -120,7 +120,19 @@ func update(model: inout Model, message: Message) -> State<Model, Message> {
 
         return .model(model.replace(status: nil))
     case .quit:
-        return .quit
+        guard let fileURL = model.fileURL else {
+            return .quit
+        }
+
+        let coder = JSONEncoder()
+        coder.outputFormatting = .prettyPrinted
+        do {
+            let data = try coder.encode(model.sheet)
+            try data.write(to: fileURL, options: [.atomic])
+            return .quit
+        } catch {
+            return showStatus(model: model, status: "Error saving JSON")
+        }
     }
 }
 
@@ -139,7 +151,6 @@ private func _render(_ model: Model, status: String?) -> [View<Message>] {
         OnKeyPress(key: .ctrl(.s), Message.saveJSON),
         OnKeyPress(key: .ctrl(.o), Message.reloadJSON),
         OnKeyPress(key: .ctrl(.z), Message.undo),
-        model.addingToColumn == nil ? OnMouseWheel(Space(), Message.scroll) : nil,
         Flow(
             .down,
             [
@@ -161,11 +172,13 @@ private func _render(_ model: Model, status: String?) -> [View<Message>] {
                     MainButtons(model: model, status: status)
                 ),
             ]),
+        model.addingToColumn == nil ? OnMouseWheel(Space(), Message.scroll) : nil,
         model.addingToColumn != nil ? renderControlEditor() : nil,
     ] as [View<Message>?]).compactMap { $0 }
 }
 
-func renderColumn(_ model: Model, _ column: SheetColumn, position: Int, index: Int) -> View<Message> {
+func renderColumn(_ model: Model, _ column: SheetColumn, position: Int, index: Int) -> View<Message>
+{
     let columnView = column.render(
         model.sheet, isEditing: model.editColumn == position)
     return ZStack(

@@ -4,7 +4,7 @@
 
 struct Attribute: Codable {
     let title: String
-    let abbreviation: String
+    let variableName: String
     let score: Int
     let isProficient: Bool
 
@@ -12,12 +12,12 @@ struct Attribute: Codable {
         (score - 10) / 2
     }
 
-    func save(proficiency: Int) -> Int {
-        modifier + (isProficient ? proficiency : 0)
+    func save(proficiencyBonus: Int) -> Int {
+        modifier + (isProficient ? proficiencyBonus : 0)
     }
 
     func replace(score: Int) -> Attribute {
         Attribute(
-            title: title, abbreviation: abbreviation, score: score, isProficient: isProficient)
+            title: title, variableName: variableName, score: score, isProficient: isProficient)
     }
 }

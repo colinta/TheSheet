@@ -9,6 +9,36 @@ struct Points: Codable {
         case ki
         case other(String)
         case many([PointType])
+
+        var toReadable: String {
+            switch self {
+            case .hitPoints:
+                return "Hit Points"
+            case .sorcery:
+                return "Sorcery Points"
+            case .ki:
+                return "Ki Points"
+            case let .many(types):
+                return types.map(\.toReadable).joined(separator: ", ")
+            case let .other(type):
+                return type
+            }
+        }
+
+
+        func `is`(_ type: Points.PointType) -> Bool {
+            switch (self, type) {
+            case (.hitPoints, .hitPoints):
+                return true
+            case (.sorcery, .sorcery):
+                return true
+            case (.ki, .ki):
+                return true
+            default:
+                guard case let .many(types) = self else { return false }
+                return types.contains(where: { $0.is(type) })
+            }
+        }
     }
 
     let title: String
@@ -29,12 +59,8 @@ struct Points: Codable {
             shouldResetOnLongRest: shouldResetOnLongRest)
     }
 
-    var isSorceryPoints: Bool {
-        type.is(.sorcery)
-    }
-
-    var isKiPoints: Bool {
-        type.is(.ki)
+    func `is`(_ type: Points.PointType) -> Bool {
+        self.type.is(type)
     }
 }
 
@@ -44,21 +70,7 @@ extension Points.PointType: Codable {
         case many
     }
 
-    func `is`(_ type: Points.PointType) -> Bool {
-        switch (self, type) {
-        case (.hitPoints, .hitPoints):
-            return true
-        case (.sorcery, .sorcery):
-            return true
-        case (.ki, .ki):
-            return true
-        default:
-            guard case let .many(types) = self else { return false }
-            return types.contains(where: { $0.is(type) })
-        }
-    }
-
-    static func from(string type: String) -> Points.PointType {
+    private static func from(string type: String) -> Points.PointType {
         switch type {
         case "hitPoints":
             return .hitPoints
@@ -71,7 +83,7 @@ extension Points.PointType: Codable {
         }
     }
 
-    var toEncodeable: String {
+    private var toEncodeable: String {
         switch self {
         case .hitPoints:
             return "hitPoints"
