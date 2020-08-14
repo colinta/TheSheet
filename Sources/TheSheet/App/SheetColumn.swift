@@ -12,21 +12,35 @@ struct SheetColumn: Codable {
     }
 
     let title: String
-    var controls: [SheetControl]
-    var formulas: Formula.Lookup {
-        Formula.mergeAll(controls.map(\.formulas))
+    let controls: [SheetControl]
+    let isFormulaColumn: Bool
+
+    init(title: String, controls: [SheetControl], isFormulaColumn: Bool = true) {
+        self.title = title
+        self.controls = controls
+        self.isFormulaColumn = isFormulaColumn
     }
+
+    var formulas: [Formula] {
+        Operation.mergeAll(controls.map(\.formulas))
+    }
+
+    var canEdit: Bool { !isFormulaColumn }
+    var canDelete: Bool { !isFormulaColumn }
+    var canAdd: Bool { !isFormulaColumn }
 
     func replace(title: String) -> SheetColumn {
         SheetColumn(
             title: title,
-            controls: controls)
+            controls: controls,
+            isFormulaColumn: isFormulaColumn)
     }
 
     func replace(controls: [SheetControl]) -> SheetColumn {
         SheetColumn(
             title: title,
-            controls: controls)
+            controls: controls,
+            isFormulaColumn: isFormulaColumn)
     }
 
     func update(_ message: Message) -> (SheetColumn, Sheet.Mod?) {
@@ -67,13 +81,13 @@ struct SheetColumn: Codable {
             controls.enumerated().flatMap { index, control -> [View<SheetColumn.Message>] in
                 let controlView = control.render(sheet).map {
                     SheetColumn.Message.control(index, $0)
-                }
-                .matchContainer(.width)
+                }.matchContainer(dimension: .width)
                 let editableControlView: View<SheetColumn.Message>
                 if isEditing {
                     editableControlView = ZStack([
                         controlView,
-                        editingControls(index: index, lastIndex: controls.count - 1),
+                        editingControls(control, index: index, lastIndex: controls.count - 1)
+                            .matchSize(ofView: controlView),
                     ])
                 } else {
                     editableControlView = controlView
@@ -87,32 +101,57 @@ struct SheetColumn: Codable {
         )
     }
 
-    private func editingControls(index: Int, lastIndex: Int) -> View<SheetColumn.Message> {
+    private func editingControls(_ control: SheetControl, index: Int, lastIndex: Int) -> View<SheetColumn.Message> {
         let canMoveUp = index > 0
         let canMoveDown = index < lastIndex
         return Flow(
             .ltr,
             [
-                (
-                    .fixed,
-                    OnLeftClick(
-                        Text("  ↑  ".background(canMoveUp ? .cyan : .black)).aligned(.middleRight),
-                        Message.moveControl(index, .up)
-                    ).background(view: Text(" ".background(canMoveUp ? .cyan : .black)))
-                ),
-                (.fixed, IgnoreMouse(Repeating(Text(" "))).width(1)),
-                (
-                    .fixed,
-                    OnLeftClick(
-                        Text("  ↓  ".background(canMoveDown ? .cyan : .black)).aligned(
-                            .middleRight), Message.moveControl(index, .down)
-                    ).background(view: Text(" ".background(canMoveDown ? .cyan : .black)))
-                ),
+                (.fixed, BasedOnSize { size in
+                    if size.height >= 3 {
+                        return Flow(.down, [
+                            (
+                                .flex1,
+                                OnLeftClick(
+                                    Text("  ↑  ".background(canMoveUp ? .cyan : .black)).aligned(.topCenter),
+                                    Message.moveControl(index, .up)
+                                ).background(view: Text(" ".background(canMoveUp ? .cyan : .black)))
+                            ),
+                            (.fixed, IgnoreMouse(Repeating(Text(" "))).height((size.height % 2) == 0 ? 2 : 1)),
+                            (
+                                .flex1,
+                                OnLeftClick(
+                                    Text("  ↓  ".background(canMoveDown ? .cyan : .black)).aligned(
+                                        .bottomCenter), Message.moveControl(index, .down)
+                                ).background(view: Text(" ".background(canMoveDown ? .cyan : .black)))
+                            ),
+                        ]).height(size.height)
+                    }
+                    else {
+                        return Stack(.ltr, [
+                            (
+                                OnLeftClick(
+                                    Text("  ↑  ".background(canMoveUp ? .cyan : .black)).aligned(.middleRight),
+                                    Message.moveControl(index, .up)
+                                ).background(view: Text(" ".background(canMoveUp ? .cyan : .black)))
+                            ),
+                            (IgnoreMouse(Repeating(Text(" "))).width(1)),
+                            (
+                                OnLeftClick(
+                                    Text("  ↓  ".background(canMoveDown ? .cyan : .black)).aligned(
+                                        .middleRight), Message.moveControl(index, .down)
+                                ).background(view: Text(" ".background(canMoveDown ? .cyan : .black)))
+                            ),
+                        ])
+                    }
+                }),
                 (.flex1, OnLeftClick(Space(), Message.stopEditing, .highlight(false))),
                 (
                     .fixed,
-                    (Text(" Edit ".background(.blue)).aligned(.middleRight)).background(
+                    control.isEditable
+                    ? (Text(" Edit ".background(.blue)).aligned(.middleRight)).background(
                         view: Text(" ".background(.blue)))
+                    : Space()
                 ),
                 (.fixed, IgnoreMouse(Repeating(Text(" "))).width(1)),
                 (

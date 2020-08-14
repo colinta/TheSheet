@@ -5,7 +5,7 @@
 struct Action: Codable {
     struct Sub: Codable {
         let title: String?
-        let check: Formula?
+        let check: Operation?
         let damage: [Roll]
         let type: String?
     }
@@ -21,10 +21,11 @@ struct Action: Codable {
     let shouldResetOnLongRest: Bool
 
     init(
-        title: String, level: String? = nil, check: Formula? = nil, damage: [Roll] = [],
+        title: String, level: String? = nil, check: Operation? = nil, damage: [Roll] = [],
         type: String? = nil,
         description: String? = nil, isExpanded: Bool = false,
-        uses: Int? = nil, remainingUses: Int? = nil, maxUses: Int? = nil, shouldResetOnLongRest: Bool = false
+        uses: Int? = nil, remainingUses: Int? = nil, maxUses: Int? = nil,
+        shouldResetOnLongRest: Bool = false
     ) {
         self.init(
             title: title,
@@ -45,7 +46,8 @@ struct Action: Codable {
     init(
         title: String, level: String? = nil, subactions: [Sub],
         description: String? = nil, isExpanded: Bool = false,
-        uses: Int? = nil, remainingUses: Int? = nil, maxUses: Int? = nil, shouldResetOnLongRest: Bool = false
+        uses: Int? = nil, remainingUses: Int? = nil, maxUses: Int? = nil,
+        shouldResetOnLongRest: Bool = false
     ) {
         self.title = title
         self.level = level

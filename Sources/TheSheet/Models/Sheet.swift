@@ -12,14 +12,14 @@ struct Sheet {
     typealias Mod = (Sheet) -> Sheet
 
     let columnsOrder: [Int]
-    let visibleColumns: Int
+    let visibleColumnsCount: Int
     let columns: [SheetColumn]
-    let formulas: Formula.Lookup
-    private var formulaMemo: [String: Formula.Value] = [:]
+    let formulas: [Formula]
+    private var formulaMemo: [String: Operation.Value] = [:]
 
-    init(columnsOrder: [Int], visibleColumns: Int, columns: [SheetColumn]) {
+    init(columnsOrder: [Int], visibleColumnsCount: Int, columns: [SheetColumn]) {
         self.columnsOrder = Sheet.fixColumns(columnsOrder, count: columns.count)
-        self.visibleColumns = visibleColumns
+        self.visibleColumnsCount = visibleColumnsCount
         self.columns = columns
         self.formulas = Sheet.formulas(columns)
     }
@@ -35,22 +35,29 @@ struct Sheet {
         return fixedColumns + missingColumns
     }
 
-    static private func formulas(_ columns: [SheetColumn]) -> Formula.Lookup {
-        columns.reduce([:]) { memo, column in
-            Formula.merge(memo, with: column.formulas)
+    static private func formulas(_ columns: [SheetColumn]) -> [Formula] {
+        columns.reduce([]) { memo, column in
+            Operation.merge(memo, with: column.formulas)
         }
     }
 
-    func replace(columnsOrder: [Int]) -> Sheet {
-        Sheet(columnsOrder: columnsOrder, visibleColumns: visibleColumns, columns: columns)
+    func findOperation(variable: String) -> Operation? {
+        formulas.first(where: { $0.is(named: variable) })?.operation
     }
 
-    func replace(visibleColumns: Int) -> Sheet {
-        Sheet(columnsOrder: columnsOrder, visibleColumns: visibleColumns, columns: columns)
+    func replace(columnsOrder: [Int]) -> Sheet {
+        Sheet(
+            columnsOrder: columnsOrder, visibleColumnsCount: visibleColumnsCount, columns: columns)
+    }
+
+    func replace(visibleColumnsCount: Int) -> Sheet {
+        Sheet(
+            columnsOrder: columnsOrder, visibleColumnsCount: visibleColumnsCount, columns: columns)
     }
 
     func replace(columns: [SheetColumn]) -> Sheet {
-        Sheet(columnsOrder: columnsOrder, visibleColumns: visibleColumns, columns: columns)
+        Sheet(
+            columnsOrder: columnsOrder, visibleColumnsCount: visibleColumnsCount, columns: columns)
     }
 
     static func mapControls(_ map: @escaping (SheetControl) -> SheetControl) -> (Sheet) -> Sheet {
@@ -86,7 +93,7 @@ struct Sheet {
 extension Sheet: Codable {
     enum CodingKeys: String, CodingKey {
         case columnsOrder
-        case visibleColumns
+        case visibleColumnsCount
         case columns
     }
 
@@ -98,14 +105,14 @@ extension Sheet: Codable {
 
         columnsOrder = fixedColumns
         self.columns = columns
-        visibleColumns = try values.decode(Int.self, forKey: .visibleColumns)
+        visibleColumnsCount = try values.decode(Int.self, forKey: .visibleColumnsCount)
         formulas = Sheet.formulas(columns)
     }
 
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(columnsOrder, forKey: .columnsOrder)
-        try container.encode(visibleColumns, forKey: .visibleColumns)
+        try container.encode(visibleColumnsCount, forKey: .visibleColumnsCount)
         try container.encode(columns, forKey: .columns)
     }
 }

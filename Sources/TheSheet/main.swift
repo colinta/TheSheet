@@ -25,22 +25,11 @@ try main()
 func createSheet() -> Sheet {
     Sheet(
         columnsOrder: [0, 1, 2],
-        visibleColumns: 3,
+        visibleColumnsCount: 3,
         columns: [
             SheetColumn(
                 title: "Actions",
                 controls: [
-                    .pointsTracker(
-                        Points(
-                            title: "Sorcery Points", current: 4, max: 4,
-                            type: .sorcery,
-                            shouldResetOnLongRest: true
-                        )),
-                    .pointsTracker(
-                        Points(
-                            title: "Ki Points", current: 3, max: 3,
-                            type: .ki,
-                            shouldResetOnLongRest: true)),
                     .stats(
                         "Attack Stats",
                         [
@@ -53,7 +42,7 @@ func createSheet() -> Sheet {
                     .action(
                         Action(
                             title: "Dagger", check: .modifier(.integer(3)),
-                            damage: [.dice(.d4), .formula(.modifier(.integer(1)))],
+                            damage: [.dice(.d4), .operation(.modifier(.integer(1)))],
                             type: "piercing",
                             description: "Finesse, Light, Thrown (range 20/60)")),
                     .action(
@@ -63,12 +52,12 @@ func createSheet() -> Sheet {
                                 Action.Sub(
                                     title: "One Handed",
                                     check: .modifier(.integer(3)),
-                                    damage: [.dice(.d6), .formula(.modifier(.integer(1)))],
+                                    damage: [.dice(.d6), .operation(.modifier(.integer(1)))],
                                     type: "bludgeoning"),
                                 Action.Sub(
                                     title: "Two Handed",
                                     check: .modifier(.integer(3)),
-                                    damage: [.dice(.d8), .formula(.modifier(.integer(1)))],
+                                    damage: [.dice(.d8), .operation(.modifier(.integer(1)))],
                                     type: "bludgeoning"),
                             ], description: "Versatile"
                         )),
@@ -109,9 +98,63 @@ func createSheet() -> Sheet {
                     .restButtons,
                     .pointsTracker(
                         Points(
-                            title: "Hit Points", current: 33, max: 33, type: .hitPoints,
+                            title: "Level", current: 1, max: 20, type: .level,
+                            shouldResetOnLongRest: true)),
+                    .pointsTracker(
+                        Points(
+                            title: "Hit Points", current: 8, max: 8, type: .hitPoints,
                             shouldResetOnLongRest: true)),
                 ]),
+            SheetColumn(
+                title: "Formula",
+                controls: [
+                    .formulas([
+                        Formula(
+                            variable: "proficiencyBonus",
+                            operation:
+                                .add([
+                                    .ceil(.divide(.variable("level"), .integer(4))),
+                                    .integer(1),
+                                ])
+                        ),
+                        Formula(
+                            variable: "attackBonus",
+                            operation: .variable("STR.Mod")
+                        ),
+                        Formula(
+                            variable: "defaultArmor",
+                            operation:
+                                .add([
+                                    .integer(10),
+                                    .variable("DEX.Mod"),
+                                ])
+                        ),
+                        Formula(
+                            variable: "draconicArmor",
+                            operation:
+                                .add([
+                                    .integer(13),
+                                    .variable("DEX.Mod"),
+                                ])
+                        ),
+                        Formula(
+                            variable: "armorClass",
+                            operation: .max([
+                                .variable("defaultArmor"),
+                                .variable("draconicArmor"),
+                            ])
+                        ),
+                        Formula(
+                            variable: "spellAttack",
+                            operation:
+                                .add([
+                                    .variable("CHA.Mod"),
+                                    .variable("proficiencyBonus"),
+                                ])
+                        ),
+                    ])
+                ],
+                isFormulaColumn: true),
         ]
     )
 }

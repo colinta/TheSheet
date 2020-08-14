@@ -28,7 +28,7 @@ func AbilityView<Msg>(
                 _AbilityTitleView(ability.title),
                 OnLeftClick(
                     Text(buttonText).bold().aligned(.topRight), onExpand())
-            ).matchContainer(.width)
+            ).matchContainer(dimension: .width)
         ] + expandedViews
     ).border(.single)
 }
@@ -61,7 +61,7 @@ func _AbilityDescriptionView<Msg>(_ description: String) -> View<
     Msg
 > {
     Text(description, .wrap(true))
-        .fitInContainer(.width)
+        .fitInContainer(dimension: .width)
 }
 func _AbilityUsesView<Msg>(
     uses: Ability.Uses, _ onChange: @escaping (Int) -> Msg
@@ -69,8 +69,11 @@ func _AbilityUsesView<Msg>(
     Flow(
         .ltr,
         [
-            (.fixed, OnLeftClick(
-                Text("[Use]".foreground(.green)), onChange(uses.amount))),
+            (
+                .fixed,
+                OnLeftClick(
+                    Text("[Use]".foreground(.green)), onChange(uses.amount))
+            ),
             (.flex1, Space()),
             (.fixed, Text("\(uses.type.toReadable): \(uses.amount)")),
         ])

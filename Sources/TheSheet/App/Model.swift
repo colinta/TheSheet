@@ -57,7 +57,7 @@ struct Model {
         Model(
             sheet: sheet, undoSheets: undoSheets + [self.sheet], fileURL: fileURL,
             firstVisibleColumn: firstVisibleColumn, scrollOffset: scrollOffset,
-            changeColumn: nil, editColumn: nil, addingToColumn: nil,
+            changeColumn: nil, editColumn: editColumn, addingToColumn: nil,
             columnScrollMaxOffsets: columnScrollMaxOffsets,
             status: status)
     }
@@ -66,8 +66,18 @@ struct Model {
         Model(
             sheet: sheet, undoSheets: undoSheets, fileURL: fileURL,
             firstVisibleColumn: firstVisibleColumn, scrollOffset: scrollOffset,
-            changeColumn: changeColumn, editColumn: editColumn, addingToColumn:
-            addingToColumn,
+            changeColumn: changeColumn, editColumn: editColumn,
+            addingToColumn:
+                addingToColumn,
+            columnScrollMaxOffsets: columnScrollMaxOffsets,
+            status: status)
+    }
+
+    func replace(firstVisibleColumn: Int) -> Model {
+        Model(
+            sheet: sheet, undoSheets: undoSheets, fileURL: fileURL,
+            firstVisibleColumn: firstVisibleColumn, scrollOffset: scrollOffset,
+            changeColumn: nil, editColumn: nil, addingToColumn: nil,
             columnScrollMaxOffsets: columnScrollMaxOffsets,
             status: status)
     }
@@ -93,7 +103,7 @@ struct Model {
     func replace(addingToColumn: Int?) -> Model {
         Model(
             sheet: sheet, undoSheets: undoSheets, fileURL: fileURL,
-            firstVisibleColumn:firstVisibleColumn, scrollOffset: scrollOffset,
+            firstVisibleColumn: firstVisibleColumn, scrollOffset: scrollOffset,
             changeColumn: nil, editColumn: nil, addingToColumn: addingToColumn,
             columnScrollMaxOffsets: columnScrollMaxOffsets,
             status: status)
@@ -105,8 +115,9 @@ struct Model {
         return Model(
             sheet: sheet, undoSheets: undoSheets, fileURL: fileURL,
             firstVisibleColumn: firstVisibleColumn, scrollOffset: scrollOffset,
-            changeColumn: changeColumn, editColumn: editColumn, addingToColumn:
-            addingToColumn,
+            changeColumn: changeColumn, editColumn: editColumn,
+            addingToColumn:
+                addingToColumn,
             columnScrollMaxOffsets: columnScrollMaxOffsets,
             status: status)
     }
@@ -115,8 +126,9 @@ struct Model {
         Model(
             sheet: sheet, undoSheets: undoSheets, fileURL: fileURL,
             firstVisibleColumn: firstVisibleColumn, scrollOffset: scrollOffset,
-            changeColumn: changeColumn, editColumn: editColumn, addingToColumn:
-            addingToColumn,
+            changeColumn: changeColumn, editColumn: editColumn,
+            addingToColumn:
+                addingToColumn,
             columnScrollMaxOffsets: columnScrollMaxOffsets,
             status: status)
     }
@@ -125,8 +137,9 @@ struct Model {
         Model(
             sheet: sheet, undoSheets: undoSheets, fileURL: fileURL,
             firstVisibleColumn: firstVisibleColumn, scrollOffset: scrollOffset,
-            changeColumn: changeColumn, editColumn: editColumn, addingToColumn:
-            addingToColumn,
+            changeColumn: changeColumn, editColumn: editColumn,
+            addingToColumn:
+                addingToColumn,
             columnScrollMaxOffsets: columnScrollMaxOffsets,
             status: (msg: status, timeout: Date().timeIntervalSince1970 + STATUS_TIMEOUT))
     }

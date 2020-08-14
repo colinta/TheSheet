@@ -7,9 +7,12 @@ import Foundation
 
 enum Message {
     case sheet(Sheet.Message)
+    case advanceVisibleColumn(Int)
+    case changeVisibleColumnsCount(Int)
     case changeColumn(Int)
     case editColumn(Int?)
-    case addControl(Int?)
+    case startAddControl(Int?)
+    case addControl(SheetControl, to: Int)
     case replaceColumn(at: Int, with: Int)
     case scroll(Int)
     case setScrollSize(Int, LocalViewport)
@@ -43,6 +46,21 @@ func update(model: inout Model, message: Message) -> State<Model, Message> {
         return .model(model.replace(editColumn: nil))
     case let .sheet(message):
         return .model(model.replace(sheet: model.sheet.update(message)))
+    case let .advanceVisibleColumn(delta):
+        let firstIndex = model.firstVisibleColumn + delta
+        let lastIndex = model.firstVisibleColumn + delta + model.sheet.visibleColumnsCount
+        guard firstIndex >= 0,
+            lastIndex <= model.sheet.columns.count
+        else { return .noChange }
+        return .model(model.replace(firstVisibleColumn: model.firstVisibleColumn + delta))
+    case let .changeVisibleColumnsCount(delta):
+        let newCount = model.sheet.visibleColumnsCount + delta
+        guard newCount > 0,
+            newCount <= model.sheet.columns.count
+        else { return .noChange }
+        return .model(
+            model.replace(
+                sheet: model.sheet.replace(visibleColumnsCount: newCount)))
     case let .changeColumn(index):
         guard model.changeColumn != index else {
             return .model(model.replace(changeColumn: nil))
@@ -53,20 +71,32 @@ func update(model: inout Model, message: Message) -> State<Model, Message> {
             return .model(model.replace(editColumn: nil))
         }
         return .model(model.replace(editColumn: index))
-    case let .addControl(index):
+    case let .startAddControl(index):
         return .model(model.replace(addingToColumn: index))
+    case let .addControl(control, changeIndex):
+        guard changeIndex >= 0, changeIndex < model.sheet.columns.count else { return .noChange }
+        return .model(
+            model.replace(
+                sheet:
+                    model.sheet.replace(
+                        columns: model.sheet.columns.enumerated().map { index, column in
+                            guard index == changeIndex else { return column }
+                            return column.replace(controls: column.controls + [control])
+                        })
+            ).replace(addingToColumn: nil))
     case let .setScrollSize(index, scrollViewport):
         return .model(model.replace(column: index, scrollViewport: scrollViewport))
-    case let .replaceColumn(oldIndex, columnIndex):
-        guard columnIndex >= 0, columnIndex < model.sheet.columns.count else { return .noChange }
-
+    case let .replaceColumn(oldIndex, newIndex):
+        guard newIndex >= 0, newIndex < model.sheet.columns.count else { return .noChange }
         return .model(
             model.replace(
                 sheet: model.sheet.replace(
-                    columnsOrder: model.sheet.columnsOrder.enumerated().map {
-                        position, index in
-                        if position == oldIndex {
-                            return columnIndex
+                    columnsOrder: model.sheet.columnsOrder.map {
+                        index in
+                        if index == oldIndex {
+                            return newIndex
+                        } else if index == newIndex {
+                            return oldIndex
                         } else {
                             return index
                         }
@@ -144,6 +174,8 @@ private func _render(_ model: Model, status: String?) -> [View<Message>] {
     ([
         OnKeyPress(key: .up, Message.scroll(-1)),
         OnKeyPress(key: .down, Message.scroll(1)),
+        OnKeyPress(key: .left, Message.advanceVisibleColumn(-1)),
+        OnKeyPress(key: .right, Message.advanceVisibleColumn(1)),
         OnKeyPress(key: .pageUp, Message.scroll(-25)),
         OnKeyPress(key: .pageDown, Message.scroll(25)),
         OnKeyPress(key: .space, Message.scroll(25)),
@@ -158,12 +190,17 @@ private func _render(_ model: Model, status: String?) -> [View<Message>] {
                 (
                     .flex1,
                     Columns(
-                        model.sheet.columnsOrder[model.firstVisibleColumn..<(model.sheet.visibleColumns + model.firstVisibleColumn)].enumerated().compactMap { position, index in
+                        model.sheet.columnsOrder[
+                            model.firstVisibleColumn..<(model.sheet.visibleColumnsCount
+                                + model.firstVisibleColumn)
+                        ].compactMap { index in
                             guard index >= 0 && index < model.sheet.columns.count else {
                                 return nil
                             }
                             let column = model.sheet.columns[index]
-                            return renderColumn(model, column, position: position, index: index)
+                            return renderColumn(
+                                model, column,
+                                index: index)
                         }
                     )
                 ),
@@ -173,20 +210,19 @@ private func _render(_ model: Model, status: String?) -> [View<Message>] {
                 ),
             ]),
         model.addingToColumn == nil ? OnMouseWheel(Space(), Message.scroll) : nil,
-        model.addingToColumn != nil ? renderControlEditor() : nil,
+        model.addingToColumn.map({ renderControlEditorModal(addToColumn: $0) }),
     ] as [View<Message>?]).compactMap { $0 }
 }
 
-func renderColumn(_ model: Model, _ column: SheetColumn, position: Int, index: Int) -> View<Message>
-{
+func renderColumn(_ model: Model, _ column: SheetColumn, index: Int) -> View<Message> {
     let columnView = column.render(
-        model.sheet, isEditing: model.editColumn == position)
+        model.sheet, isEditing: model.editColumn == index)
     return ZStack(
         [
             Scroll(
                 columnView.map {
                     Message.sheet(Sheet.Message.column(index, $0))
-                }.fitInContainer(.width),
+                }.fitInContainer(dimension: .width),
                 onResizeContent: { scrollViewport in
                     Message.setScrollSize(index, scrollViewport)
                 },
@@ -196,11 +232,11 @@ func renderColumn(_ model: Model, _ column: SheetColumn, position: Int, index: I
                 .alignment(.topLeft)
             )
 
-        ] + renderColumnEditor(model, position)
+        ] + renderColumnEditor(model, index)
     )
 }
 
-func renderControlEditor() -> View<Message> {
+func renderControlEditorModal(addToColumn: Int) -> View<Message> {
     ZStack([
         IgnoreMouse(),
         OnLeftClick(
@@ -208,28 +244,41 @@ func renderControlEditor() -> View<Message> {
                 return AttributedCharacter(
                     character: AttributedCharacter.null.character, attributes: []
                 ).styled(.foreground(.black)).styled(.background(.none))
-            }, Message.addControl(nil), .highlight(false)),
+            }, Message.startAddControl(nil), .highlight(false)),
+        Box(
+            Stack(
+                .down,
+                SheetControl.allControls.map({
+                    renderAddControlModal(control: $0, addToColumn: addToColumn)
+                }))
+        )
+        .minWidth(50, fittingContainer: true)
+        .background(view: Text(" "))
+        .aligned(.middleCenter),
     ])
 }
 
-func renderColumnEditor(_ model: Model, _ position: Int) -> [View<Message>] {
-    guard model.sheet.columns.count > model.sheet.visibleColumns else { return [] }
+func renderAddControlModal(control: (String, SheetControl), addToColumn: Int) -> View<Message> {
+    OnLeftClick(Text("[+] \(control.0)"), Message.addControl(control.1, to: addToColumn))
+}
 
-    let current = model.sheet.columnsOrder[position]
-    let isChanging = model.changeColumn == position
-    let isEditing = model.editColumn == position
-    let isAdding = model.addingToColumn == position
+func renderColumnEditor(_ model: Model, _ index: Int) -> [View<Message>] {
+    guard model.sheet.columns.count > model.sheet.visibleColumnsCount else { return [] }
+
+    let isChanging = model.changeColumn == index
+    let isEditing = model.editColumn == index
+    let isAdding = model.addingToColumn == index
 
     let changeButton = OnLeftClick(
-        Text("[…]".styled(isEditing ? .reverse : .none)), Message.changeColumn(position)
+        Text("[…]".styled(isChanging ? .reverse : .none)), Message.changeColumn(index)
     ).padding(right: 1).compact()
     let editButton = OnLeftClick(
         Text("[Edit]".styled(isEditing ? .reverse : .none)),
-        Message.editColumn(position)
+        Message.editColumn(index)
     ).padding(right: 1).compact()
     let addButton = OnLeftClick(
         Text("[Add]".styled(isAdding ? .reverse : .none)),
-        Message.addControl(position)
+        Message.startAddControl(index)
     ).padding(right: 1).compact()
 
     let buttons = Stack(
@@ -240,6 +289,7 @@ func renderColumnEditor(_ model: Model, _ position: Int) -> [View<Message>] {
             addButton,
         ]
     )
+
     if isChanging {
         return [
             Box(
@@ -247,8 +297,8 @@ func renderColumnEditor(_ model: Model, _ position: Int) -> [View<Message>] {
                     .down,
                     model.sheet.columns.enumerated().map { newIndex, column in
                         OnLeftClick(
-                            newIndex == current ? Text(column.title.bold()) : Text(column.title),
-                            Message.replaceColumn(at: position, with: newIndex))
+                            newIndex == index ? Text(column.title.bold()) : Text(column.title),
+                            Message.replaceColumn(at: index, with: newIndex))
                     }
                 )
             ).background(view: Text(" ")).aligned(.topRight),
@@ -257,13 +307,28 @@ func renderColumnEditor(_ model: Model, _ position: Int) -> [View<Message>] {
     } else {
         return [
             buttons
-
         ]
     }
 }
 
 func MainButtons(model: Model, status: String?) -> View<Message> {
+    let columnCountControls = Stack(
+        .ltr,
+        [
+            Text("Visible Columns: ").padding(top: 1),
+            Stack(
+                .down,
+                [
+                    OnLeftClick(
+                        Text("[+]".foreground(.blue)), Message.changeVisibleColumnsCount(1)),
+                    Text(model.sheet.visibleColumnsCount).foreground(color: .white).centered()
+                        .width(3),
+                    OnLeftClick(
+                        Text("[-]".foreground(.blue)), Message.changeVisibleColumnsCount(-1)),
+                ]),
+        ])
     let buttons: [View<Message>] = [
+        columnCountControls,
         OnLeftClick(
             Text("Undo".foreground(model.canUndo ? .none : .black))
                 .underlined()

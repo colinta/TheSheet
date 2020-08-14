@@ -4,14 +4,34 @@
 
 struct Points: Codable {
     indirect enum PointType {
+        case level
         case hitPoints
         case sorcery
         case ki
-        case other(String)
+        case other(String, String)
         case many([PointType])
+
+        var toVariables: [String] {
+            switch self {
+            case .level:
+                return ["level"]
+            case .hitPoints:
+                return ["hitPoints"]
+            case .sorcery:
+                return ["sorceryPoints"]
+            case .ki:
+                return ["kiPoints"]
+            case let .many(types):
+                return types.flatMap(\.toVariables)
+            case let .other(type, _):
+                return [type]
+            }
+        }
 
         var toReadable: String {
             switch self {
+            case .level:
+                return "Level"
             case .hitPoints:
                 return "Hit Points"
             case .sorcery:
@@ -20,24 +40,19 @@ struct Points: Codable {
                 return "Ki Points"
             case let .many(types):
                 return types.map(\.toReadable).joined(separator: ", ")
-            case let .other(type):
-                return type
+            case let .other(_, title):
+                return title
             }
         }
 
-
         func `is`(_ type: Points.PointType) -> Bool {
-            switch (self, type) {
-            case (.hitPoints, .hitPoints):
-                return true
-            case (.sorcery, .sorcery):
-                return true
-            case (.ki, .ki):
-                return true
-            default:
-                guard case let .many(types) = self else { return false }
+            if case let .many(types) = self {
                 return types.contains(where: { $0.is(type) })
             }
+            if case let .many(types) = type {
+                return types.contains(where: { $0.is(self) })
+            }
+            return self.toReadable == type.toReadable
         }
     }
 
@@ -46,6 +61,12 @@ struct Points: Codable {
     let max: Int?
     let type: PointType
     let shouldResetOnLongRest: Bool
+
+    var formulas: [Formula] {
+        type.toVariables.map { name in
+            Formula(variable: name, operation: .integer(current))
+        }
+    }
 
     func replace(current: Int) -> Points {
         Points(
@@ -68,10 +89,14 @@ extension Points.PointType: Codable {
     enum CodingKeys: String, CodingKey {
         case type
         case many
+        case variable
+        case title
     }
 
     private static func from(string type: String) -> Points.PointType {
         switch type {
+        case "level":
+            return .level
         case "hitPoints":
             return .hitPoints
         case "sorcery":
@@ -79,12 +104,14 @@ extension Points.PointType: Codable {
         case "ki":
             return .ki
         default:
-            return .other(type)
+            return .other(type, type)
         }
     }
 
     private var toEncodeable: String {
         switch self {
+        case .level:
+            return "level"
         case .hitPoints:
             return "hitPoints"
         case .sorcery:
@@ -93,8 +120,8 @@ extension Points.PointType: Codable {
             return "ki"
         case .many:
             return "many"
-        case let .other(type):
-            return type
+        case .other:
+            return "other"
         }
     }
 
@@ -102,9 +129,13 @@ extension Points.PointType: Codable {
         let values = try decoder.container(keyedBy: CodingKeys.self)
         let type = try values.decode(String.self, forKey: .type)
         switch type {
+        case "other":
+            let variable = try values.decode(String.self, forKey: .variable)
+            let title = try values.decode(String.self, forKey: .title)
+            self = .other(variable, title)
         case "many":
-            let values = try values.decode([String].self, forKey: .many)
-            self = .many(values.map { Points.PointType.from(string: $0) })
+            let values = try values.decode([Points.PointType].self, forKey: .many)
+            self = .many(values)
         default:
             self = Points.PointType.from(string: type)
         }
@@ -116,6 +147,9 @@ extension Points.PointType: Codable {
 
         if case let .many(types) = self {
             try container.encode(types.map { $0.toEncodeable }, forKey: .many)
+        } else if case let .other(variable, title) = self {
+            try container.encode(variable, forKey: .variable)
+            try container.encode(title, forKey: .title)
         }
     }
 }

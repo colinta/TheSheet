@@ -29,7 +29,7 @@ func ActionView<Msg>(
                 _ActionTitleView(action.title),
                 OnLeftClick(
                     Text(buttonText).bold().aligned(.topRight), onExpand())
-            ).matchContainer(.width)
+            ).matchContainer(dimension: .width)
         ] + expandedViews
     ).border(.single)
 }
@@ -102,7 +102,7 @@ func _ActionTitleView<Msg>(_ title: String) -> View<Msg> {
 func _ActionLevelView<Msg>(_ level: String?) -> View<Msg> {
     level.map { Text($0) } ?? Space()
 }
-func _ActionCheckView<Msg>(_ check: Formula, sheet: Sheet) -> View<Msg> {
+func _ActionCheckView<Msg>(_ check: Operation, sheet: Sheet) -> View<Msg> {
     StatView(Stat(title: "Check", value: check), sheet: sheet)
 }
 func _ActionDamageView<Msg>(_ damage: [Roll], sheet: Sheet) -> View<Msg> {
@@ -119,7 +119,7 @@ func _ActionDescriptionView<Msg>(_ description: String) -> View<
     Msg
 > {
     Text(description, .wrap(true))
-        .fitInContainer(.width)
+        .fitInContainer(dimension: .width)
 }
 func _ActionUsesView<Msg>(
     action: Action, remainingUses: Int, _ onChange: @escaping (Int) -> Msg,
@@ -142,9 +142,12 @@ func _ActionUsesView<Msg>(
             ),
             (.fixed, remaining),
             (.flex1, Space()),
-            (.fixed, canAdd
-                ? OnLeftClick(Text("+Add".foreground(.green)), onChange(1))
-                : Text("+Add".foreground(.black))),
+            (
+                .fixed,
+                canAdd
+                    ? OnLeftClick(Text("+Add".foreground(.green)), onChange(1))
+                    : Text("+Add".foreground(.black))
+            ),
         ]
             + (action.uses != nil
                 ? [

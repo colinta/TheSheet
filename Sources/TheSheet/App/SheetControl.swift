@@ -33,30 +33,7 @@ enum SheetControl {
     case skills([Skill])
     case stats(String, [Stat])
     case restButtons
-    case formulas([(String, Formula)])
-
-    var formulas: Formula.Lookup {
-        switch self {
-        case let .attributes(attributes):
-            return Formula.mergeAll(
-                attributes.map { attribute in
-                    [
-                        attribute.variableName: .integer(attribute.score),
-                        "\(attribute.variableName).Mod": .modifier(.integer(attribute.modifier)),
-                    ] as Formula.Lookup
-                })
-        case let .stats(_, stats):
-            return Formula.mergeAll(stats.map { $0.formulas })
-        case let .formulas(formulas):
-            let val = formulas.reduce(Formula.Lookup()) { memo, variable_formula in
-                let (variable, formula) = variable_formula
-                return Formula.merge(memo, with: [variable: formula])
-            }
-            return val
-        default:
-            return [:]
-        }
-    }
+    case formulas([Formula])
 
     static var allControls: [(String, SheetControl)] = [
         ("Inventory", .inventory(Inventory(title: "", quantity: nil))),
@@ -79,8 +56,32 @@ enum SheetControl {
         ("Skills (Acrobatics, Stealth, …)", .skills([])),
         ("Stats (Armor, Attack, …)", .stats("", [])),
         ("Take a Short or Long Rest", .restButtons),
-        ("Formulas", .formulas([])),
     ]
+
+    var isEditable: Bool { if case .attributes = self { return false }; return true }
+    var formulas: [Formula] {
+        switch self {
+        case let .attributes(attributes):
+            return Operation.mergeAll(
+                attributes.map { attribute in
+                    [
+                        Formula(
+                            variable: attribute.variableName, operation: .integer(attribute.score)),
+                        Formula(
+                            variable: "\(attribute.variableName).Mod",
+                            operation: .modifier(.integer(attribute.modifier))),
+                    ] as [Formula]
+                })
+        case let .stats(_, stats):
+            return Operation.mergeAll(stats.map { $0.formulas })
+        case let .formulas(formulas):
+            return formulas
+        case let .pointsTracker(points):
+            return points.formulas
+        default:
+            return []
+        }
+    }
 
     func update(_ message: Message) -> (SheetControl, Sheet.Mod?) {
         var control: SheetControl = self
@@ -213,7 +214,12 @@ enum SheetControl {
         case let .skills(skills):
             return SkillsView(skills.map { $0.resolve(sheet) })
         case let .formulas(formulas):
-            return FormulasView(formulas)
+            let sheetFormulas = sheet.formulas.filter { sf in
+                !formulas.contains(where: { ff in ff.is(named: sf.variable) })
+            }.sorted { lhs, rhs in
+                lhs.variable.lowercased() < rhs.variable.lowercased()
+            }
+            return FormulasView(editable: formulas, fixed: sheetFormulas, sheet: sheet)
         case .restButtons:
             return TakeRestView(Message.takeRest(.short), Message.takeRest(.long))
         }
@@ -272,11 +278,8 @@ extension SheetControl: Codable {
         case "restButtons":
             self = .restButtons
         case "formulas":
-            let formulas = try values.decode([[String: Formula]].self, forKey: .formulas)
-            self = .formulas(
-                formulas.flatMap { dict in
-                    dict.map { ($0, $1) }
-                })
+            let formulas = try values.decode([Formula].self, forKey: .formulas)
+            self = .formulas(formulas)
         default:
             throw Error.decoding
         }
@@ -314,10 +317,7 @@ extension SheetControl: Codable {
             try container.encode("restButtons", forKey: .type)
         case let .formulas(formulas):
             try container.encode("formulas", forKey: .type)
-            try container.encode(
-                formulas.map { (key, value) in
-                    [key: value]
-                }, forKey: .formulas)
+            try container.encode(formulas, forKey: .formulas)
         }
     }
 }

@@ -4,14 +4,14 @@
 
 enum Roll {
     case dice(Dice)
-    case formula(Formula)
+    case operation(Operation)
 
     func toReadable(_ sheet: Sheet) -> String {
         switch self {
         case let .dice(dice):
             return dice.toReadableRoll
-        case let .formula(formula):
-            return Formula.eval(sheet, formula).toReadable
+        case let .operation(operation):
+            return Operation.eval(sheet, operation).toReadable
         }
     }
 }
@@ -33,9 +33,9 @@ extension Roll: Codable {
         case "dice":
             let dice = try values.decode(Dice.self, forKey: .value)
             self = .dice(dice)
-        case "formula":
-            let formula = try values.decode(Formula.self, forKey: .value)
-            self = .formula(formula)
+        case "operation":
+            let operation = try values.decode(Operation.self, forKey: .value)
+            self = .operation(operation)
         default:
             throw Error.decoding
         }
@@ -47,9 +47,9 @@ extension Roll: Codable {
         case let .dice(dice):
             try container.encode("dice", forKey: .type)
             try container.encode(dice, forKey: .value)
-        case let .formula(formula):
-            try container.encode("formula", forKey: .type)
-            try container.encode(formula, forKey: .value)
+        case let .operation(operation):
+            try container.encode("operation", forKey: .type)
+            try container.encode(operation, forKey: .value)
         }
     }
 }

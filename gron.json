@@ -1,4 +1,13 @@
 {
+  "visibleColumnsCount" : 3,
+  "columnsOrder" : [
+    0,
+    5,
+    3,
+    4,
+    1,
+    2
+  ],
   "columns" : [
     {
       "title" : "Actions",
@@ -74,7 +83,7 @@
                     }
                   },
                   {
-                    "type" : "formula",
+                    "type" : "operation",
                     "value" : {
                       "type" : "integer",
                       "value" : 1
@@ -114,7 +123,7 @@
                     }
                   },
                   {
-                    "type" : "formula",
+                    "type" : "operation",
                     "value" : {
                       "type" : "integer",
                       "value" : 1
@@ -146,7 +155,7 @@
                     }
                   },
                   {
-                    "type" : "formula",
+                    "type" : "operation",
                     "value" : {
                       "type" : "integer",
                       "value" : 1
@@ -212,7 +221,8 @@
             "remainingUses" : 7
           }
         }
-      ]
+      ],
+      "isFormulaColumn" : false
     },
     {
       "title" : "Inventory",
@@ -383,7 +393,8 @@
             "title" : "Waterskin"
           }
         }
-      ]
+      ],
+      "isFormulaColumn" : false
     },
     {
       "title" : "Spells",
@@ -531,7 +542,7 @@
                     }
                   },
                   {
-                    "type" : "formula",
+                    "type" : "operation",
                     "value" : {
                       "type" : "integer",
                       "value" : 1
@@ -612,7 +623,8 @@
             "isExpanded" : true
           }
         }
-      ]
+      ],
+      "isFormulaColumn" : false
     },
     {
       "title" : "Stats",
@@ -661,6 +673,34 @@
         {
           "type" : "pointsTracker",
           "points" : {
+            "title" : "Sorcerer Level",
+            "current" : 4,
+            "max" : 20,
+            "type" : {
+              "type" : "other",
+              "variable" : "sorcererLevel",
+              "title" : "Sorcerer Level"
+            },
+            "shouldResetOnLongRest" : false
+          }
+        },
+        {
+          "type" : "pointsTracker",
+          "points" : {
+            "title" : "Monk Level",
+            "current" : 0,
+            "max" : 20,
+            "type" : {
+              "type" : "other",
+              "variable" : "monkLevel",
+              "title" : "Monk Level"
+            },
+            "shouldResetOnLongRest" : false
+          }
+        },
+        {
+          "type" : "pointsTracker",
+          "points" : {
             "title" : "Hit Points",
             "current" : 44,
             "max" : 44,
@@ -700,7 +740,9 @@
             "title" : "Inspiration",
             "current" : 1,
             "type" : {
-              "type" : "inspiration"
+              "type" : "other",
+              "variable" : "inspiration",
+              "title" : "inspiration"
             },
             "shouldResetOnLongRest" : false
           }
@@ -800,7 +842,8 @@
             }
           ]
         }
-      ]
+      ],
+      "isFormulaColumn" : false
     },
     {
       "title" : "Abilities",
@@ -860,7 +903,8 @@
             "description" : "Double Proficiency Bonus to Charisma when talking with Dragons"
           }
         }
-      ]
+      ],
+      "isFormulaColumn" : false
     },
     {
       "title" : "Formulas",
@@ -869,7 +913,24 @@
           "type" : "formulas",
           "formulas" : [
             {
-              "proficiencyBonus" : {
+              "variable" : "level",
+              "operation" : {
+                "type" : "add",
+                "value" : [
+                  {
+                    "type" : "variable",
+                    "value" : "sorcererLevel"
+                  },
+                  {
+                    "type" : "variable",
+                    "value" : "monkLevel"
+                  }
+                ]
+              }
+            },
+            {
+              "variable" : "proficiencyBonus",
+              "operation" : {
                 "type" : "add",
                 "value" : [
                   {
@@ -894,19 +955,24 @@
               }
             },
             {
-              "level" : {
-                "type" : "integer",
-                "value" : 3
+              "variable" : "attackBonus",
+              "operation" : {
+                "type" : "max",
+                "value" : [
+                  {
+                    "type" : "variable",
+                    "value" : "STR.Mod"
+                  },
+                  {
+                    "type" : "variable",
+                    "value" : "DEX.Mod"
+                  }
+                ]
               }
             },
             {
-              "attackBonus" : {
-                "type" : "variable",
-                "value" : "STR.Mod"
-              }
-            },
-            {
-              "defaultArmor" : {
+              "variable" : "defaultArmor",
+              "operation" : {
                 "type" : "add",
                 "value" : [
                   {
@@ -921,7 +987,8 @@
               }
             },
             {
-              "draconicArmor" : {
+              "variable" : "draconicArmor",
+              "operation" : {
                 "type" : "add",
                 "value" : [
                   {
@@ -936,7 +1003,8 @@
               }
             },
             {
-              "armorClass" : {
+              "variable" : "armorClass",
+              "operation" : {
                 "type" : "max",
                 "value" : [
                   {
@@ -951,7 +1019,8 @@
               }
             },
             {
-              "spellAttack" : {
+              "variable" : "spellAttack",
+              "operation" : {
                 "type" : "add",
                 "value" : [
                   {
@@ -967,16 +1036,8 @@
             }
           ]
         }
-      ]
+      ],
+      "isFormulaColumn" : true
     }
-  ],
-  "columnsOrder" : [
-    0,
-    2,
-    3,
-    4,
-    5,
-    1
-  ],
-  "visibleColumns" : 4
+  ]
 }
