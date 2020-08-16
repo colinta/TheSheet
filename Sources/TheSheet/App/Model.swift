@@ -14,7 +14,7 @@ struct Model {
         case changeColumn(Int)
         case editColumn(Int)
         case addToColumn(Int)
-        case editControl(column: Int, control: Int, restore: SheetControl)
+        case editControl(column: Int, control: Int, editor: EditableControl)
         case none
 
         enum Filter {
@@ -73,9 +73,9 @@ struct Model {
         guard case let .addToColumn(editingColumn) = editing else { return nil }
         return editingColumn
     }
-    var editingControl: (column: Int, control: Int)? {
-        guard case let .editControl(column, control, _) = editing else { return nil }
-        return (column, control)
+    var editingControl: (column: Int, control: Int, editor: EditableControl)? {
+        guard case let .editControl(column, control, editor) = editing else { return nil }
+        return (column, control, editor)
     }
 
     init(
@@ -124,12 +124,26 @@ struct Model {
             status: status)
     }
 
-    func replace(editControl control: Int, inColumn column: Int, restore: SheetControl) -> Model {
+    func addControl(_ control: SheetControl, toColumn columnIndex: Int) -> Model {
+        replace(sheet: sheet.replace(
+            columns: sheet.columns.modifying({ column in
+                column.replace(controls: column.controls + [control])
+            }, at: columnIndex)))
+    }
+
+    func replace(control controlIndex: Int, inColumn columnIndex: Int, with newControl: SheetControl) -> Model {
+        replace(sheet: sheet.replace(
+            columns: sheet.columns.modifying({ column in
+                column.replace(controls: column.controls.replacing(newControl, at: controlIndex))
+            }, at: columnIndex)))
+    }
+
+    func replace(editControl control: Int, inColumn column: Int, editor: EditableControl) -> Model {
         Model(
             sheet: sheet, undoSheets: undoSheets, fileURL: fileURL,
             firstVisibleColumn: firstVisibleColumn,
             columnScrollOffset: columnScrollOffset, modalScrollOffset: modalScrollOffset,
-            editing: .editControl(column: column, control: control, restore: restore),
+            editing: .editControl(column: column, control: control, editor: editor),
             columnScrollMaxOffsets: columnScrollMaxOffsets,
             modalScrollMaxOffset: modalScrollMaxOffset,
             status: status)

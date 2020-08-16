@@ -7,14 +7,6 @@ struct Skill: Codable {
     let basedOn: String
     let isProficient: Bool
 
-    struct Editor {
-        let responder: Int?
-
-        func replace(responder: Int) -> Editor {
-            Editor(responder: responder)
-        }
-    }
-
     func resolve(_ sheet: Sheet) -> ResolvedSkill {
         ResolvedSkill(
             skill: self,

@@ -6,22 +6,29 @@ import Ashen
 import Foundation
 
 enum Message {
-    case sheet(Sheet.Message)
-    case advanceVisibleColumn(Int)
-    case changeVisibleColumnsCount(Int)
+    case sheetMessage(Sheet.Message)
+    case controlEditingMessage(EditableControl.Message)
+
     case changeColumn(Int)
     case editColumn(Int)
     case startAddControl(Int)
     case addControl(SheetControl, to: Int)
+    case saveControl
+
+    case changeVisibleColumn(Int)
+    case changeVisibleColumnsCount(Int)
     case replaceColumn(at: Int, with: Int)
-    case cancelModal
+
     case scrollColumns(Int)
-    case scrollModal(Int)
     case setColumnScrollSize(Int, LocalViewport)
+
+    case scrollModal(Int)
     case setModalScrollSize(LocalViewport)
+    case cancelModal
+
+    case statusDidTimeout
     case undo
     case reloadJSON
-    case statusDidTimeout
     case saveJSON
     case quit
 }
@@ -50,17 +57,48 @@ func showStatus(model: Model, status: String?) -> State<Model, Message> {
 
 func update(model: inout Model, message: Message) -> State<Model, Message> {
     switch message {
-    case let .sheet(.columnMessage(columnIndex, .delegate(delegate))):
+    case let .sheetMessage(.columnMessage(columnIndex, .delegate(delegate))):
         switch delegate {
         case let .showControlEditor(controlIndex):
-            let restore = model.sheet.columns[columnIndex].controls[controlIndex]
-            return .model(model.replace(editControl: controlIndex, inColumn: columnIndex, restore: restore))
+            let control = model.sheet.columns[columnIndex].controls[controlIndex]
+            guard let editor = control.editor else {
+                return .model(model.stopEditing())
+            }
+            return .model(model.replace(editControl: controlIndex, inColumn: columnIndex, editor: editor))
         case .stopEditing:
             return .model(model.stopEditing())
         }
-    case let .sheet(message):
+    case let .sheetMessage(message):
         return .model(model.replace(sheet: model.sheet.update(message)))
-    case let .advanceVisibleColumn(delta):
+    case let .controlEditingMessage(message):
+        guard case let .editControl(column, control, editor) = model.editing else {
+            return .model(model.stopEditing())
+        }
+        let newEditor = editor.update(message)
+        return .model(model.replace(editControl: control, inColumn: column, editor: newEditor))
+
+    case let .changeColumn(index):
+        guard !model.isChangingColumn(index) else {
+            return .model(model.stopEditing())
+        }
+        return .model(model.replace(changeColumn: index))
+    case let .editColumn(index):
+        guard !model.isEditingColumn(index) else {
+            return .model(model.stopEditing())
+        }
+        return .model(model.replace(editColumn: index))
+    case let .startAddControl(index):
+        return .model(model.replace(addToColumn: index))
+    case let .addControl(control, columnIndex):
+        guard columnIndex >= 0, columnIndex < model.sheet.columns.count else { return .noChange }
+        return .model(model.addControl(control, toColumn: columnIndex).stopEditing())
+    case .saveControl:
+        guard case let .editControl(column, control, editor) = model.editing else {
+            return .model(model.stopEditing())
+        }
+        return .model(model.replace(control: control, inColumn: column, with: editor.control).stopEditing())
+
+    case let .changeVisibleColumn(delta):
         let firstIndex = model.firstVisibleColumn + delta
         let lastIndex = model.firstVisibleColumn + delta + model.sheet.visibleColumnsCount
         guard firstIndex >= 0,
@@ -75,31 +113,7 @@ func update(model: inout Model, message: Message) -> State<Model, Message> {
         return .model(
             model.replace(
                 sheet: model.sheet.replace(visibleColumnsCount: newCount)))
-    case let .changeColumn(index):
-        guard !model.isChangingColumn(index) else {
-            return .model(model.stopEditing())
-        }
-        return .model(model.replace(changeColumn: index))
-    case let .editColumn(index):
-        guard !model.isEditingColumn(index) else {
-            return .model(model.stopEditing())
-        }
-        return .model(model.replace(editColumn: index))
-    case let .startAddControl(index):
-        return .model(model.replace(addToColumn: index))
-    case let .addControl(control, changeIndex):
-        guard changeIndex >= 0, changeIndex < model.sheet.columns.count else { return .noChange }
-        return .model(
-            model.replace(
-                sheet:
-                    model.sheet.replace(
-                        columns: model.sheet.columns.enumerated().map { index, column in
-                            guard index == changeIndex else { return column }
-                            return column.replace(controls: column.controls + [control])
-                        })
-            ).stopEditing())
     case let .replaceColumn(oldIndex, newIndex):
-        guard newIndex >= 0, newIndex < model.sheet.columns.count else { return .noChange }
         return .model(
             model.replace(
                 sheet: model.sheet.replace(
@@ -115,18 +129,30 @@ func update(model: inout Model, message: Message) -> State<Model, Message> {
                     }))
                 .replace(changeColumn: newIndex)
             )
-    case .cancelModal:
-        return .model(model.stopEditing())
+
     case let .scrollColumns(delta):
         let scrollOffset = max(0, min(model.columnScrollOffset + delta, model.columnScrollMaxOffset))
         return .model(model.replace(columnScrollOffset: scrollOffset))
     case let .setColumnScrollSize(index, scrollViewport):
         return .model(model.replace(column: index, scrollViewport: scrollViewport))
+
     case let .setModalScrollSize(scrollViewport):
         return .model(model.replace(modalScrollViewport: scrollViewport))
     case let .scrollModal(delta):
         let scrollOffset = max(0, min(model.modalScrollOffset + delta, model.modalScrollMaxOffset))
         return .model(model.replace(modalScrollOffset: scrollOffset))
+    case .cancelModal:
+        return .model(model.stopEditing())
+
+    case .statusDidTimeout:
+        let now = Date().timeIntervalSince1970
+        if let timeout = model.status?.timeout, timeout > now {
+            return .update(
+                model,
+                [Timeout(timeout - now + 0.01, Message.statusDidTimeout)])
+        }
+
+        return .model(model.replace(status: nil))
     case .undo:
         return .model(model.undo())
     case .reloadJSON:
@@ -159,15 +185,6 @@ func update(model: inout Model, message: Message) -> State<Model, Message> {
         } catch {
             return showStatus(model: model, status: "Error saving JSON")
         }
-    case .statusDidTimeout:
-        let now = Date().timeIntervalSince1970
-        if let timeout = model.status?.timeout, timeout > now {
-            return .update(
-                model,
-                [Timeout(timeout - now + 0.01, Message.statusDidTimeout)])
-        }
-
-        return .model(model.replace(status: nil))
     case .quit:
         guard let fileURL = model.fileURL else {
             return .quit
@@ -191,17 +208,17 @@ func render(model: Model) -> [View<Message>] {
 
 private func _render(_ model: Model, status: String?) -> [View<Message>] {
     ([
-        OnKeyPress(key: .up, Message.scrollColumns(-1)),
-        OnKeyPress(key: .down, Message.scrollColumns(1)),
-        OnKeyPress(key: .left, Message.advanceVisibleColumn(-1)),
-        OnKeyPress(key: .right, Message.advanceVisibleColumn(1)),
-        OnKeyPress(key: .pageUp, Message.scrollColumns(-25)),
-        OnKeyPress(key: .pageDown, Message.scrollColumns(25)),
-        OnKeyPress(key: .space, Message.scrollColumns(25)),
-        OnKeyPress(key: .esc, Message.quit),
-        OnKeyPress(key: .ctrl(.s), Message.saveJSON),
-        OnKeyPress(key: .ctrl(.o), Message.reloadJSON),
-        OnKeyPress(key: .ctrl(.z), Message.undo),
+        OnKeyPress(.up, Message.scrollColumns(-1)),
+        OnKeyPress(.down, Message.scrollColumns(1)),
+        OnKeyPress(.left, Message.changeVisibleColumn(-1)),
+        OnKeyPress(.right, Message.changeVisibleColumn(1)),
+        OnKeyPress(.pageUp, Message.scrollColumns(-25)),
+        OnKeyPress(.pageDown, Message.scrollColumns(25)),
+        OnKeyPress(.space, Message.scrollColumns(25)),
+        OnKeyPress(.ctrl(.s), Message.saveJSON),
+        OnKeyPress(.ctrl(.r), Message.reloadJSON),
+        OnKeyPress(.ctrl(.x), Message.quit),
+        OnKeyPress(.ctrl(.z), Message.undo),
         Flow(
             .down,
             [
@@ -229,51 +246,62 @@ private func _render(_ model: Model, status: String?) -> [View<Message>] {
                 ),
             ]),
         !(model.isAddingToColumn() || model.isEditingControl()) ? OnMouseWheel(Space(), Message.scrollColumns) : nil,
-        model.editingControl.map({ column, control in renderControlEditor(model: model, column: column, control: control) }),
+        model.editingControl.map({ column, control, editor in renderControlEditor(model: model, column: column, control: control, editor: editor) }),
         model.addingToColumn.map({ renderControlSelector(model: model, addToColumn: $0) }),
     ] as [View<Message>?]).compactMap { $0 }
 }
 
-func inModal(model: Model, _ view: View<Message>) -> View<Message> {
+func inModal(model: Model, view: View<Message>, header: View<Message>? = nil, footer: View<Message>? = nil) -> View<Message> {
     ZStack([
         IgnoreMouse(),
+        IgnoreKeys(),
         OnLeftClick(
-            Space().modifyCharacters { pt, size, c in
-                return AttributedCharacter(
-                    character: AttributedCharacter.null.character, attributes: []
-                ).styled(.foreground(.black)).styled(.background(.none))
-            }, Message.cancelModal, .highlight(false)),
-        Scroll(
-            view,
-            onResizeContent: { scrollViewport in
-                Message.setModalScrollSize(scrollViewport)
-            },
-            .offset(y: model.modalScrollOffset)
-        ).border(
-            .single
-        )
+            Space(), Message.cancelModal, .highlight(false)),
+        Stack(.down, [
+            header,
+            Scroll(
+                view,
+                onResizeContent: { scrollViewport in
+                    Message.setModalScrollSize(scrollViewport)
+                },
+                .offset(y: model.modalScrollOffset)
+            ).border(
+                .single
+            )
+                ,
+            footer,
+        ].compactMap { $0 })
+        .background(view: Text(" "))
             .minWidth(75, fittingContainer: true)
-            .background(view: Text(" "))
+            .fitInContainer(dimension: .height)
             .aligned(.middleCenter),
         OnMouseWheel(Space(), Message.scrollModal)
     ])
 }
 
 func renderControlSelector(model: Model, addToColumn: Int) -> View<Message> {
-    inModal(model: model, Stack(
-        .down,
-        SheetControl.allControls.map({ title, control in
-            OnLeftClick(Text("[+] \(title)"), Message.addControl(control, to: addToColumn))
-        })))
+    inModal(model: model,
+        view: Stack(
+            .down,
+            SheetControl.allControls.map({ title, control in
+                OnLeftClick(Text("[+] \(title)"), Message.addControl(control, to: addToColumn))
+            })
+        ))
 }
 
-func renderControlEditor(model: Model, column columnIndex: Int, control controlIndex: Int) -> View<Message> {
-    let column = model.sheet.columns[columnIndex]
-    let control = column.controls[controlIndex]
-    return inModal(model: model, control.editor(model.sheet)
-        .map { SheetColumn.Message.controlEditingMessage(controlIndex, $0) }
-        .map { Sheet.Message.columnMessage(columnIndex, $0) }
-        .map { Message.sheet($0) })
+func renderControlEditor(model: Model, column columnIndex: Int, control controlIndex: Int, editor: EditableControl) -> View<Message> {
+    inModal(model: model,
+        view: editor.render(model.sheet).map { Message.controlEditingMessage($0) },
+        footer: Flow(.ltr, [
+            (.flex1, Space()),
+            (.fixed, OnLeftClick(Text(" Cancel ").border(.single), Message.cancelModal)),
+            (.fixed, Space().width(1)),
+            (.fixed, editor.canSave
+                ? OnLeftClick(Text(" Save ").border(.single), Message.saveControl)
+                : Text(" Save ".foreground(.black)).border(.single)
+            ),
+        ])
+    )
 }
 
 func renderColumn(_ model: Model, _ column: SheetColumn, columnIndex: Int) -> View<Message> {
@@ -286,7 +314,7 @@ func renderColumn(_ model: Model, _ column: SheetColumn, columnIndex: Int) -> Vi
         [
             Scroll(
                 columnView.map {
-                    Message.sheet(Sheet.Message.columnMessage(columnIndex, $0))
+                    Message.sheetMessage(Sheet.Message.columnMessage(columnIndex, $0))
                 }.fitInContainer(dimension: .width),
                 onResizeContent: { scrollViewport in
                     Message.setColumnScrollSize(columnIndex, scrollViewport)
@@ -322,7 +350,7 @@ func renderColumnEditor(_ model: Model, _ columnIndex: Int) -> [View<Message>] {
         .rtl,
         [
             changeButton,
-            currentColumn.canEdit ? editButton : nil,
+            editButton,
             currentColumn.canAdd ? addButton : nil,
         ].compactMap { $0 }
     )
@@ -367,24 +395,21 @@ func MainButtons(model: Model, status: String?) -> View<Message> {
     let buttons: [View<Message>] = [
         columnCountControls,
         OnLeftClick(
-            Text("Undo".foreground(model.canUndo ? .none : .black))
-                .underlined()
+            Text("Undo (" + "Z".underlined() + ")")
+                .foreground(color: model.canUndo ? .none : .black)
                 .padding(left: 1, right: 1)
                 .border(.single), Message.undo, .isEnabled(model.canUndo)),
         OnLeftClick(
-            Text("Reload")
-                .underlined()
+            Text("R".underlined() + "eload")
                 .padding(left: 1, right: 1)
                 .border(.single), Message.reloadJSON),
         OnLeftClick(
-            Text("Save")
-                .underlined()
+            Text("S".underlined() + "ave")
                 .padding(left: 1, right: 1)
                 .border(.single),
             Message.saveJSON),
         OnLeftClick(
-            Text("Exit")
-                .underlined()
+            Text("Save & E" + "x".underlined() + "it")
                 .padding(left: 1, right: 1)
                 .border(.single),
             Message.quit),

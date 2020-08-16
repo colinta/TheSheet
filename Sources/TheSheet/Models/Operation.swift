@@ -118,6 +118,9 @@ indirect enum Operation {
         case let .add(operations):
             return Operation.reduce(sheet, operations, +)
         case let .subtract(operations):
+            if operations.count == 1 {
+                return Operation.reduce(sheet, [.integer(0), operations[0]], -)
+            }
             return Operation.reduce(sheet, operations, -)
         case let .multiply(operations):
             return Operation.reduce(sheet, operations, *)
@@ -203,7 +206,12 @@ indirect enum Operation {
             guard case let .integer(value) = operation else {
                 return operation.toAttributed(sheet)
             }
-            return value.description.foreground(.blue)
+            if value > 0 {
+                return "+\(value.description)".foreground(.blue).bold()
+            }
+            else {
+                return "-\(value.description)".foreground(.blue).bold()
+            }
         case let .variable(name):
             guard sheet.findOperation(variable: name) != nil else {
                 return name.underlined().foreground(.white).background(.red)

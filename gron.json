@@ -1,11 +1,11 @@
 {
-  "visibleColumnsCount" : 3,
+  "visibleColumnsCount" : 2,
   "columnsOrder" : [
     0,
-    4,
     3,
     5,
     1,
+    4,
     2
   ],
   "columns" : [
@@ -264,13 +264,13 @@
         {
           "type" : "inventory",
           "inventory" : {
-            "title" : "15g Wetshrooms\nbreath underwater?"
+            "title" : "Caltrops (bag of 20)"
           }
         },
         {
           "type" : "inventory",
           "inventory" : {
-            "title" : "Caltrops (bag of 20)"
+            "title" : "15g Wetshrooms\nbreath underwater?"
           }
         },
         {
@@ -768,6 +768,11 @@
               "title" : "Persuasion",
               "basedOn" : "CHA",
               "isProficient" : false
+            },
+            {
+              "title" : "Awesomeness",
+              "basedOn" : "CHA",
+              "isProficient" : true
             }
           ]
         },

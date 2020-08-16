@@ -12,6 +12,16 @@ struct Attribute: Codable {
         (score - 10) / 2
     }
 
+    var formulas: [Formula] {
+        [
+            Formula(
+                variable: variableName, operation: .integer(score)),
+            Formula(
+                variable: "\(variableName).Mod",
+                operation: .modifier(.integer(modifier))),
+        ]
+    }
+
     func save(proficiencyBonus: Int) -> Int {
         modifier + (isProficient ? proficiencyBonus : 0)
     }
