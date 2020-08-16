@@ -7,12 +7,32 @@ struct Skill: Codable {
     let basedOn: String
     let isProficient: Bool
 
+    struct Editor {
+        let responder: Int?
+
+        func replace(responder: Int) -> Editor {
+            Editor(responder: responder)
+        }
+    }
+
     func resolve(_ sheet: Sheet) -> ResolvedSkill {
         ResolvedSkill(
             skill: self,
             modifierString:
                 Operation.eval(sheet, .modifier(.variable(basedOn + ".Mod")))
                 .toReadable)
+    }
+
+    func replace(title: String) -> Skill {
+        Skill(title: title, basedOn: basedOn, isProficient: isProficient)
+    }
+
+    func replace(basedOn: String) -> Skill {
+        Skill(title: title, basedOn: basedOn, isProficient: isProficient)
+    }
+
+    func replace(isProficient: Bool) -> Skill {
+        Skill(title: title, basedOn: basedOn, isProficient: isProficient)
     }
 }
 

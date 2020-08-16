@@ -2,6 +2,7 @@
 ///  SheetControl.swift
 //
 
+import Foundation
 import Ashen
 
 enum SheetControl {
@@ -10,27 +11,13 @@ enum SheetControl {
         case long
     }
 
-    enum Message {
-        case updateSlotCurrent(slotIndex: Int, current: Int)
-        case updateSlotMax(slotIndex: Int, max: Int)
-        case burnSlot(slotIndex: Int)
-        case buySlot(slotIndex: Int)
-        case updatePoints(current: Int, max: Int?)
-        case toggleExpanded
-        case changeQuantity(delta: Int)
-        case changeAttribute(index: Int, delta: Int)
-        case resetActionUses
-        case takeRest(Rest)
-        case removeControl
-    }
-
     case inventory(Inventory)
     case action(Action)
     case ability(Ability)
     case spellSlots(SpellSlots)
     case pointsTracker(Points)
     case attributes([Attribute])
-    case skills([Skill])
+    case skills([Skill], Skill.Editor?)
     case stats(String, [Stat])
     case restButtons
     case formulas([Formula])
@@ -53,12 +40,12 @@ enum SheetControl {
                     title: "", current: 0, max: nil, type: .many([]), shouldResetOnLongRest: false))
         ),
         ("Attributes (Strength, Charisma, …)", .attributes([])),
-        ("Skills (Acrobatics, Stealth, …)", .skills([])),
+        ("Skills (Acrobatics, Stealth, …)", .skills([], nil)),
         ("Stats (Armor, Attack, …)", .stats("", [])),
         ("Take a Short or Long Rest", .restButtons),
     ]
 
-    var isEditable: Bool { if case .attributes = self { return false }; return true }
+    var isEditable: Bool { true }
     var formulas: [Formula] {
         switch self {
         case let .attributes(attributes):
@@ -81,6 +68,23 @@ enum SheetControl {
         default:
             return []
         }
+    }
+
+    enum Message {
+        enum Delegate {
+            case removeControl
+        }
+        case updateSlotCurrent(slotIndex: Int, current: Int)
+        case updateSlotMax(slotIndex: Int, max: Int)
+        case burnSlot(slotIndex: Int)
+        case buySlot(slotIndex: Int)
+        case updatePoints(current: Int, max: Int?)
+        case toggleExpanded
+        case changeQuantity(delta: Int)
+        case changeAttribute(index: Int, delta: Int)
+        case resetActionUses
+        case takeRest(Rest)
+        case delegate(Delegate)
     }
 
     func update(_ message: Message) -> (SheetControl, Sheet.Mod?) {
@@ -168,7 +172,7 @@ enum SheetControl {
         switch self {
         case let .inventory(inventory):
             return InventoryView(
-                inventory, onChange: Message.changeQuantity, onRemove: Message.removeControl)
+                inventory, onChange: Message.changeQuantity, onRemove: Message.delegate(.removeControl))
         case let .action(action):
             return ActionView(
                 action, sheet: sheet,
@@ -211,7 +215,7 @@ enum SheetControl {
             return StatsView(title: title, stats: stats, sheet: sheet)
         case let .attributes(attributes):
             return AttributesView(attributes, onChange: Message.changeAttribute)
-        case let .skills(skills):
+        case let .skills(skills, _):
             return SkillsView(skills.map { $0.resolve(sheet) })
         case let .formulas(formulas):
             let sheetFormulas = sheet.formulas.filter { sf in
@@ -225,6 +229,64 @@ enum SheetControl {
         }
     }
 
+    indirect enum EditMessage {
+        enum Property {
+            case title
+            case basedOn
+            case isProficient
+        }
+
+        case atIndex(Int, EditMessage)
+        case firstResponder(IndexPath)
+        case remove
+        case changeString(Property, String)
+        case changeInt(Property, Int)
+        case changeBool(Property, Bool)
+    }
+
+    func edit(_ message: EditMessage) -> SheetControl {
+        switch (self, message) {
+        case let (.skills(skills, editor), .atIndex(removeIndex, .remove)):
+            return .skills(
+                skills.enumerated()
+                    .filter({ index, _ in index != removeIndex })
+                    .map({ _, control in control }), editor)
+        case let (.skills(skills, editor), .atIndex(atIndex, .changeString(.title, value))):
+            return .skills(
+                skills.enumerated()
+                    .map { index, skill in
+                        guard index == atIndex else { return skill }
+                        return skill.replace(title: value)
+                    }, editor)
+        case let (.skills(skills, editor), .atIndex(atIndex, .changeString(.basedOn, value))):
+            return .skills(
+                skills.enumerated()
+                    .map { index, skill in
+                        guard index == atIndex else { return skill }
+                        return skill.replace(basedOn: value)
+                    }, editor)
+        case let (.skills(skills, editor), .atIndex(atIndex, .changeBool(.isProficient, value))):
+            return .skills(
+                skills.enumerated()
+                    .map { index, skill in
+                        guard index == atIndex else { return skill }
+                        return skill.replace(isProficient: value)
+                    }, editor)
+        case let (.skills(skills, editorSkills), .firstResponder(path)):
+            return .skills(skills, (editorSkills ?? Skill.Editor(responder: nil)).replace(responder: path[0]))
+        default:
+            return self
+        }
+    }
+
+    func editor(_ sheet: Sheet) -> View<EditMessage> {
+        switch self {
+        case let .skills(skills, editorSkills):
+            return EditSkillsView(skills, editor: editorSkills ?? Skill.Editor(responder: nil))
+        default:
+            return Space()
+        }
+    }
 }
 
 extension SheetControl: Codable {
@@ -270,7 +332,7 @@ extension SheetControl: Codable {
             self = .attributes(attributes)
         case "skills":
             let skills = try values.decode([Skill].self, forKey: .skills)
-            self = .skills(skills)
+            self = .skills(skills, nil)
         case "stats":
             let title = try values.decode(String.self, forKey: .title)
             let stats = try values.decode([Stat].self, forKey: .stats)
@@ -306,7 +368,7 @@ extension SheetControl: Codable {
         case let .attributes(attributes):
             try container.encode("attributes", forKey: .type)
             try container.encode(attributes, forKey: .attributes)
-        case let .skills(skills):
+        case let .skills(skills, _):
             try container.encode("skills", forKey: .type)
             try container.encode(skills, forKey: .skills)
         case let .stats(title, stats):

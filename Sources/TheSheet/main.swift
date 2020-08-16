@@ -20,6 +20,7 @@ private func main() throws {
             ), update, render))
 }
 
+debugSilenced(true)
 try main()
 
 func createSheet() -> Sheet {

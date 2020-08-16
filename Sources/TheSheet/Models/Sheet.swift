@@ -6,7 +6,7 @@ import Ashen
 
 struct Sheet {
     enum Message {
-        case column(Int, SheetColumn.Message)
+        case columnMessage(Int, SheetColumn.Message)
     }
 
     typealias Mod = (Sheet) -> Sheet
@@ -76,7 +76,7 @@ struct Sheet {
 
     func update(_ message: Message) -> Sheet {
         switch message {
-        case let .column(changeIndex, message):
+        case let .columnMessage(changeIndex, message):
             var mod: Mod? = nil
             let columns = self.columns.enumerated().map { (index, column) -> SheetColumn in
                 guard index == changeIndex else { return column }

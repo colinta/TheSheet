@@ -2,9 +2,9 @@
   "visibleColumnsCount" : 3,
   "columnsOrder" : [
     0,
-    5,
-    3,
     4,
+    3,
+    5,
     1,
     2
   ],
@@ -400,25 +400,6 @@
       "title" : "Spells",
       "controls" : [
         {
-          "type" : "spellSlots",
-          "spellSlots" : {
-            "title" : "Spell Slots",
-            "slots" : [
-              {
-                "title" : "1",
-                "current" : 4,
-                "max" : 4
-              },
-              {
-                "title" : "2",
-                "current" : 3,
-                "max" : 3
-              }
-            ],
-            "shouldResetOnLongRest" : true
-          }
-        },
-        {
           "type" : "action",
           "action" : {
             "shouldResetOnLongRest" : false,
@@ -630,6 +611,31 @@
       "title" : "Stats",
       "controls" : [
         {
+          "type" : "pointsTracker",
+          "points" : {
+            "title" : "Hit Points",
+            "current" : 44,
+            "max" : 44,
+            "type" : {
+              "type" : "hitPoints"
+            },
+            "shouldResetOnLongRest" : true
+          }
+        },
+        {
+          "type" : "pointsTracker",
+          "points" : {
+            "title" : "Inspiration",
+            "current" : 1,
+            "type" : {
+              "type" : "other",
+              "variable" : "inspiration",
+              "title" : "inspiration"
+            },
+            "shouldResetOnLongRest" : false
+          }
+        },
+        {
           "type" : "attributes",
           "attributes" : [
             {
@@ -669,83 +675,6 @@
               "score" : 16
             }
           ]
-        },
-        {
-          "type" : "pointsTracker",
-          "points" : {
-            "title" : "Sorcerer Level",
-            "current" : 4,
-            "max" : 20,
-            "type" : {
-              "type" : "other",
-              "variable" : "sorcererLevel",
-              "title" : "Sorcerer Level"
-            },
-            "shouldResetOnLongRest" : false
-          }
-        },
-        {
-          "type" : "pointsTracker",
-          "points" : {
-            "title" : "Monk Level",
-            "current" : 0,
-            "max" : 20,
-            "type" : {
-              "type" : "other",
-              "variable" : "monkLevel",
-              "title" : "Monk Level"
-            },
-            "shouldResetOnLongRest" : false
-          }
-        },
-        {
-          "type" : "pointsTracker",
-          "points" : {
-            "title" : "Hit Points",
-            "current" : 44,
-            "max" : 44,
-            "type" : {
-              "type" : "hitPoints"
-            },
-            "shouldResetOnLongRest" : true
-          }
-        },
-        {
-          "type" : "pointsTracker",
-          "points" : {
-            "title" : "Sorcery Points",
-            "current" : 4,
-            "max" : 4,
-            "type" : {
-              "type" : "sorcery"
-            },
-            "shouldResetOnLongRest" : true
-          }
-        },
-        {
-          "type" : "pointsTracker",
-          "points" : {
-            "title" : "Ki Points",
-            "current" : 4,
-            "max" : 4,
-            "type" : {
-              "type" : "ki"
-            },
-            "shouldResetOnLongRest" : true
-          }
-        },
-        {
-          "type" : "pointsTracker",
-          "points" : {
-            "title" : "Inspiration",
-            "current" : 1,
-            "type" : {
-              "type" : "other",
-              "variable" : "inspiration",
-              "title" : "inspiration"
-            },
-            "shouldResetOnLongRest" : false
-          }
         },
         {
           "type" : "skills",
@@ -841,6 +770,34 @@
               "isProficient" : false
             }
           ]
+        },
+        {
+          "type" : "pointsTracker",
+          "points" : {
+            "title" : "Sorcerer Level",
+            "current" : 4,
+            "max" : 20,
+            "type" : {
+              "type" : "other",
+              "variable" : "sorcererLevel",
+              "title" : "Sorcerer Level"
+            },
+            "shouldResetOnLongRest" : false
+          }
+        },
+        {
+          "type" : "pointsTracker",
+          "points" : {
+            "title" : "Monk Level",
+            "current" : 0,
+            "max" : 20,
+            "type" : {
+              "type" : "other",
+              "variable" : "monkLevel",
+              "title" : "Monk Level"
+            },
+            "shouldResetOnLongRest" : false
+          }
         }
       ],
       "isFormulaColumn" : false
@@ -850,6 +807,49 @@
       "controls" : [
         {
           "type" : "restButtons"
+        },
+        {
+          "type" : "spellSlots",
+          "spellSlots" : {
+            "title" : "Spell Slots",
+            "slots" : [
+              {
+                "title" : "1",
+                "current" : 4,
+                "max" : 4
+              },
+              {
+                "title" : "2",
+                "current" : 3,
+                "max" : 3
+              }
+            ],
+            "shouldResetOnLongRest" : true
+          }
+        },
+        {
+          "type" : "pointsTracker",
+          "points" : {
+            "title" : "Sorcery Points",
+            "current" : 4,
+            "max" : 4,
+            "type" : {
+              "type" : "sorcery"
+            },
+            "shouldResetOnLongRest" : true
+          }
+        },
+        {
+          "type" : "pointsTracker",
+          "points" : {
+            "title" : "Ki Points",
+            "current" : 4,
+            "max" : 4,
+            "type" : {
+              "type" : "ki"
+            },
+            "shouldResetOnLongRest" : true
+          }
         },
         {
           "type" : "ability",
