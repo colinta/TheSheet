@@ -16,7 +16,7 @@ func SkillView(_ skill: ResolvedSkill) -> View<SheetControl.Message> {
         .ltr,
         [
             skill.isProficient ? Text(" ◼ ") : Text(" ◦ "),
-            Text(skill.modifierString),
+            Text(skill.modifierString).minWidth(1),
             Text(" "),
             Text(skill.basedOn),
             Text(" "),

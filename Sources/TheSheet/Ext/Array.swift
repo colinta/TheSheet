@@ -5,10 +5,9 @@
 extension Array {
     func modifying(_ modify: (Element) -> Element, at: Int) -> Self {
         enumerated().map { index, item in
-            if (index == at) {
+            if index == at {
                 return modify(item)
-            }
-            else {
+            } else {
                 return item
             }
         }
@@ -16,10 +15,9 @@ extension Array {
 
     func replacing(_ newItem: Element, at: Int) -> Self {
         enumerated().map { index, item in
-            if (index == at) {
+            if index == at {
                 return newItem
-            }
-            else {
+            } else {
                 return item
             }
         }

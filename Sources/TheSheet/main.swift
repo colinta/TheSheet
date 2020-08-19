@@ -1,5 +1,6 @@
 import Ashen
 import Foundation
+import Termbox
 
 private func main() throws {
     let file = "gron.json"
@@ -35,15 +36,15 @@ func createSheet() -> Sheet {
                         "Attack Stats",
                         [
                             Stat(title: "A.C.", value: .integer(15)),
-                            Stat(title: "Prof.", value: .modifier(.integer(2))),
-                            Stat(title: "Str", value: .modifier(.integer(1))),
-                            Stat(title: "Dex", value: .modifier(.integer(2))),
-                            Stat(title: "Spell", value: .modifier(.integer(5))),
+                            Stat(title: "Prof.", value: .modifier(2)),
+                            Stat(title: "Str", value: .modifier(1)),
+                            Stat(title: "Dex", value: .modifier(2)),
+                            Stat(title: "Spell", value: .modifier(5)),
                         ]),
                     .action(
                         Action(
-                            title: "Dagger", check: .modifier(.integer(3)),
-                            damage: [.dice(.d4), .operation(.modifier(.integer(1)))],
+                            title: "Dagger", check: .modifier(3),
+                            damage: .add([.dice(Operation.Dice(n: 1, d: 4)), .modifier(1)]),
                             type: "piercing",
                             description: "Finesse, Light, Thrown (range 20/60)")),
                     .action(
@@ -52,13 +53,13 @@ func createSheet() -> Sheet {
                             subactions: [
                                 Action.Sub(
                                     title: "One Handed",
-                                    check: .modifier(.integer(3)),
-                                    damage: [.dice(.d6), .operation(.modifier(.integer(1)))],
+                                    check: .modifier(3),
+                                    damage: .add([.dice(Operation.Dice(n: 1, d: 6)), .modifier(1)]),
                                     type: "bludgeoning"),
                                 Action.Sub(
                                     title: "Two Handed",
-                                    check: .modifier(.integer(3)),
-                                    damage: [.dice(.d8), .operation(.modifier(.integer(1)))],
+                                    check: .modifier(3),
+                                    damage: .add([.dice(Operation.Dice(n: 1, d: 8)), .modifier(1)]),
                                     type: "bludgeoning"),
                             ], description: "Versatile"
                         )),
@@ -78,8 +79,8 @@ func createSheet() -> Sheet {
                         Action(
                             title: "Chill Touch",
                             level: "Cantrip",
-                            check: .modifier(.integer(5)),
-                            damage: [.dice(.d8)],
+                            check: .modifier(5),
+                            damage: .dice(Operation.Dice(n: 1, d: 8)),
                             type: "necrotic",
                             description:
                                 "Target can't regain hit points, undead have disadv on attack rolls, hand clings to target"
@@ -99,11 +100,11 @@ func createSheet() -> Sheet {
                     .restButtons,
                     .pointsTracker(
                         Points(
-                            title: "Level", current: 1, max: 20, type: .level,
+                            title: "Level", current: 1, max: 20, types: [.level],
                             shouldResetOnLongRest: true)),
                     .pointsTracker(
                         Points(
-                            title: "Hit Points", current: 8, max: 8, type: .hitPoints,
+                            title: "Hit Points", current: 8, max: 8, types: [.hitPoints],
                             shouldResetOnLongRest: true)),
                 ]),
             SheetColumn(

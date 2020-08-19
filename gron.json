@@ -1,12 +1,13 @@
 {
-  "visibleColumnsCount" : 2,
+  "visibleColumnsCount" : 3,
   "columnsOrder" : [
+    5,
     0,
     3,
-    5,
     1,
     4,
-    2
+    2,
+    6
   ],
   "columns" : [
     {
@@ -75,21 +76,20 @@
                   ]
                 },
                 "type" : "Piercing",
-                "damage" : [
-                  {
-                    "type" : "dice",
-                    "value" : {
-                      "dice" : "d4"
-                    }
-                  },
-                  {
-                    "type" : "operation",
-                    "value" : {
+                "damage" : {
+                  "type" : "add",
+                  "value" : [
+                    {
+                      "type" : "dice",
+                      "n" : 1,
+                      "d" : 4
+                    },
+                    {
                       "type" : "integer",
                       "value" : 1
                     }
-                  }
-                ]
+                  ]
+                }
               }
             ],
             "isExpanded" : true
@@ -115,21 +115,20 @@
                     }
                   ]
                 },
-                "damage" : [
-                  {
-                    "type" : "dice",
-                    "value" : {
-                      "dice" : "d6"
-                    }
-                  },
-                  {
-                    "type" : "operation",
-                    "value" : {
+                "damage" : {
+                  "type" : "add",
+                  "value" : [
+                    {
+                      "type" : "dice",
+                      "n" : 1,
+                      "d" : 6
+                    },
+                    {
                       "type" : "integer",
                       "value" : 1
                     }
-                  }
-                ],
+                  ]
+                },
                 "title" : "One Handed",
                 "type" : "Bludgeoning"
               },
@@ -147,21 +146,11 @@
                     }
                   ]
                 },
-                "damage" : [
-                  {
-                    "type" : "dice",
-                    "value" : {
-                      "dice" : "d8"
-                    }
-                  },
-                  {
-                    "type" : "operation",
-                    "value" : {
-                      "type" : "integer",
-                      "value" : 1
-                    }
-                  }
-                ],
+                "damage" : {
+                  "type" : "dice",
+                  "n" : 1,
+                  "d" : 8
+                },
                 "title" : "Two Handed",
                 "type" : "Bludgeoning"
               }
@@ -178,14 +167,11 @@
             "subactions" : [
               {
                 "type" : "Cold",
-                "damage" : [
-                  {
-                    "type" : "dice",
-                    "value" : {
-                      "dice" : "2d6"
-                    }
-                  }
-                ]
+                "damage" : {
+                  "type" : "dice",
+                  "n" : 2,
+                  "d" : 6
+                }
               }
             ],
             "shouldResetOnLongRest" : true,
@@ -410,20 +396,14 @@
               {
                 "check" : {
                   "type" : "modifier",
-                  "value" : {
-                    "type" : "integer",
-                    "value" : 5
-                  }
+                  "value" : 5
                 },
                 "type" : "Necrotic",
-                "damage" : [
-                  {
-                    "type" : "dice",
-                    "value" : {
-                      "dice" : "d8"
-                    }
-                  }
-                ]
+                "damage" : {
+                  "type" : "dice",
+                  "n" : 1,
+                  "d" : 8
+                }
               }
             ],
             "isExpanded" : true
@@ -440,20 +420,14 @@
               {
                 "check" : {
                   "type" : "modifier",
-                  "value" : {
-                    "type" : "integer",
-                    "value" : 5
-                  }
+                  "value" : 5
                 },
                 "type" : "Cold",
-                "damage" : [
-                  {
-                    "type" : "dice",
-                    "value" : {
-                      "dice" : "d6"
-                    }
-                  }
-                ]
+                "damage" : {
+                  "type" : "dice",
+                  "n" : 1,
+                  "d" : 6
+                }
               }
             ],
             "isExpanded" : true
@@ -509,27 +483,23 @@
               {
                 "check" : {
                   "type" : "modifier",
-                  "value" : {
-                    "type" : "integer",
-                    "value" : 5
-                  }
+                  "value" : 5
                 },
                 "type" : "Force",
-                "damage" : [
-                  {
-                    "type" : "dice",
-                    "value" : {
-                      "dice" : "d4"
-                    }
-                  },
-                  {
-                    "type" : "operation",
-                    "value" : {
+                "damage" : {
+                  "type" : "add",
+                  "value" : [
+                    {
+                      "type" : "dice",
+                      "n" : 1,
+                      "d" : 4
+                    },
+                    {
                       "type" : "integer",
                       "value" : 1
                     }
-                  }
-                ]
+                  ]
+                }
               }
             ],
             "isExpanded" : true
@@ -546,20 +516,14 @@
               {
                 "check" : {
                   "type" : "modifier",
-                  "value" : {
-                    "type" : "integer",
-                    "value" : 5
-                  }
+                  "value" : 5
                 },
                 "type" : "Cold",
-                "damage" : [
-                  {
-                    "type" : "dice",
-                    "value" : {
-                      "dice" : "2d1"
-                    }
-                  }
-                ]
+                "damage" : {
+                  "type" : "dice",
+                  "n" : 2,
+                  "d" : 1
+                }
               }
             ],
             "isExpanded" : true
@@ -616,9 +580,11 @@
             "title" : "Hit Points",
             "current" : 44,
             "max" : 44,
-            "type" : {
-              "type" : "hitPoints"
-            },
+            "types" : [
+              {
+                "type" : "hitPoints"
+              }
+            ],
             "shouldResetOnLongRest" : true
           }
         },
@@ -627,11 +593,11 @@
           "points" : {
             "title" : "Inspiration",
             "current" : 1,
-            "type" : {
-              "type" : "other",
-              "variable" : "inspiration",
-              "title" : "inspiration"
-            },
+            "types" : [
+              {
+                "type" : "inspiration"
+              }
+            ],
             "shouldResetOnLongRest" : false
           }
         },
@@ -770,8 +736,8 @@
               "isProficient" : false
             },
             {
-              "title" : "Awesomeness",
-              "basedOn" : "CHA",
+              "title" : "Caligrapher's Tools",
+              "basedOn" : "",
               "isProficient" : true
             }
           ]
@@ -781,26 +747,13 @@
           "points" : {
             "title" : "Sorcerer Level",
             "current" : 4,
-            "max" : 20,
-            "type" : {
-              "type" : "other",
-              "variable" : "sorcererLevel",
-              "title" : "Sorcerer Level"
-            },
-            "shouldResetOnLongRest" : false
-          }
-        },
-        {
-          "type" : "pointsTracker",
-          "points" : {
-            "title" : "Monk Level",
-            "current" : 0,
-            "max" : 20,
-            "type" : {
-              "type" : "other",
-              "variable" : "monkLevel",
-              "title" : "Monk Level"
-            },
+            "types" : [
+              {
+                "type" : "other",
+                "variable" : "sorcererLevel",
+                "title" : "Sorcerer Level"
+              }
+            ],
             "shouldResetOnLongRest" : false
           }
         }
@@ -838,21 +791,11 @@
             "title" : "Sorcery Points",
             "current" : 4,
             "max" : 4,
-            "type" : {
-              "type" : "sorcery"
-            },
-            "shouldResetOnLongRest" : true
-          }
-        },
-        {
-          "type" : "pointsTracker",
-          "points" : {
-            "title" : "Ki Points",
-            "current" : 4,
-            "max" : 4,
-            "type" : {
-              "type" : "ki"
-            },
+            "types" : [
+              {
+                "type" : "sorcery"
+              }
+            ],
             "shouldResetOnLongRest" : true
           }
         },
@@ -931,6 +874,71 @@
                     "value" : "monkLevel"
                   }
                 ]
+              }
+            },
+            {
+              "variable" : "chillTouch",
+              "operation" : {
+                "lhs" : {
+                  "type" : "dice",
+                  "n" : 4,
+                  "d" : 8
+                },
+                "condition" : {
+                  "type" : ">=",
+                  "lhs" : {
+                    "type" : "variable",
+                    "value" : "level"
+                  },
+                  "rhs" : {
+                    "type" : "integer",
+                    "value" : 17
+                  }
+                },
+                "type" : "if",
+                "rhs" : {
+                  "lhs" : {
+                    "type" : "dice",
+                    "n" : 3,
+                    "d" : 8
+                  },
+                  "condition" : {
+                    "type" : ">=",
+                    "lhs" : {
+                      "type" : "variable",
+                      "value" : "level"
+                    },
+                    "rhs" : {
+                      "type" : "integer",
+                      "value" : 11
+                    }
+                  },
+                  "type" : "if",
+                  "rhs" : {
+                    "lhs" : {
+                      "type" : "dice",
+                      "n" : 2,
+                      "d" : 8
+                    },
+                    "condition" : {
+                      "type" : ">=",
+                      "lhs" : {
+                        "type" : "variable",
+                        "value" : "level"
+                      },
+                      "rhs" : {
+                        "type" : "integer",
+                        "value" : 5
+                      }
+                    },
+                    "type" : "if",
+                    "rhs" : {
+                      "type" : "dice",
+                      "n" : 1,
+                      "d" : 8
+                    }
+                  }
+                }
               }
             },
             {
@@ -1043,6 +1051,95 @@
         }
       ],
       "isFormulaColumn" : true
+    },
+    {
+      "title" : "Monk",
+      "controls" : [
+        {
+          "type" : "pointsTracker",
+          "points" : {
+            "title" : "Monk Level",
+            "current" : 0,
+            "types" : [
+              {
+                "type" : "other",
+                "variable" : "monkLevel",
+                "title" : "Monk Level"
+              }
+            ],
+            "shouldResetOnLongRest" : false
+          }
+        },
+        {
+          "type" : "action",
+          "action" : {
+            "shouldResetOnLongRest" : false,
+            "title" : "Detect Magic",
+            "level" : "1",
+            "description" : "Range: 30' | Duration: Concentration, 10 minutes\nFor the duration, you sense the presence of magic within 30 feet of you. If you sense magic in this way, you can use your action to see a faint aura around any visible creature or object in the area that bears magic, and you learn its school of magic, if any.\nThe spell can penetrate most barriers, but it is blocked by 1 foot of stone, 1 inch of common metal, a thin sheet of lead, or 3 feet of wood or dirt.",
+            "subactions" : [
+
+            ],
+            "isExpanded" : true
+          }
+        },
+        {
+          "type" : "pointsTracker",
+          "points" : {
+            "title" : "Ki Points",
+            "current" : 4,
+            "max" : 0,
+            "types" : [
+              {
+                "type" : "ki"
+              }
+            ],
+            "shouldResetOnLongRest" : true
+          }
+        },
+        {
+          "type" : "ability",
+          "ability" : {
+            "title" : "Patient Defense",
+            "uses" : {
+              "type" : {
+                "type" : "ki"
+              },
+              "amount" : 1
+            },
+            "description" : "You can spend 1 ki point to take the Dodge action as a bonus action on your turn.",
+            "isExpanded" : true
+          }
+        },
+        {
+          "type" : "ability",
+          "ability" : {
+            "title" : "Step of the Wind",
+            "uses" : {
+              "type" : {
+                "type" : "ki"
+              },
+              "amount" : 1
+            },
+            "description" : "You can spend 1 ki point to take the Disengage or Dash action as a bonus action on your turn, and your jump distance is doubled for the turn.",
+            "isExpanded" : true
+          }
+        },
+        {
+          "type" : "action",
+          "action" : {
+            "shouldResetOnLongRest" : false,
+            "title" : "Silent Image",
+            "level" : "1",
+            "description" : "You create the image of an object, a creature, or some other visible phenomenon that is no larger than a 15-foot cube. The image appears at a spot within range and lasts for the duration. The image is purely visual; it isn't accompanied by sound, smell, or other sensory effects. You can use your action to cause the image to move to any spot within range. As the image changes location, you can alter its appearance so that its movements appear natural for the image. Physical interaction with the image reveals it to be an illusion, because things can pass through it. A creature that uses its action to examine the image can determine that it is an illusion with a successful Investigation (INT) check against your spell save DC.",
+            "subactions" : [
+
+            ],
+            "isExpanded" : true
+          }
+        }
+      ],
+      "isFormulaColumn" : false
     }
   ]
 }

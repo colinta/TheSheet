@@ -8,23 +8,38 @@ struct Points: Codable {
         case hitPoints
         case sorcery
         case ki
+        case inspiration
         case other(String, String)
-        case many([PointType])
 
-        var toVariables: [String] {
+        static func all(_ types: [PointType]) -> [(Int, PointType)] {
+            return [
+                (-1, .level),
+                (-1, .hitPoints),
+                (-1, .sorcery),
+                (-1, .ki),
+                (-1, .inspiration),
+            ] + PointType.others(types)
+        }
+
+        var isBuiltIn: Bool {
+            guard case .other = self else { return true }
+            return false
+        }
+
+        var toVariable: String {
             switch self {
             case .level:
-                return ["level"]
+                return "level"
             case .hitPoints:
-                return ["hitPoints"]
+                return "hitPoints"
             case .sorcery:
-                return ["sorceryPoints"]
+                return "sorceryPoints"
             case .ki:
-                return ["kiPoints"]
-            case let .many(types):
-                return types.flatMap(\.toVariables)
+                return "kiPoints"
+            case .inspiration:
+                return "inspiration"
             case let .other(type, _):
-                return [type]
+                return type
             }
         }
 
@@ -38,57 +53,71 @@ struct Points: Codable {
                 return "Sorcery Points"
             case .ki:
                 return "Ki Points"
-            case let .many(types):
-                return types.map(\.toReadable).joined(separator: ", ")
+            case .inspiration:
+                return "Inspiration"
             case let .other(_, title):
                 return title
             }
         }
 
-        func `is`(_ type: Points.PointType) -> Bool {
-            if case let .many(types) = self {
-                return types.contains(where: { $0.is(type) })
-            }
-            if case let .many(types) = type {
-                return types.contains(where: { $0.is(self) })
-            }
-            return self.toReadable == type.toReadable
+        func `is`(_ type: PointType) -> Bool {
+            return self.toVariable == type.toVariable
         }
     }
 
     let title: String
     let current: Int
     let max: Int?
-    let type: PointType
+    let types: [PointType]
     let shouldResetOnLongRest: Bool
 
     var formulas: [Formula] {
-        type.toVariables.map { name in
-            Formula(variable: name, operation: .integer(current))
+        types.map(\.toVariable).flatMap { name in
+            [
+                Formula(variable: name, operation: .integer(current)),
+                (max.map { Formula(variable: "\(name).Max", operation: .integer($0)) }),
+            ].compactMap { $0 }
         }
+    }
+
+    func replace(title: String) -> Points {
+        Points(
+            title: title, current: current, max: max, types: types,
+            shouldResetOnLongRest: shouldResetOnLongRest)
     }
 
     func replace(current: Int) -> Points {
         Points(
-            title: title, current: current, max: max, type: type,
+            title: title, current: current, max: max, types: types,
             shouldResetOnLongRest: shouldResetOnLongRest)
     }
 
     func replace(max: Int?) -> Points {
         Points(
-            title: title, current: current, max: max, type: type,
+            title: title, current: current, max: max, types: types,
+            shouldResetOnLongRest: shouldResetOnLongRest)
+    }
+
+    func replace(types: [PointType]) -> Points {
+        Points(
+            title: title, current: current, max: max, types: types,
+            shouldResetOnLongRest: shouldResetOnLongRest)
+    }
+
+    func replace(shouldResetOnLongRest: Bool) -> Points {
+        Points(
+            title: title, current: current, max: max, types: types,
             shouldResetOnLongRest: shouldResetOnLongRest)
     }
 
     func `is`(_ type: Points.PointType) -> Bool {
-        self.type.is(type)
+        types.contains(where: { $0.is(type) })
     }
 }
 
 extension Points.PointType: Codable {
     enum CodingKeys: String, CodingKey {
         case type
-        case many
         case variable
         case title
     }
@@ -103,6 +132,8 @@ extension Points.PointType: Codable {
             return .sorcery
         case "ki":
             return .ki
+        case "inspiration":
+            return .inspiration
         default:
             return .other(type, type)
         }
@@ -118,8 +149,8 @@ extension Points.PointType: Codable {
             return "sorcery"
         case .ki:
             return "ki"
-        case .many:
-            return "many"
+        case .inspiration:
+            return "inspiration"
         case .other:
             return "other"
         }
@@ -133,9 +164,6 @@ extension Points.PointType: Codable {
             let variable = try values.decode(String.self, forKey: .variable)
             let title = try values.decode(String.self, forKey: .title)
             self = .other(variable, title)
-        case "many":
-            let values = try values.decode([Points.PointType].self, forKey: .many)
-            self = .many(values)
         default:
             self = Points.PointType.from(string: type)
         }
@@ -144,12 +172,19 @@ extension Points.PointType: Codable {
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(toEncodeable, forKey: .type)
-
-        if case let .many(types) = self {
-            try container.encode(types.map { $0.toEncodeable }, forKey: .many)
-        } else if case let .other(variable, title) = self {
+        if case let .other(variable, title) = self {
             try container.encode(variable, forKey: .variable)
             try container.encode(title, forKey: .title)
+        }
+    }
+}
+
+extension Points.PointType {
+    private static func others(_ types: [Points.PointType]) -> [(Int, Points.PointType)] {
+        types.enumerated().reduce([(Int, Points.PointType)]()) { memo, index_type in
+            let (_, type) = index_type
+            guard case .other = type else { return memo }
+            return memo + [index_type]
         }
     }
 }

@@ -79,7 +79,8 @@ struct SheetColumn: Codable {
         }
     }
 
-    func render(_ sheet: Sheet, isEditing: Bool, editingControl: Int?) -> View<SheetColumn.Message> {
+    func render(_ sheet: Sheet, isEditing: Bool, editingControl: Int?) -> View<SheetColumn.Message>
+    {
         Stack(
             .down,
             controls.enumerated().flatMap { controlIndex, control -> [View<SheetColumn.Message>] in
@@ -90,8 +91,10 @@ struct SheetColumn: Codable {
                 if isEditing {
                     editableControlView = ZStack([
                         controlView,
-                        editingControls(control, controlIndex: controlIndex, lastIndex: controls.count - 1)
-                            .matchSize(ofView: controlView),
+                        editingControls(
+                            control, controlIndex: controlIndex, lastIndex: controls.count - 1
+                        )
+                        .matchSize(ofView: controlView),
                     ])
                 } else if editingControl == controlIndex {
                     editableControlView = controlView.reversed()
@@ -107,12 +110,13 @@ struct SheetColumn: Codable {
         )
     }
 
-    private func editingControls(_ control: SheetControl, controlIndex: Int, lastIndex: Int) -> View<SheetColumn.Message> {
+    private func editingControls(_ control: SheetControl, controlIndex: Int, lastIndex: Int)
+        -> View<SheetColumn.Message>
+    {
         let reorderControls: View<SheetColumn.Message>
         if canReorder {
             reorderControls = self.reorderControls(controlIndex: controlIndex, lastIndex: lastIndex)
-        }
-        else {
+        } else {
             reorderControls = Space()
         }
         let removeControl: View<SheetColumn.Message>
@@ -121,8 +125,7 @@ struct SheetColumn: Codable {
                 Text("  X  ").aligned(.middleRight),
                 Message.controlMessage(controlIndex, .delegate(.removeControl))
             ).background(view: Text(" ")).background(color: .red)
-        }
-        else {
+        } else {
             removeControl = Space()
         }
         return Flow(
@@ -133,12 +136,12 @@ struct SheetColumn: Codable {
                 (
                     .fixed,
                     control.isEditable
-                    ? OnLeftClick(
-                        Text(" Edit ").aligned(.middleRight)
-                            .background(view: Text(" "))
-                            .background(color: .blue),
-                        Message.delegate(.showControlEditor(controlIndex)))
-                    : Space()
+                        ? OnLeftClick(
+                            Text(" Edit ").aligned(.middleRight)
+                                .background(view: Text(" "))
+                                .background(color: .blue),
+                            Message.delegate(.showControlEditor(controlIndex)))
+                        : Space()
                 ),
                 (.fixed, IgnoreMouse(Repeating(Text(" "))).width(canDelete ? 1 : 0)),
                 (.fixed, removeControl),
@@ -150,43 +153,46 @@ struct SheetColumn: Codable {
         let canMoveDown = controlIndex < lastIndex
         return BasedOnSize { size in
             if size.height >= 3 {
-                return Flow(.down, [
-                    (
-                        .flex1,
-                        OnLeftClick(
+                return Flow(
+                    .down,
+                    [
+                        (
+                            .flex1,
+                            OnLeftClick(
+                                Text("  ↑  ").aligned(.topCenter),
+                                Message.moveControl(controlIndex, .up)
+                            ).background(view: Text(" "))
+                                .background(color: canMoveUp ? .cyan : .black)
+                        ),
+                        (
+                            .fixed,
+                            IgnoreMouse(Repeating(Text(" "))).height((size.height % 2) == 0 ? 0 : 1)
+                        ),
+                        (
+                            .flex1,
+                            OnLeftClick(
+                                Text("  ↓  ").aligned(
+                                    .bottomCenter), Message.moveControl(controlIndex, .down)
+                            ).background(view: Text(" "))
+                                .background(color: canMoveDown ? .cyan : .black)
+                        ),
+                    ]
+                ).height(size.height)
+            } else {
+                return Stack(
+                    .ltr,
+                    [
+                        (OnLeftClick(
                             Text("  ↑  ").aligned(.topCenter),
                             Message.moveControl(controlIndex, .up)
                         ).background(view: Text(" "))
-                        .background(color: canMoveUp ? .cyan : .black)
-                    ),
-                    (.fixed, IgnoreMouse(Repeating(Text(" "))).height((size.height % 2) == 0 ? 0 : 1)),
-                    (
-                        .flex1,
-                        OnLeftClick(
-                            Text("  ↓  ").aligned(
-                                .bottomCenter), Message.moveControl(controlIndex, .down)
-                        ).background(view: Text(" "))
-                        .background(color: canMoveDown ? .cyan : .black)
-                    ),
-                ]).height(size.height)
-            }
-            else {
-                return Stack(.ltr, [
-                    (
-                        OnLeftClick(
-                            Text("  ↑  ").aligned(.topCenter),
-                            Message.moveControl(controlIndex, .up)
-                        ).background(view: Text(" "))
-                        .background(color: canMoveUp ? .cyan : .black)
-                    ),
-                    (IgnoreMouse(Repeating(Text(" "))).width(1)),
-                    (
-                        OnLeftClick(
+                            .background(color: canMoveUp ? .cyan : .black)),
+                        (IgnoreMouse(Repeating(Text(" "))).width(1)),
+                        (OnLeftClick(
                             Text("  ↓  ".background(canMoveDown ? .cyan : .black)).aligned(
                                 .bottomCenter), Message.moveControl(controlIndex, .down)
-                        ).background(view: Text(" ".background(canMoveDown ? .cyan : .black)))
-                    ),
-                ])
+                        ).background(view: Text(" ".background(canMoveDown ? .cyan : .black)))),
+                    ])
             }
         }
     }

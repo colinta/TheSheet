@@ -18,7 +18,7 @@ struct Attribute: Codable {
                 variable: variableName, operation: .integer(score)),
             Formula(
                 variable: "\(variableName).Mod",
-                operation: .modifier(.integer(modifier))),
+                operation: .modifier(modifier)),
         ]
     }
 

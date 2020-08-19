@@ -73,7 +73,7 @@ func SpellSlotsView<Msg>(
                 [
                     (.fixed, titles),
                     (
-                        .fixed,
+                        .flex1,
                         Flow(.rtl, [(.fixed, labels)] + [(.flex1, Space())] + columns.reversed())
                     ),
                 ]),

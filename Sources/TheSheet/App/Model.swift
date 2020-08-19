@@ -51,14 +51,15 @@ struct Model {
 
     var canUndo: Bool { !undoSheets.isEmpty }
     var columnScrollMaxOffset: Int {
-        let visibleColumns = sheet.columnsOrder[firstVisibleColumn..<firstVisibleColumn + sheet.visibleColumnsCount]
+        let visibleColumns = sheet.columnsOrder[
+            firstVisibleColumn..<firstVisibleColumn + sheet.visibleColumnsCount]
         return columnScrollMaxOffsets.reduce(
             nil as Int?,
             { memo, index_height in
                 let (index, height) = index_height
                 guard visibleColumns.contains(index) else { return memo }
                 return max(memo ?? 0, height)
-        }) ?? 0
+            }) ?? 0
     }
 
     var changingColumn: Int? {
@@ -125,17 +126,24 @@ struct Model {
     }
 
     func addControl(_ control: SheetControl, toColumn columnIndex: Int) -> Model {
-        replace(sheet: sheet.replace(
-            columns: sheet.columns.modifying({ column in
-                column.replace(controls: column.controls + [control])
-            }, at: columnIndex)))
+        replace(
+            sheet: sheet.replace(
+                columns: sheet.columns.modifying(
+                    { column in
+                        column.replace(controls: column.controls + [control])
+                    }, at: columnIndex)))
     }
 
-    func replace(control controlIndex: Int, inColumn columnIndex: Int, with newControl: SheetControl) -> Model {
-        replace(sheet: sheet.replace(
-            columns: sheet.columns.modifying({ column in
-                column.replace(controls: column.controls.replacing(newControl, at: controlIndex))
-            }, at: columnIndex)))
+    func replace(
+        control controlIndex: Int, inColumn columnIndex: Int, with newControl: SheetControl
+    ) -> Model {
+        replace(
+            sheet: sheet.replace(
+                columns: sheet.columns.modifying(
+                    { column in
+                        column.replace(
+                            controls: column.controls.replacing(newControl, at: controlIndex))
+                    }, at: columnIndex)))
     }
 
     func replace(editControl control: Int, inColumn column: Int, editor: EditableControl) -> Model {

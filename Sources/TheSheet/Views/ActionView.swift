@@ -41,7 +41,7 @@ func _ActionStatsView<Msg>(
     var actionViews = action.subactions.reduce([View<Msg>]()) { views, sub in
         let statViews: [View<Msg>] = [
             sub.check.map({ _ActionCheckView($0, sheet: sheet) }) as View<Msg>?,
-            sub.damage.isEmpty ? nil : _ActionDamageView(sub.damage, sheet: sheet),
+            sub.damage.map({ _ActionDamageView($0, sheet: sheet) }) as View<Msg>?,
             sub.type.map({ _ActionTypeView($0, sheet: sheet) }),
         ].compactMap { $0 }
 
@@ -105,12 +105,8 @@ func _ActionLevelView<Msg>(_ level: String?) -> View<Msg> {
 func _ActionCheckView<Msg>(_ check: Operation, sheet: Sheet) -> View<Msg> {
     StatView(Stat(title: "Check", value: check), sheet: sheet)
 }
-func _ActionDamageView<Msg>(_ damage: [Roll], sheet: Sheet) -> View<Msg> {
-    StatView(
-        Stat(
-            title: "Damage",
-            value: .string(damage.map { $0.toReadable(sheet) }.joined(separator: "+"))),
-        sheet: sheet)
+func _ActionDamageView<Msg>(_ damage: Operation, sheet: Sheet) -> View<Msg> {
+    StatView(Stat(title: "Damage", value: damage), sheet: sheet)
 }
 func _ActionTypeView<Msg>(_ type: String, sheet: Sheet) -> View<Msg> {
     StatView(Stat(title: "Type", value: .string(type)), sheet: sheet)

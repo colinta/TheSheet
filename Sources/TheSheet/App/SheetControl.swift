@@ -21,7 +21,7 @@ enum SheetControl {
     case restButtons
     case formulas([Formula])
 
-    static var allControls: [(String, SheetControl)] = [
+    static var all: [(String, SheetControl)] = [
         ("Inventory", .inventory(Inventory(title: "", quantity: nil))),
         ("Action (Weapon, Spell)", .action(Action(title: ""))),
         (
@@ -36,7 +36,7 @@ enum SheetControl {
             "Points Tracker (Hit Points, Ki, …)",
             .pointsTracker(
                 Points(
-                    title: "", current: 0, max: nil, type: .many([]), shouldResetOnLongRest: false))
+                    title: "", current: 0, max: nil, types: [], shouldResetOnLongRest: false))
         ),
         ("Attributes (Strength, Charisma, …)", .attributes([])),
         ("Skills (Acrobatics, Stealth, …)", .skills([])),
@@ -62,10 +62,12 @@ enum SheetControl {
 
     var editor: EditableControl? {
         switch self {
-        case let .skills(skills):
-            return .skills(skills, AtXYEditor(atXY: nil))
         case let .inventory(inventory):
             return .inventory(inventory)
+        case let .pointsTracker(points):
+            return .pointsTracker(points, AtXYEditor(atXY: Point(x: 0, y: 0)))
+        case let .skills(skills):
+            return .skills(skills, AtXYEditor(atXY: nil))
         case let .formulas(formulas):
             return .formulas(formulas.map(\.toEditable), AtXYEditor(atXY: nil))
         default:
@@ -175,7 +177,8 @@ enum SheetControl {
         switch self {
         case let .inventory(inventory):
             return InventoryView(
-                inventory, onChange: Message.changeQuantity, onRemove: Message.delegate(.removeControl))
+                inventory, onChange: Message.changeQuantity,
+                onRemove: Message.delegate(.removeControl))
         case let .action(action):
             return ActionView(
                 action, sheet: sheet,
