@@ -1,12 +1,12 @@
 {
-  "visibleColumnsCount" : 3,
+  "visibleColumnsCount" : 4,
   "columnsOrder" : [
-    5,
     0,
-    3,
-    1,
     4,
     2,
+    5,
+    1,
+    3,
     6
   ],
   "columns" : [
@@ -406,7 +406,7 @@
                 }
               }
             ],
-            "isExpanded" : true
+            "isExpanded" : false
           }
         },
         {
@@ -430,7 +430,7 @@
                 }
               }
             ],
-            "isExpanded" : true
+            "isExpanded" : false
           }
         },
         {
@@ -526,7 +526,7 @@
                 }
               }
             ],
-            "isExpanded" : true
+            "isExpanded" : false
           }
         },
         {

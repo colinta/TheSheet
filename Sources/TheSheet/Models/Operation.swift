@@ -158,10 +158,10 @@ indirect enum Operation {
         }
     }
 
-    static func eval(_ sheet: Sheet, _ operation: Operation, _ dontRecur: [String] = [])
+    func eval(_ sheet: Sheet, _ dontRecur: [String] = [])
         -> Operation.Value
     {
-        switch operation {
+        switch self {
         case let .integer(value):
             return .integer(value)
         case let .bool(value):
@@ -178,13 +178,13 @@ indirect enum Operation {
             else {
                 return .undefined
             }
-            return eval(sheet, operation, dontRecur + [name])
+            return operation.eval(sheet, dontRecur + [name])
         case let .add(operations):
             var dice = [Dice]()
             var sum = 0
             var isModifier: Bool?
             for operation in operations {
-                let resolved = eval(sheet, operation, dontRecur)
+                let resolved = operation.eval(sheet, dontRecur)
                 if case let .diceAdd(moreDice, value) = resolved {
                     dice += moreDice
                     sum += value
@@ -215,7 +215,7 @@ indirect enum Operation {
 
         case let .floor(operation):
             guard case let .divide(lhs, rhs) = operation else {
-                return eval(sheet, operation)
+                return operation.eval(sheet, dontRecur)
             }
             return reduce(
                 toValues([lhs, rhs], sheet, dontRecur),
@@ -225,7 +225,7 @@ indirect enum Operation {
                 })
         case let .round(operation):
             guard case let .divide(lhs, rhs) = operation else {
-                return eval(sheet, operation)
+                return operation.eval(sheet, dontRecur)
             }
             return reduce(
                 toValues([lhs, rhs], sheet, dontRecur),
@@ -235,7 +235,7 @@ indirect enum Operation {
                 })
         case let .ceil(operation):
             guard case let .divide(lhs, rhs) = operation else {
-                return eval(sheet, operation)
+                return operation.eval(sheet, dontRecur)
             }
             return reduce(
                 toValues([lhs, rhs], sheet, dontRecur),
@@ -250,8 +250,8 @@ indirect enum Operation {
             return reduce(toValues(operations, sheet, dontRecur), Swift.min)
 
         case let .if(condition, lhs, rhs):
-            guard let pass = eval(sheet, condition).toBool else { return .undefined }
-            return pass ? eval(sheet, lhs) : eval(sheet, rhs)
+            guard let pass = condition.eval(sheet, dontRecur).toBool else { return .undefined }
+            return pass ? lhs.eval(sheet, dontRecur) : rhs.eval(sheet, dontRecur)
         case let .equal(lhs, rhs):
             return test(lhs, rhs, sheet, dontRecur, ==, ==)
         case let .greaterThan(lhs, rhs):
@@ -263,61 +263,6 @@ indirect enum Operation {
         case let .lessThanEqual(lhs, rhs):
             return test(lhs, rhs, sheet, dontRecur, <=)
         }
-    }
-
-    static func toValues(_ operations: [Operation], _ sheet: Sheet, _ dontRecur: [String])
-        -> [Value]
-    {
-        operations.map({ eval(sheet, $0) })
-    }
-
-    static func reduce(_ values: [Value], _ fn: (Int, Int) throws -> Int) -> Value {
-        var memo: Int?
-        var isModifier: Bool?
-        for value in values {
-            guard let int = value.toInt else { return .undefined }
-
-            if case .modifier = value, isModifier == nil {
-                isModifier = true
-            } else if case .integer = value, isModifier == nil {
-                isModifier = false
-            }
-
-            if let prev = memo {
-                do {
-                    memo = try fn(prev, int)
-                } catch {
-                    return .undefined
-                }
-            } else {
-                memo = int
-            }
-        }
-
-        if let isModifier = isModifier, let memo = memo {
-            return isModifier ? .modifier(memo) : .integer(memo)
-        }
-        return .undefined
-    }
-
-    static func test(
-        _ lhs: Operation, _ rhs: Operation, _ sheet: Sheet, _ dontRecur: [String],
-        _ intTest: (Int, Int) -> Bool, _ strTest: (String, String) -> Bool = { _, _ in false }
-    ) -> Value {
-        let lhsValue = eval(sheet, lhs)
-        let rhsValue = eval(sheet, rhs)
-        if let lhsInt = lhsValue.toInt,
-            let rhsInt = rhsValue.toInt
-        {
-            return .bool(intTest(lhsInt, rhsInt))
-        }
-
-        if let lhsStr = lhsValue.toString,
-            let rhsStr = rhsValue.toString
-        {
-            return .bool(strTest(lhsStr, rhsStr))
-        }
-        return .undefined
     }
 
     func toAttributed(_ sheet: Sheet, prevPrecedence: Int = 10) -> AttributedString {
@@ -631,4 +576,59 @@ private func attributedFunction(_ fnName: String, operations: [Operation], sheet
         + "(".foreground(.brightYellow)
         + insides
         + ")".foreground(.brightYellow)
+}
+
+private func toValues(_ operations: [Operation], _ sheet: Sheet, _ dontRecur: [String])
+    -> [Operation.Value]
+{
+    operations.map({ $0.eval(sheet, dontRecur) })
+}
+
+private func reduce(_ values: [Operation.Value], _ fn: (Int, Int) throws -> Int) -> Operation.Value {
+    var memo: Int?
+    var isModifier: Bool?
+    for value in values {
+        guard let int = value.toInt else { return .undefined }
+
+        if case .modifier = value, isModifier == nil {
+            isModifier = true
+        } else if case .integer = value, isModifier == nil {
+            isModifier = false
+        }
+
+        if let prev = memo {
+            do {
+                memo = try fn(prev, int)
+            } catch {
+                return .undefined
+            }
+        } else {
+            memo = int
+        }
+    }
+
+    if let isModifier = isModifier, let memo = memo {
+        return isModifier ? .modifier(memo) : .integer(memo)
+    }
+    return .undefined
+}
+
+private func test(
+    _ lhs: Operation, _ rhs: Operation, _ sheet: Sheet, _ dontRecur: [String],
+    _ intTest: (Int, Int) -> Bool, _ strTest: (String, String) -> Bool = { _, _ in false }
+) -> Operation.Value {
+    let lhsValue = lhs.eval(sheet, dontRecur)
+    let rhsValue = rhs.eval(sheet, dontRecur)
+    if let lhsInt = lhsValue.toInt,
+        let rhsInt = rhsValue.toInt
+    {
+        return .bool(intTest(lhsInt, rhsInt))
+    }
+
+    if let lhsStr = lhsValue.toString,
+        let rhsStr = rhsValue.toString
+    {
+        return .bool(strTest(lhsStr, rhsStr))
+    }
+    return .undefined
 }

@@ -78,6 +78,7 @@ enum SheetControl {
     enum Message {
         enum Delegate {
             case removeControl
+            case moveControl
         }
         case updateSlotCurrent(slotIndex: Int, current: Int)
         case updateSlotMax(slotIndex: Int, max: Int)

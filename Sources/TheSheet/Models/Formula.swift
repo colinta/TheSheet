@@ -31,6 +31,7 @@ struct Formula: Codable {
                 return Formula(variable: variable, operation: parsed)
             } catch let error {
                 debug("=============== \(#file) line \(#line) ===============")
+                debug("editableFormula: \(editableFormula)")
                 debug("error: \(error)")
                 return nil
             }

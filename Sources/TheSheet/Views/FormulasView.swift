@@ -30,7 +30,7 @@ func FormulaView<Msg>(_ formula: Formula, sheet: Sheet, isEditable: Bool) -> Vie
                 [
                     formula.operation.toAttributed(sheet),
                     " -> ".bold(),
-                    Operation.eval(sheet, formula.operation).toAttributed,
+                    formula.operation.eval(sheet).toAttributed,
                 ], .wrap(true)),
         ])
 }
