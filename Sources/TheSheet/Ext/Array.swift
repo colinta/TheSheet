@@ -23,7 +23,7 @@ extension Array {
         }
     }
 
-    func removingItem(at: Int) -> Self {
+    func removing(at: Int) -> Self {
         enumerated().filter { index, _ in
             index != at
         }.map { _, item in

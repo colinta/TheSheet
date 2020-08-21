@@ -7,51 +7,41 @@ import Ashen
 func SheetControlEditor(column: SheetColumn, control: SheetControl, controlIndex: Int, lastIndex: Int)
     -> View<SheetColumn.Message>
 {
-    let reorderControls: View<SheetColumn.Message>
+    var leftHandControls: [View<SheetColumn.Message>] = []
+    var rightHandControls: [View<SheetColumn.Message>] = []
+
     if column.canReorder {
-        reorderControls = ReorderControls(controlIndex: controlIndex, lastIndex: lastIndex)
-    } else {
-        reorderControls = Space()
+        leftHandControls.append(ReorderControls(controlIndex: controlIndex, lastIndex: lastIndex))
     }
 
-    let removeControl: View<SheetColumn.Message>
-    if column.canDelete {
-        removeControl = OnLeftClick(
-            Text("  X  ").aligned(.middleRight),
-            .controlMessage(controlIndex, .delegate(.removeControl))
-        ).background(view: Text(" ")).background(color: .red)
-    } else {
-        removeControl = Space()
+    if control.canEdit {
+        rightHandControls.append(OnLeftClick(
+            Text(" Edit ").aligned(.middleRight)
+                .background(view: Text(" "))
+                .background(color: .blue),
+            .delegate(.showControlEditor(controlIndex))))
     }
 
-    let moveControl: View<SheetColumn.Message>
     if column.canDelete {
-        moveControl = OnLeftClick(
-            Text(" Move ").aligned(.middleRight),
-            .controlMessage(controlIndex, .delegate(.moveControl))
-        ).background(view: Text(" ")).background(color: .green)
-    } else {
-        moveControl = Space()
+        leftHandControls.append(OnLeftClick(
+                Text(" Move ").aligned(.middleRight),
+                .delegate(.relocateControl(controlIndex))
+            ).background(view: Text(" ")).background(color: .green))
+        rightHandControls.append(IgnoreMouse(Repeating(Text(" "))).width(column.canDelete ? 1 : 0))
+        rightHandControls.append(OnLeftClick(
+                Text("  X  ").aligned(.middleRight),
+                .controlMessage(controlIndex, .delegate(.removeControl))
+            ).background(view: Text(" ")).background(color: .red))
     }
+
     return Flow(
         .ltr,
-        [
-            (.fixed, reorderControls),
-            (.fixed, moveControl),
-            (.flex1, OnLeftClick(Space(), SheetColumn.Message.delegate(.stopEditing), .highlight(false))),
-            (
-                .fixed,
-                control.isEditable
-                    ? OnLeftClick(
-                        Text(" Edit ").aligned(.middleRight)
-                            .background(view: Text(" "))
-                            .background(color: .blue),
-                        SheetColumn.Message.delegate(.showControlEditor(controlIndex)))
-                    : Space()
-            ),
-            (.fixed, IgnoreMouse(Repeating(Text(" "))).width(column.canDelete ? 1 : 0)),
-            (.fixed, removeControl),
-        ])
+            leftHandControls.map { (.fixed, $0) } +
+            [
+                (.flex1, OnLeftClick(Space(), SheetColumn.Message.delegate(.stopEditing), .highlight(false)))
+            ] +
+            rightHandControls.map { (.fixed, $0) }
+        )
 }
 
 private func ReorderControls(controlIndex: Int, lastIndex: Int) -> View<SheetColumn.Message> {

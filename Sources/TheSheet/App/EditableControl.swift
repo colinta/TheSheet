@@ -77,7 +77,7 @@ enum EditableControl {
         case let (.skills(skills, editor), .add):
             return .skills(skills + [Skill(title: "", basedOn: "", isProficient: false)], editor)
         case let (.skills(skills, editor), .atPath(path, .remove)):
-            return .skills(skills.removingItem(at: path[0]), editor)
+            return .skills(skills.removing(at: path[0]), editor)
         case let (.skills(skills, editor), .atPath(path, .changeString(.title, value))):
             return .skills(
                 skills.modifying({ $0.replace(title: value) }, at: path[0]),
@@ -138,7 +138,7 @@ enum EditableControl {
                 formulas + [Formula.Editable(variable: "name", editableFormula: "formula")],
                 editor.replace(x: 0, y: formulas.count))
         case let (.formulas(formulas, editor), .atPath(path, .remove)):
-            return .formulas(formulas.removingItem(at: path[0]), editor)
+            return .formulas(formulas.removing(at: path[0]), editor)
         case let (.formulas(formulas, editor), .firstResponder(path)):
             return .formulas(formulas, editor.replace(x: path[0], y: path[1]))
         case let (.formulas(formulas, editor), .noFirstResponder):

@@ -13,6 +13,7 @@ enum Message {
     case editColumn(Int)
     case startAddControl(Int)
     case addControl(SheetControl, to: Int)
+    case relocateControl(from: IndexPath, to: Int)
     case saveControl
 
     case changeVisibleColumn(Int)
@@ -66,6 +67,8 @@ func update(model: inout Model, message: Message) -> State<Model, Message> {
             }
             return .model(
                 model.replace(editControl: controlIndex, inColumn: columnIndex, editor: editor))
+        case let .relocateControl(controlIndex):
+            return .model(model.replace(relocateControl: controlIndex, inColumn: columnIndex))
         case .stopEditing:
             return .model(model.stopEditing())
         }
@@ -99,6 +102,19 @@ func update(model: inout Model, message: Message) -> State<Model, Message> {
         }
         return .model(
             model.replace(control: control, inColumn: column, with: editor.control).stopEditing())
+    case let .relocateControl(from, toColumn):
+        let oldColumn = model.sheet.columns[from[0]]
+        let control = oldColumn.controls[from[1]]
+        let newColumn = model.sheet.columns[toColumn]
+        return .model(model.replace(sheet:
+            model.sheet.replace(
+                column: oldColumn.replace(controls: oldColumn.controls.removing(at: from[1])),
+                at: from[0]
+                )
+                .replace(
+                    column: newColumn.replace(controls: [control] + newColumn.controls),
+                    at: toColumn)
+            ).stopEditing())
 
     case let .changeVisibleColumn(delta):
         let firstIndex = model.firstVisibleColumn + delta
@@ -185,9 +201,9 @@ func update(model: inout Model, message: Message) -> State<Model, Message> {
         do {
             let data = try coder.encode(model.sheet)
             try data.write(to: fileURL, options: [.atomic])
-            return showStatus(model: model, status: "JSON Saved")
+            return showStatus(model: model.stopEditing(), status: "JSON Saved")
         } catch {
-            return showStatus(model: model, status: "Error saving JSON")
+            return showStatus(model: model.stopEditing(), status: "Error saving JSON")
         }
     case .quit:
         guard let fileURL = model.fileURL else {
@@ -255,6 +271,7 @@ private func _render(_ model: Model, status: String?) -> [View<Message>] {
             renderControlEditor(model: model, column: column, control: control, editor: editor)
         }),
         model.addingToColumn.map({ renderControlSelector(model: model, addToColumn: $0) }),
+        model.relocatingControl.map({ renderControlRelocator(model: model, relocatingControl: $0.control, inColumn: $0.column) }),
     ] as [View<Message>?]).compactMap { $0 }
 }
 
@@ -265,7 +282,11 @@ func inModal(
         IgnoreMouse(),
         IgnoreKeys(),
         OnLeftClick(
-            Space(), Message.cancelModal, .highlight(false)),
+            Space().modifyCharacters { pt, size, c in
+                return AttributedCharacter(
+                    character: AttributedCharacter.null.character, attributes: []
+                ).styled(.foreground(.black)).styled(.background(.none))
+            }, Message.cancelModal, .highlight(false)),
         Stack(
             .down,
             [
@@ -320,6 +341,18 @@ func renderControlEditor(
                         : Text(" Save ".foreground(.black)).border(.single)
                 ),
             ])
+    )
+}
+
+func renderControlRelocator(model: Model, relocatingControl controlIndex: Int, inColumn columnIndex: Int) -> View<Message> {
+    inModal(
+        model: model,
+        view: Stack(.down, model.sheet.orderedColumns.map { index, column in
+            return index == columnIndex
+            ? Text(column.title.bold())
+            : OnLeftClick(Text(column.title),
+                Message.relocateControl(from: [columnIndex, controlIndex], to: index))
+        }.map { $0.centered() }).aligned(.middleCenter)
     )
 }
 

@@ -8,19 +8,19 @@ func FormulasView<Msg>(editable: [Formula], fixed: [Formula], sheet: Sheet) -> V
     Stack(
         .down,
         editable.map { formula in
-            FormulaView(formula, sheet: sheet, isEditable: true)
+            FormulaView(formula, sheet: sheet, canEdit: true)
         }
             + [
                 Repeating(Text("─".foreground(.black))).height(1),
                 Text(" Variables ".bold().underlined()).centered(),
             ]
             + fixed.map { formula in
-                FormulaView(formula, sheet: sheet, isEditable: false)
+                FormulaView(formula, sheet: sheet, canEdit: false)
             }
     )
 }
 
-func FormulaView<Msg>(_ formula: Formula, sheet: Sheet, isEditable: Bool) -> View<Msg> {
+func FormulaView<Msg>(_ formula: Formula, sheet: Sheet, canEdit: Bool) -> View<Msg> {
     Stack(
         .ltr,
         [

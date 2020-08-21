@@ -15,7 +15,9 @@ struct Sheet {
     let visibleColumnsCount: Int
     let columns: [SheetColumn]
     let formulas: [Formula]
-    private var formulaMemo: [String: Operation.Value] = [:]
+    var orderedColumns: [(Int, SheetColumn)] {
+        columnsOrder.map { ($0, columns[$0]) }
+    }
 
     init(columnsOrder: [Int], visibleColumnsCount: Int, columns: [SheetColumn]) {
         self.columnsOrder = Sheet.fixColumns(columnsOrder, count: columns.count)
@@ -58,6 +60,11 @@ struct Sheet {
     func replace(columns: [SheetColumn]) -> Sheet {
         Sheet(
             columnsOrder: columnsOrder, visibleColumnsCount: visibleColumnsCount, columns: columns)
+    }
+
+    func replace(column: SheetColumn, at columnIndex: Int) -> Sheet {
+        Sheet(columnsOrder: columnsOrder, visibleColumnsCount: visibleColumnsCount,
+            columns: columns.replacing(column, at: columnIndex))
     }
 
     static func mapControls(_ map: @escaping (SheetControl) -> SheetControl) -> (Sheet) -> Sheet {

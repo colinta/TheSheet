@@ -4,10 +4,11 @@
 
 import Ashen
 
-struct SheetColumn: Codable {
+struct SheetColumn {
     enum Message {
         enum Delegate {
             case showControlEditor(Int)
+            case relocateControl(Int)
             case stopEditing
         }
         case controlMessage(Int, SheetControl.Message)
@@ -41,6 +42,13 @@ struct SheetColumn: Codable {
     }
 
     func replace(controls: [SheetControl]) -> SheetColumn {
+        SheetColumn(
+            title: title,
+            controls: controls,
+            isFormulaColumn: isFormulaColumn)
+    }
+
+    func replace(movingControl: Int?) -> SheetColumn {
         SheetColumn(
             title: title,
             controls: controls,
@@ -81,9 +89,8 @@ struct SheetColumn: Codable {
 
     func render(_ sheet: Sheet, isEditing: Bool, editingControl: Int?) -> View<SheetColumn.Message>
     {
-        Stack(
-            .down,
-            controls.enumerated().flatMap { controlIndex, control -> [View<SheetColumn.Message>] in
+        let controlViews: [View<SheetColumn.Message>] = controls
+            .enumerated().flatMap { controlIndex, control -> [View<SheetColumn.Message>] in
                 let controlView = control.render(sheet).map {
                     SheetColumn.Message.controlMessage(controlIndex, $0)
                 }.matchContainer(dimension: .width)
@@ -108,6 +115,30 @@ struct SheetColumn: Codable {
                     Repeating(Text("─".foreground(.black))).height(1),
                 ]
             }
-        )
+        return Stack(
+            .down, controlViews)
+    }
+}
+
+extension SheetColumn: Codable {
+
+    enum CodingKeys: String, CodingKey {
+        case title
+        case controls
+        case isFormulaColumn
+    }
+
+    init(from decoder: Decoder) throws {
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        title = try values.decode(String.self, forKey: .title)
+        controls = try values.decode([SheetControl].self, forKey: .controls)
+        isFormulaColumn = try values.decode(Bool.self, forKey: .isFormulaColumn)
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(title, forKey: .title)
+        try container.encode(controls, forKey: .controls)
+        try container.encode(isFormulaColumn, forKey: .isFormulaColumn)
     }
 }

@@ -15,27 +15,8 @@ struct Model {
         case editColumn(Int)
         case addToColumn(Int)
         case editControl(column: Int, control: Int, editor: EditableControl)
+        case relocateControl(column: Int, control: Int)
         case none
-
-        enum Filter {
-            case changeColumn
-            case editColumn
-            case addToColumn
-            case editControl
-        }
-
-        func filter(_ filter: Filter) -> Editing {
-            if case .changeColumn = self, case .changeColumn = filter {
-                return self
-            } else if case .editColumn = self, case .editColumn = filter {
-                return self
-            } else if case .addToColumn = self, case .addToColumn = filter {
-                return self
-            } else if case .editControl = self, case .editControl = filter {
-                return self
-            }
-            return .none
-        }
     }
 
     let sheet: Sheet
@@ -77,6 +58,10 @@ struct Model {
     var editingControl: (column: Int, control: Int, editor: EditableControl)? {
         guard case let .editControl(column, control, editor) = editing else { return nil }
         return (column, control, editor)
+    }
+    var relocatingControl: (column: Int, control: Int)? {
+        guard case let .relocateControl(column, control) = editing else { return nil }
+        return (column, control)
     }
 
     init(
@@ -146,17 +131,6 @@ struct Model {
                     }, at: columnIndex)))
     }
 
-    func replace(editControl control: Int, inColumn column: Int, editor: EditableControl) -> Model {
-        Model(
-            sheet: sheet, undoSheets: undoSheets, fileURL: fileURL,
-            firstVisibleColumn: firstVisibleColumn,
-            columnScrollOffset: columnScrollOffset, modalScrollOffset: modalScrollOffset,
-            editing: .editControl(column: column, control: control, editor: editor),
-            columnScrollMaxOffsets: columnScrollMaxOffsets,
-            modalScrollMaxOffset: modalScrollMaxOffset,
-            status: status)
-    }
-
     func replace(changeColumn column: Int) -> Model {
         let columnScrollOffset = max(0, min(self.columnScrollOffset, columnScrollMaxOffset))
         return Model(
@@ -186,6 +160,28 @@ struct Model {
             firstVisibleColumn: firstVisibleColumn,
             columnScrollOffset: columnScrollOffset, modalScrollOffset: modalScrollOffset,
             editing: .addToColumn(column),
+            columnScrollMaxOffsets: columnScrollMaxOffsets,
+            modalScrollMaxOffset: modalScrollMaxOffset,
+            status: status)
+    }
+
+    func replace(editControl control: Int, inColumn column: Int, editor: EditableControl) -> Model {
+        Model(
+            sheet: sheet, undoSheets: undoSheets, fileURL: fileURL,
+            firstVisibleColumn: firstVisibleColumn,
+            columnScrollOffset: columnScrollOffset, modalScrollOffset: modalScrollOffset,
+            editing: .editControl(column: column, control: control, editor: editor),
+            columnScrollMaxOffsets: columnScrollMaxOffsets,
+            modalScrollMaxOffset: modalScrollMaxOffset,
+            status: status)
+    }
+
+    func replace(relocateControl control: Int, inColumn column: Int) -> Model {
+        Model(
+            sheet: sheet, undoSheets: undoSheets, fileURL: fileURL,
+            firstVisibleColumn: firstVisibleColumn,
+            columnScrollOffset: columnScrollOffset, modalScrollOffset: modalScrollOffset,
+            editing: .relocateControl(column: column, control: control),
             columnScrollMaxOffsets: columnScrollMaxOffsets,
             modalScrollMaxOffset: modalScrollMaxOffset,
             status: status)
@@ -316,5 +312,12 @@ struct Model {
         else { return false }
         guard let controlIndex = controlIndex else { return true }
         return editingControl == controlIndex
+    }
+
+    func isRelocatingControl(_ controlIndex: Int, inColumn columnIndex: Int) -> Bool {
+        guard case let .relocateControl(editingColumn, editingControl) = editing,
+            editingColumn == columnIndex, editingControl == controlIndex
+        else { return false }
+        return true
     }
 }

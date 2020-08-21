@@ -44,7 +44,7 @@ enum SheetControl {
         ("Take a Short or Long Rest", .restButtons),
     ]
 
-    var isEditable: Bool { editor != nil }
+    var canEdit: Bool { editor != nil }
     var formulas: [Formula] {
         switch self {
         case let .attributes(attributes):
@@ -78,7 +78,6 @@ enum SheetControl {
     enum Message {
         enum Delegate {
             case removeControl
-            case moveControl
         }
         case updateSlotCurrent(slotIndex: Int, current: Int)
         case updateSlotMax(slotIndex: Int, max: Int)
