@@ -5,7 +5,7 @@
 import Ashen
 import Foundation
 
-func SkillsEditor(_ skills: [Skill], basedOn: [String], editor: AtXYEditor) -> View<
+func SkillsEditor(_ skills: [Skill], basedOn: [String], editor: AtPathEditor) -> View<
     EditableControl.Message
 > {
     if let xy = editor.atXY, xy.x == 1 {

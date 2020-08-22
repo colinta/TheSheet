@@ -12,14 +12,17 @@ func SkillsView(_ skills: [ResolvedSkill]) -> View<SheetControl.Message> {
 }
 
 func SkillView(_ skill: ResolvedSkill) -> View<SheetControl.Message> {
-    Stack(
+    guard !skill.title.isEmpty else { return Space().height(1) }
+    return Stack(
         .ltr,
         [
             skill.isProficient ? Text(" ◼ ") : Text(" ◦ "),
-            Text(skill.modifierString).minWidth(1),
-            Text(" "),
-            Text(skill.basedOn),
-            Text(" "),
+            skill.modifierString.isEmpty
+                ? Space()
+                : Text(skill.modifierString).minWidth(1).padding(right: 1),
+            skill.basedOn.isEmpty
+            ? Space()
+            : Text(skill.basedOn).padding(right: 1),
             Text(skill.title),
         ])
 }

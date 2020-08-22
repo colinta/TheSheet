@@ -122,8 +122,8 @@ func _ActionUsesView<Msg>(
     _ onResetUses: @escaping @autoclosure SimpleEvent<Msg>
 ) -> View<Msg> {
     let remaining: View<Msg>
-    if let uses = action.uses {
-        remaining = Text(" \(remainingUses) of \(uses) remaining")
+    if let maxUses = action.maxUses {
+        remaining = Text(" \(remainingUses) of \(maxUses) remaining")
     } else {
         remaining = Text(" \(remainingUses) remaining")
     }
@@ -141,11 +141,11 @@ func _ActionUsesView<Msg>(
             (
                 .fixed,
                 canAdd
-                    ? OnLeftClick(Text("+Add".foreground(.green)), onChange(1))
-                    : Text("+Add".foreground(.black))
+                    ? OnLeftClick(Text("[Add]".foreground(.green)), onChange(1))
+                    : Text("[Add]".foreground(.black))
             ),
         ]
-            + (action.uses != nil
+            + (action.maxUses != nil
                 ? [
                     (.fixed, Space().width(1)),
                     (.fixed, OnLeftClick(Text("[Reset]".foreground(.blue)), onResetUses())),

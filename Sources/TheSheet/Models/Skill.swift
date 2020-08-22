@@ -10,8 +10,9 @@ struct Skill: Codable {
     func resolve(_ sheet: Sheet) -> ResolvedSkill {
         ResolvedSkill(
             skill: self,
-            modifierString:
-                Operation.variable(basedOn + ".Mod").eval(sheet)
+            modifierString: basedOn.isEmpty
+            ? ""
+            : Operation.variable(basedOn + ".Mod").eval(sheet)
                 .toReadable)
     }
 

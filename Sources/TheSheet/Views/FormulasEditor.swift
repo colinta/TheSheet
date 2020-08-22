@@ -5,7 +5,7 @@
 import Ashen
 import Foundation
 
-func FormulasEditor(_ formulas: [Formula.Editable], editor: AtXYEditor) -> View<
+func FormulasEditor(_ formulas: [Formula.Editable], editor: AtPathEditor) -> View<
     EditableControl.Message
 > {
     let nextResponder: IndexPath

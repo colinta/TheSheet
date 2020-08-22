@@ -64,12 +64,14 @@ enum SheetControl {
         switch self {
         case let .inventory(inventory):
             return .inventory(inventory)
+        case let .action(action):
+            return .action(action, AtPathEditor(atPath: [0, 0]))
         case let .pointsTracker(points):
-            return .pointsTracker(points, AtXYEditor(atXY: Point(x: 0, y: 0)))
+            return .pointsTracker(points, AtPathEditor(atPath: [0, 0]))
         case let .skills(skills):
-            return .skills(skills, AtXYEditor(atXY: nil))
+            return .skills(skills, AtPathEditor(atPath: nil))
         case let .formulas(formulas):
-            return .formulas(formulas.map(\.toEditable), AtXYEditor(atXY: nil))
+            return .formulas(formulas.map(\.toEditable), AtPathEditor(atPath: nil))
         default:
             return nil
         }
@@ -105,8 +107,8 @@ enum SheetControl {
             guard let remainingUses = action.remainingUses else { break }
             control = .action(action.replace(remainingUses: max(0, remainingUses + delta)))
         case let (.action(action), .resetActionUses):
-            guard let uses = action.uses else { break }
-            control = .action(action.replace(remainingUses: uses))
+            guard let maxUses = action.maxUses else { break }
+            control = .action(action.replace(remainingUses: maxUses))
         case let (.ability(ability), .toggleExpanded):
             control = .ability(ability.replace(isExpanded: !ability.isExpanded))
         case let (.ability(ability), .changeQuantity(delta)):
@@ -346,8 +348,8 @@ extension SheetControl {
             guard points.shouldResetOnLongRest, let pointsMax = points.max else { break }
             control = .pointsTracker(points.replace(current: pointsMax))
         case let (.action(action), .long):
-            guard action.shouldResetOnLongRest, let uses = action.uses else { break }
-            control = .action(action.replace(remainingUses: uses))
+            guard action.shouldResetOnLongRest, let maxUses = action.maxUses else { break }
+            control = .action(action.replace(remainingUses: maxUses))
         default:
             break
         }

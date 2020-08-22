@@ -5,7 +5,7 @@
 import Ashen
 import Foundation
 
-func PointsEditor(_ points: Points, editor: AtXYEditor) -> View<EditableControl.Message> {
+func PointsEditor(_ points: Points, editor: AtPathEditor) -> View<EditableControl.Message> {
     // type: PointType
     // case level
     // case hitPoints

@@ -29,10 +29,10 @@ struct Formula: Codable {
             do {
                 let parsed = try Editable.parse(editableFormula)
                 return Formula(variable: variable, operation: parsed)
-            } catch let error {
-                debug("=============== \(#file) line \(#line) ===============")
-                debug("editableFormula: \(editableFormula)")
-                debug("error: \(error)")
+            } catch {
+                // debug("=============== \(#file) line \(#line) ===============")
+                // debug("editableFormula: \(editableFormula)")
+                // debug("error: \(error)")
                 return nil
             }
         }

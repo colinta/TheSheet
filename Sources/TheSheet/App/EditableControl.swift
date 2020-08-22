@@ -7,19 +7,21 @@ import Foundation
 
 enum EditableControl {
     case inventory(Inventory)
-    // case action(Action)
+    case action(Action, AtPathEditor)
     // case ability(Ability)
     // case spellSlots(SpellSlots)
-    case pointsTracker(Points, AtXYEditor)
+    case pointsTracker(Points, AtPathEditor)
     // case attributes([Attribute])
-    case skills([Skill], AtXYEditor)
+    case skills([Skill], AtPathEditor)
     // case stats(String, [Stat])
     // case restButtons
-    case formulas([Formula.Editable], AtXYEditor)
+    case formulas([Formula.Editable], AtPathEditor)
 
     indirect enum Message {
         enum Property {
             case title
+            case level
+            case description
             case basedOn
             case isProficient
             case variable
@@ -48,6 +50,8 @@ enum EditableControl {
         switch self {
         case let .inventory(inventory):
             return .inventory(inventory)
+        case let .action(action, _):
+            return .action(action)
         case let .pointsTracker(points, _):
             return .pointsTracker(points)
         case let .skills(skills, _):
@@ -74,6 +78,31 @@ enum EditableControl {
         case let (.inventory(inventory), .changeString(.title, value)):
             return .inventory(inventory.replace(title: value))
 
+        case let (.action(action, editor), .changeString(.title, value)):
+            return .action(action.replace(title: value), editor)
+        case let (.action(action, editor), .changeString(.level, value)):
+            return .action(action.replace(level: value), editor)
+        case let (.action(action, editor), .changeString(.description, value)):
+            return .action(action.replace(description: value), editor)
+        case let (.action(action, editor), .changeString(.current, value)):
+            if value == "" {
+                return .action(action.replace(remainingUses: nil), editor)
+            } else if let value = Int(value) {
+                return .action(action.replace(remainingUses: value), editor)
+            } else {
+                return self
+            }
+        case let (.action(action, editor), .changeString(.max, value)):
+            if value == "" {
+                return .action(action.replace(maxUses: nil), editor)
+            } else if let value = Int(value) {
+                return .action(action.replace(maxUses: value), editor)
+            } else {
+                return self
+            }
+        case let (.action(action, editor), .firstResponder(path)):
+            return .action(action, editor.replace(path: path))
+
         case let (.skills(skills, editor), .add):
             return .skills(skills + [Skill(title: "", basedOn: "", isProficient: false)], editor)
         case let (.skills(skills, editor), .atPath(path, .remove)):
@@ -90,7 +119,7 @@ enum EditableControl {
                 skills.modifying({ $0.replace(isProficient: value) }, at: path[0]),
                 editor)
         case let (.skills(skills, editor), .firstResponder(path)):
-            return .skills(skills, editor.replace(x: path[0], y: path[1]))
+            return .skills(skills, editor.replace(path: path))
         case let (.skills(skills, editor), .noFirstResponder):
             return .skills(skills, editor.deselect())
 
@@ -99,7 +128,7 @@ enum EditableControl {
         case let (.pointsTracker(points, editor), .changeInt(.current, value)):
             return .pointsTracker(points.replace(current: max(0, value)), editor)
         case let (.pointsTracker(points, editor), .changeInt(.max, value)):
-            guard points.max != nil else { return .pointsTracker(points, editor) }
+            guard points.max != nil else { return self }
             return .pointsTracker(points.replace(max: max(0, value)), editor)
         case let (.pointsTracker(points, editor), .changeBool(.max, enabled)):
             var newPoints = points.replace(max: enabled ? points.max ?? points.current : nil)
@@ -119,7 +148,7 @@ enum EditableControl {
         case let (.pointsTracker(points, editor), .add):
             return .pointsTracker(points.replace(types: points.types + [.other("", "")]), editor)
         case let (.pointsTracker(pointsTracker, editor), .firstResponder(path)):
-            return .pointsTracker(pointsTracker, editor.replace(x: path[0], y: path[1]))
+            return .pointsTracker(pointsTracker, editor.replace(path: path))
         case let (.pointsTracker(points, editor), .atPath(path, .changeString(.title, value))):
             let types: [Points.PointType] = points.types.enumerated().map { index, type in
                 guard index == path[0], case let .other(variable, _) = type else { return type }
@@ -140,7 +169,7 @@ enum EditableControl {
         case let (.formulas(formulas, editor), .atPath(path, .remove)):
             return .formulas(formulas.removing(at: path[0]), editor)
         case let (.formulas(formulas, editor), .firstResponder(path)):
-            return .formulas(formulas, editor.replace(x: path[0], y: path[1]))
+            return .formulas(formulas, editor.replace(path: path))
         case let (.formulas(formulas, editor), .noFirstResponder):
             return .formulas(formulas, editor.deselect())
         case let (.formulas(formulas, editor), .atPath(path, .changeString(.variable, value))):
@@ -164,6 +193,8 @@ enum EditableControl {
         switch self {
         case let .inventory(inventory):
             return InventoryEditor(inventory)
+        case let .action(action, editor):
+            return ActionEditor(action, editor)
         case let .skills(skills, editor):
             let basedOn = sheet.formulas.compactMap { formula in
                 formula.variable.removingSuffix(".Mod")

@@ -1,10 +1,10 @@
 {
-  "visibleColumnsCount" : 4,
+  "visibleColumnsCount" : 3,
   "columnsOrder" : [
     0,
     4,
-    2,
     3,
+    2,
     1,
     6,
     5
@@ -13,47 +13,6 @@
     {
       "title" : "Actions",
       "controls" : [
-        {
-          "type" : "stats",
-          "title" : "Attack Stats",
-          "stats" : [
-            {
-              "title" : "A.C.",
-              "value" : {
-                "type" : "variable",
-                "value" : "armorClass"
-              }
-            },
-            {
-              "title" : "Prof.",
-              "value" : {
-                "type" : "variable",
-                "value" : "proficiencyBonus"
-              }
-            },
-            {
-              "title" : "Str",
-              "value" : {
-                "type" : "variable",
-                "value" : "STR.Mod"
-              }
-            },
-            {
-              "title" : "Dex",
-              "value" : {
-                "type" : "variable",
-                "value" : "DEX.Mod"
-              }
-            },
-            {
-              "title" : "Spell",
-              "value" : {
-                "type" : "variable",
-                "value" : "spellAttack"
-              }
-            }
-          ]
-        },
         {
           "type" : "action",
           "action" : {
@@ -162,15 +121,14 @@
           "type" : "action",
           "action" : {
             "isExpanded" : true,
-            "uses" : 1,
+            "maxUses" : 1,
             "title" : "Breath Weapon",
             "subactions" : [
               {
                 "type" : "Cold",
                 "damage" : {
-                  "type" : "dice",
-                  "n" : 2,
-                  "d" : 6
+                  "type" : "variable",
+                  "value" : "breathWeapon"
                 }
               }
             ],
@@ -183,7 +141,7 @@
           "type" : "action",
           "action" : {
             "isExpanded" : true,
-            "uses" : 1,
+            "maxUses" : 1,
             "title" : "Hat of Wizardry",
             "subactions" : [
 
@@ -400,9 +358,8 @@
                 },
                 "type" : "Necrotic",
                 "damage" : {
-                  "type" : "dice",
-                  "n" : 1,
-                  "d" : 8
+                  "type" : "variable",
+                  "value" : "chillTouch"
                 }
               }
             ],
@@ -424,9 +381,8 @@
                 },
                 "type" : "Cold",
                 "damage" : {
-                  "type" : "dice",
-                  "n" : 1,
-                  "d" : 6
+                  "type" : "variable",
+                  "value" : "frostbite"
                 }
               }
             ],
@@ -602,6 +558,74 @@
           }
         },
         {
+          "type" : "stats",
+          "title" : "Attack Stats",
+          "stats" : [
+            {
+              "title" : "A.C.",
+              "value" : {
+                "type" : "variable",
+                "value" : "armorClass"
+              }
+            },
+            {
+              "title" : "Prof.",
+              "value" : {
+                "type" : "variable",
+                "value" : "proficiencyBonus"
+              }
+            },
+            {
+              "title" : "Str",
+              "value" : {
+                "type" : "variable",
+                "value" : "STR.Mod"
+              }
+            },
+            {
+              "title" : "Dex",
+              "value" : {
+                "type" : "variable",
+                "value" : "DEX.Mod"
+              }
+            },
+            {
+              "title" : "Attack",
+              "value" : {
+                "type" : "variable",
+                "value" : "attackBonus"
+              }
+            },
+            {
+              "title" : "Spell",
+              "value" : {
+                "type" : "variable",
+                "value" : "spellAttack"
+              }
+            }
+          ]
+        },
+        {
+          "type" : "stats",
+          "title" : "Hit Dice",
+          "stats" : [
+            {
+              "title" : "1d6",
+              "value" : {
+                "type" : "variable",
+                "value" : "sorcererLevel"
+              }
+            },
+            {
+              "title" : "1d8",
+              "value" : {
+                "type" : "variable",
+                "value" : "monkLevel"
+              }
+            }
+          ]
+        },
+        {
           "type" : "attributes",
           "attributes" : [
             {
@@ -734,7 +758,7 @@
               "title" : "Persuasion",
               "basedOn" : "CHA",
               "isProficient" : false
-            },
+            }, {"title": "", "basedOn": "", "isProficient": false},
             {
               "title" : "Caligrapher's Tools",
               "basedOn" : "",
@@ -880,9 +904,17 @@
               "variable" : "chillTouch",
               "operation" : {
                 "lhs" : {
-                  "type" : "dice",
-                  "n" : 4,
-                  "d" : 8
+                  "type" : "multiply",
+                  "value" : [
+                    {
+                      "type" : "integer",
+                      "value" : 4
+                    },
+                    {
+                      "type" : "variable",
+                      "value" : "d8"
+                    }
+                  ]
                 },
                 "condition" : {
                   "type" : ">=",
@@ -898,9 +930,17 @@
                 "type" : "if",
                 "rhs" : {
                   "lhs" : {
-                    "type" : "dice",
-                    "n" : 3,
-                    "d" : 8
+                    "type" : "multiply",
+                    "value" : [
+                      {
+                        "type" : "integer",
+                        "value" : 3
+                      },
+                      {
+                        "type" : "variable",
+                        "value" : "d8"
+                      }
+                    ]
                   },
                   "condition" : {
                     "type" : ">=",
@@ -916,9 +956,17 @@
                   "type" : "if",
                   "rhs" : {
                     "lhs" : {
-                      "type" : "dice",
-                      "n" : 2,
-                      "d" : 8
+                      "type" : "multiply",
+                      "value" : [
+                        {
+                          "type" : "integer",
+                          "value" : 2
+                        },
+                        {
+                          "type" : "variable",
+                          "value" : "d8"
+                        }
+                      ]
                     },
                     "condition" : {
                       "type" : ">=",
@@ -933,9 +981,211 @@
                     },
                     "type" : "if",
                     "rhs" : {
-                      "type" : "dice",
-                      "n" : 1,
-                      "d" : 8
+                      "type" : "multiply",
+                      "value" : [
+                        {
+                          "type" : "integer",
+                          "value" : 1
+                        },
+                        {
+                          "type" : "variable",
+                          "value" : "d8"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "variable" : "frostbite",
+              "operation" : {
+                "lhs" : {
+                  "type" : "multiply",
+                  "value" : [
+                    {
+                      "type" : "integer",
+                      "value" : 5
+                    },
+                    {
+                      "type" : "variable",
+                      "value" : "d6"
+                    }
+                  ]
+                },
+                "condition" : {
+                  "type" : ">=",
+                  "lhs" : {
+                    "type" : "variable",
+                    "value" : "level"
+                  },
+                  "rhs" : {
+                    "type" : "integer",
+                    "value" : 16
+                  }
+                },
+                "type" : "if",
+                "rhs" : {
+                  "lhs" : {
+                    "type" : "multiply",
+                    "value" : [
+                      {
+                        "type" : "integer",
+                        "value" : 4
+                      },
+                      {
+                        "type" : "variable",
+                        "value" : "d6"
+                      }
+                    ]
+                  },
+                  "condition" : {
+                    "type" : ">=",
+                    "lhs" : {
+                      "type" : "variable",
+                      "value" : "level"
+                    },
+                    "rhs" : {
+                      "type" : "integer",
+                      "value" : 11
+                    }
+                  },
+                  "type" : "if",
+                  "rhs" : {
+                    "lhs" : {
+                      "type" : "multiply",
+                      "value" : [
+                        {
+                          "type" : "integer",
+                          "value" : 3
+                        },
+                        {
+                          "type" : "variable",
+                          "value" : "d6"
+                        }
+                      ]
+                    },
+                    "condition" : {
+                      "type" : ">=",
+                      "lhs" : {
+                        "type" : "variable",
+                        "value" : "level"
+                      },
+                      "rhs" : {
+                        "type" : "integer",
+                        "value" : 6
+                      }
+                    },
+                    "type" : "if",
+                    "rhs" : {
+                      "type" : "multiply",
+                      "value" : [
+                        {
+                          "type" : "integer",
+                          "value" : 2
+                        },
+                        {
+                          "type" : "variable",
+                          "value" : "d6"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "variable" : "breathWeapon",
+              "operation" : {
+                "lhs" : {
+                  "type" : "multiply",
+                  "value" : [
+                    {
+                      "type" : "integer",
+                      "value" : 4
+                    },
+                    {
+                      "type" : "variable",
+                      "value" : "d6"
+                    }
+                  ]
+                },
+                "condition" : {
+                  "type" : ">=",
+                  "lhs" : {
+                    "type" : "variable",
+                    "value" : "level"
+                  },
+                  "rhs" : {
+                    "type" : "integer",
+                    "value" : 17
+                  }
+                },
+                "type" : "if",
+                "rhs" : {
+                  "lhs" : {
+                    "type" : "multiply",
+                    "value" : [
+                      {
+                        "type" : "integer",
+                        "value" : 3
+                      },
+                      {
+                        "type" : "variable",
+                        "value" : "d6"
+                      }
+                    ]
+                  },
+                  "condition" : {
+                    "type" : ">=",
+                    "lhs" : {
+                      "type" : "variable",
+                      "value" : "level"
+                    },
+                    "rhs" : {
+                      "type" : "integer",
+                      "value" : 11
+                    }
+                  },
+                  "type" : "if",
+                  "rhs" : {
+                    "lhs" : {
+                      "type" : "multiply",
+                      "value" : [
+                        {
+                          "type" : "integer",
+                          "value" : 2
+                        },
+                        {
+                          "type" : "variable",
+                          "value" : "d6"
+                        }
+                      ]
+                    },
+                    "condition" : {
+                      "type" : ">=",
+                      "lhs" : {
+                        "type" : "variable",
+                        "value" : "level"
+                      },
+                      "rhs" : {
+                        "type" : "integer",
+                        "value" : 5
+                      }
+                    },
+                    "type" : "if",
+                    "rhs" : {
+                      "type" : "multiply",
+                      "value" : [
+                        {
+                          "type" : "integer",
+                          "value" : 1
+                        },
+                        {
+                          "type" : "variable",
+                          "value" : "d6"
+                        }
+                      ]
                     }
                   }
                 }
@@ -970,17 +1220,35 @@
             {
               "variable" : "attackBonus",
               "operation" : {
-                "type" : "max",
-                "value" : [
-                  {
+                "lhs" : {
+                  "type" : "max",
+                  "value" : [
+                    {
+                      "type" : "variable",
+                      "value" : "STR.Mod"
+                    },
+                    {
+                      "type" : "variable",
+                      "value" : "DEX.Mod"
+                    }
+                  ]
+                },
+                "condition" : {
+                  "type" : ">",
+                  "lhs" : {
                     "type" : "variable",
-                    "value" : "STR.Mod"
+                    "value" : "monkLevel"
                   },
-                  {
-                    "type" : "variable",
-                    "value" : "DEX.Mod"
+                  "rhs" : {
+                    "type" : "integer",
+                    "value" : 0
                   }
-                ]
+                },
+                "type" : "if",
+                "rhs" : {
+                  "type" : "variable",
+                  "value" : "STR.Mod"
+                }
               }
             },
             {
@@ -1011,6 +1279,26 @@
                   {
                     "type" : "variable",
                     "value" : "DEX.Mod"
+                  }
+                ]
+              }
+            },
+            {
+              "variable" : "kiSaveDC",
+              "operation" : {
+                "type" : "add",
+                "value" : [
+                  {
+                    "type" : "integer",
+                    "value" : 8
+                  },
+                  {
+                    "type" : "variable",
+                    "value" : "proficiencyBonus"
+                  },
+                  {
+                    "type" : "variable",
+                    "value" : "WIS.Mod"
                   }
                 ]
               }
@@ -1053,7 +1341,7 @@
       "isFormulaColumn" : true
     },
     {
-      "title" : "Monk",
+      "title" : "Future",
       "controls" : [
         {
           "type" : "pointsTracker",
@@ -1132,6 +1420,19 @@
             "title" : "Silent Image",
             "level" : "1",
             "description" : "You create the image of an object, a creature, or some other visible phenomenon that is no larger than a 15-foot cube. The image appears at a spot within range and lasts for the duration. The image is purely visual; it isn't accompanied by sound, smell, or other sensory effects. You can use your action to cause the image to move to any spot within range. As the image changes location, you can alter its appearance so that its movements appear natural for the image. Physical interaction with the image reveals it to be an illusion, because things can pass through it. A creature that uses its action to examine the image can determine that it is an illusion with a successful Investigation (INT) check against your spell save DC.",
+            "subactions" : [
+
+            ],
+            "isExpanded" : true
+          }
+        },
+        {
+          "type" : "action",
+          "action" : {
+            "shouldResetOnLongRest" : false,
+            "title" : "See Invisibility",
+            "level" : "2",
+            "description" : "For the duration, you see invisible creatures and objects as if they were visible, and you can see into the Ethereal Plane.",
             "subactions" : [
 
             ],

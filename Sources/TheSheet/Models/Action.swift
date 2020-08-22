@@ -15,7 +15,6 @@ struct Action: Codable {
     let subactions: [Sub]
     let description: String?
     let isExpanded: Bool
-    let uses: Int?
     let remainingUses: Int?
     let maxUses: Int?
     let shouldResetOnLongRest: Bool
@@ -24,7 +23,7 @@ struct Action: Codable {
         title: String, level: String? = nil, check: Operation? = nil, damage: Operation? = nil,
         type: String? = nil,
         description: String? = nil, isExpanded: Bool = false,
-        uses: Int? = nil, remainingUses: Int? = nil, maxUses: Int? = nil,
+        remainingUses: Int? = nil, maxUses: Int? = nil,
         shouldResetOnLongRest: Bool = false
     ) {
         self.init(
@@ -46,7 +45,7 @@ struct Action: Codable {
     init(
         title: String, level: String? = nil, subactions: [Sub],
         description: String? = nil, isExpanded: Bool = false,
-        uses: Int? = nil, remainingUses: Int? = nil, maxUses: Int? = nil,
+        remainingUses: Int? = nil, maxUses: Int? = nil,
         shouldResetOnLongRest: Bool = false
     ) {
         self.title = title
@@ -54,23 +53,68 @@ struct Action: Codable {
         self.subactions = subactions
         self.description = description
         self.isExpanded = isExpanded
-        self.uses = uses
         self.remainingUses = remainingUses
         self.maxUses = maxUses
         self.shouldResetOnLongRest = shouldResetOnLongRest
     }
 
-    func replace(isExpanded: Bool) -> Action {
+    func replace(title: String) -> Action {
         Action(
             title: title, level: level, subactions: subactions, description: description,
-            isExpanded: isExpanded, uses: uses, remainingUses: remainingUses, maxUses: maxUses,
+            isExpanded: isExpanded, remainingUses: remainingUses, maxUses: maxUses,
             shouldResetOnLongRest: shouldResetOnLongRest)
     }
 
-    func replace(remainingUses: Int) -> Action {
+    func replace(level: String) -> Action {
+        Action(
+            title: title, level: level.isEmpty ? nil : level, subactions: subactions, description: description,
+            isExpanded: isExpanded, remainingUses: remainingUses, maxUses: maxUses,
+            shouldResetOnLongRest: shouldResetOnLongRest)
+    }
+
+    func replace(description: String) -> Action {
+        Action(
+            title: title, level: level, subactions: subactions, description: description.isEmpty ? nil : description,
+            isExpanded: isExpanded, remainingUses: remainingUses, maxUses: maxUses,
+            shouldResetOnLongRest: shouldResetOnLongRest)
+    }
+
+    func replace(isExpanded: Bool) -> Action {
         Action(
             title: title, level: level, subactions: subactions, description: description,
-            isExpanded: isExpanded, uses: uses, remainingUses: remainingUses, maxUses: maxUses,
+            isExpanded: isExpanded, remainingUses: remainingUses, maxUses: maxUses,
+            shouldResetOnLongRest: shouldResetOnLongRest)
+    }
+
+    func replace(remainingUses: Int?) -> Action {
+        Action(
+            title: title, level: level, subactions: subactions, description: description,
+            isExpanded: isExpanded, remainingUses: remainingUses, maxUses: maxUses,
+            shouldResetOnLongRest: shouldResetOnLongRest)
+    }
+
+    func replace(maxUses: Int?) -> Action {
+        Action(
+            title: title, level: level, subactions: subactions, description: description,
+            isExpanded: isExpanded,
+            remainingUses: remainingUses == nil && maxUses != nil
+                ? maxUses
+                : remainingUses,
+            maxUses: maxUses,
+            shouldResetOnLongRest: shouldResetOnLongRest)
+    }
+
+    func replace(shouldResetOnLongRest: Bool) -> Action {
+        Action(
+            title: title, level: level, subactions: subactions, description: description,
+            isExpanded: isExpanded, remainingUses: remainingUses, maxUses: maxUses,
+            shouldResetOnLongRest: shouldResetOnLongRest)
+    }
+
+    func replace(subactions: [Sub]) -> Action {
+        Action(
+            title: title, level: level, subactions: subactions, description: description,
+            isExpanded: isExpanded, remainingUses: remainingUses, maxUses: maxUses,
             shouldResetOnLongRest: shouldResetOnLongRest)
     }
 }
