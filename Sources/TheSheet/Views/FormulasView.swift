@@ -21,16 +21,20 @@ func FormulasView<Msg>(editable: [Formula], fixed: [Formula], sheet: Sheet) -> V
 }
 
 func FormulaView<Msg>(_ formula: Formula, sheet: Sheet, canEdit: Bool) -> View<Msg> {
-    Stack(
-        .ltr,
-        [
-            Text(formula.variable.underlined()),
-            Text(" = "),
-            Text(
-                [
-                    formula.operation.toAttributed(sheet),
-                    " -> ".bold(),
-                    formula.operation.eval(sheet).toAttributed,
-                ], .wrap(true)),
-        ])
+    Stack(.down, [
+        Stack(
+            .ltr,
+            [
+                Text(formula.variable.underlined()),
+                Text(" = "),
+                Text(formula.operation.toAttributed(sheet), .wrap(true)),
+            ]),
+        Stack(
+            .ltr,
+            [
+                Text(String(repeating: " ", count: formula.variable.count)),
+                Text("-> ".bold()),
+                Text(formula.operation.eval(sheet).toAttributed),
+            ]),
+    ])
 }

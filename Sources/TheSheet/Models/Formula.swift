@@ -269,7 +269,7 @@ extension Formula.Editable {
         if variable == "false" {
             return (.bool(false), remainder)
         }
-        if let remainder = remainder.removingPrefix("d"), let dice = Int(remainder) {
+        if let afterD = variable.removingPrefix("d"), let dice = Int(afterD) {
             return (.dice(Operation.Dice(n: 1, d: dice)), remainder)
         }
         return (.variable(variable), remainder)

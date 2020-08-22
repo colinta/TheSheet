@@ -306,7 +306,16 @@ indirect enum Operation {
             return attributedFunction("min", operations: operations, sheet: sheet)
 
         case let .if(condition, lhs, rhs):
-            return attributedFunction("if", operations: [condition, lhs, rhs], sheet: sheet)
+            return (
+                "if".foreground(.white)
+                + "(".foreground(.brightYellow)
+                + condition.toAttributed(sheet)
+                + ") {\n".foreground(.brightYellow)
+                + lhs.toAttributed(sheet).indented()
+                + "\n} else {\n"
+                + rhs.toAttributed(sheet).indented()
+                + "\n}".foreground(.brightYellow)
+                )
         case let .equal(lhs, rhs):
             return attributedOperator(
                 "=", operations: [lhs, rhs], sheet: sheet, precedence: 2, prevPrecedence)

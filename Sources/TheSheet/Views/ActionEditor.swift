@@ -21,7 +21,8 @@ func ActionEditor(_ action: Action, _ editor: AtPathEditor) -> View<EditableCont
             Input(action.description ?? "", onChange: { EditableControl.Message.changeString(.description, $0) },
                 .placeholder("(optional)"),
                 .isResponder(editor.atPath == [0, 4]),
-                .isMultiline(true)),
+                .isMultiline(true),
+                .wrap(true)),
             EditableControl.Message.firstResponder([0, 4]), .highlight(false)
         ).padding(left: 4),
     ]

@@ -22,6 +22,10 @@ private func main() throws {
 }
 
 // debugSilenced(true)
+// let op: Operation = .if(.bool(true), .dice(Operation.Dice(n: 1, d: 4)), .if(.bool(true), .dice(Operation.Dice(n: 1, d: 4)), .dice(Operation.Dice(n: 1, d: 6))))
+// let sheet = Sheet(columnsOrder: [], visibleColumnsCount: 0, columns: [])
+// print("=============== \(#file) line \(#line) ===============")
+// print("op: \(op.toAttributed(sheet).string)")
 try main()
 
 func createSheet() -> Sheet {

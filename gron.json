@@ -121,7 +121,10 @@
           "type" : "action",
           "action" : {
             "isExpanded" : true,
-            "maxUses" : {"type":"integer","value":1},
+            "maxUses" : {
+              "type" : "integer",
+              "value" : 1
+            },
             "title" : "Breath Weapon",
             "subactions" : [
               {
@@ -141,7 +144,10 @@
           "type" : "action",
           "action" : {
             "isExpanded" : true,
-            "maxUses" : {"type":"integer","value":1},
+            "maxUses" : {
+              "type" : "integer",
+              "value" : 1
+            },
             "title" : "Hat of Wizardry",
             "subactions" : [
 
@@ -155,7 +161,10 @@
           "type" : "action",
           "action" : {
             "isExpanded" : true,
-            "maxUses" : {"type":"integer","value":7},
+            "maxUses" : {
+              "type" : "integer",
+              "value" : 7
+            },
             "title" : "Wand of Pyrotechnics",
             "subactions" : [
 
@@ -576,17 +585,10 @@
               }
             },
             {
-              "title" : "Str",
+              "title" : "Speed",
               "value" : {
                 "type" : "variable",
-                "value" : "STR.Mod"
-              }
-            },
-            {
-              "title" : "Dex",
-              "value" : {
-                "type" : "variable",
-                "value" : "DEX.Mod"
+                "value" : "speed"
               }
             },
             {
@@ -758,7 +760,12 @@
               "title" : "Persuasion",
               "basedOn" : "CHA",
               "isProficient" : false
-            }, {"title": "", "basedOn": "", "isProficient": false},
+            },
+            {
+              "title" : "",
+              "basedOn" : "",
+              "isProficient" : false
+            },
             {
               "title" : "Caligrapher's Tools",
               "basedOn" : "",
@@ -901,20 +908,28 @@
               }
             },
             {
+              "variable" : "speed",
+              "operation" : {
+                "type" : "add",
+                "value" : [
+                  {
+                    "type" : "variable",
+                    "value" : "sorcererLevel"
+                  },
+                  {
+                    "type" : "variable",
+                    "value" : "monkLevel"
+                  }
+                ]
+              }
+            },
+            {
               "variable" : "chillTouch",
               "operation" : {
                 "lhs" : {
-                  "type" : "multiply",
-                  "value" : [
-                    {
-                      "type" : "integer",
-                      "value" : 4
-                    },
-                    {
-                      "type" : "variable",
-                      "value" : "d8"
-                    }
-                  ]
+                  "type" : "dice",
+                  "n" : 1,
+                  "d" : 8
                 },
                 "condition" : {
                   "type" : ">=",
@@ -930,17 +945,9 @@
                 "type" : "if",
                 "rhs" : {
                   "lhs" : {
-                    "type" : "multiply",
-                    "value" : [
-                      {
-                        "type" : "integer",
-                        "value" : 3
-                      },
-                      {
-                        "type" : "variable",
-                        "value" : "d8"
-                      }
-                    ]
+                    "type" : "dice",
+                    "n" : 1,
+                    "d" : 8
                   },
                   "condition" : {
                     "type" : ">=",
@@ -956,17 +963,9 @@
                   "type" : "if",
                   "rhs" : {
                     "lhs" : {
-                      "type" : "multiply",
-                      "value" : [
-                        {
-                          "type" : "integer",
-                          "value" : 2
-                        },
-                        {
-                          "type" : "variable",
-                          "value" : "d8"
-                        }
-                      ]
+                      "type" : "dice",
+                      "n" : 1,
+                      "d" : 8
                     },
                     "condition" : {
                       "type" : ">=",
@@ -981,17 +980,9 @@
                     },
                     "type" : "if",
                     "rhs" : {
-                      "type" : "multiply",
-                      "value" : [
-                        {
-                          "type" : "integer",
-                          "value" : 1
-                        },
-                        {
-                          "type" : "variable",
-                          "value" : "d8"
-                        }
-                      ]
+                      "type" : "dice",
+                      "n" : 1,
+                      "d" : 8
                     }
                   }
                 }
@@ -1001,17 +992,74 @@
               "variable" : "frostbite",
               "operation" : {
                 "lhs" : {
-                  "type" : "multiply",
-                  "value" : [
-                    {
-                      "type" : "integer",
-                      "value" : 5
-                    },
-                    {
+                  "type" : "dice",
+                  "n" : 1,
+                  "d" : 6
+                },
+                "condition" : {
+                  "type" : ">=",
+                  "lhs" : {
+                    "type" : "variable",
+                    "value" : "level"
+                  },
+                  "rhs" : {
+                    "type" : "integer",
+                    "value" : 17
+                  }
+                },
+                "type" : "if",
+                "rhs" : {
+                  "lhs" : {
+                    "type" : "dice",
+                    "n" : 1,
+                    "d" : 6
+                  },
+                  "condition" : {
+                    "type" : ">=",
+                    "lhs" : {
                       "type" : "variable",
-                      "value" : "d6"
+                      "value" : "level"
+                    },
+                    "rhs" : {
+                      "type" : "integer",
+                      "value" : 11
                     }
-                  ]
+                  },
+                  "type" : "if",
+                  "rhs" : {
+                    "lhs" : {
+                      "type" : "dice",
+                      "n" : 1,
+                      "d" : 6
+                    },
+                    "condition" : {
+                      "type" : ">=",
+                      "lhs" : {
+                        "type" : "variable",
+                        "value" : "level"
+                      },
+                      "rhs" : {
+                        "type" : "integer",
+                        "value" : 5
+                      }
+                    },
+                    "type" : "if",
+                    "rhs" : {
+                      "type" : "dice",
+                      "n" : 1,
+                      "d" : 6
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "variable" : "breathWeapon",
+              "operation" : {
+                "lhs" : {
+                  "type" : "dice",
+                  "n" : 1,
+                  "d" : 6
                 },
                 "condition" : {
                   "type" : ">=",
@@ -1027,17 +1075,9 @@
                 "type" : "if",
                 "rhs" : {
                   "lhs" : {
-                    "type" : "multiply",
-                    "value" : [
-                      {
-                        "type" : "integer",
-                        "value" : 4
-                      },
-                      {
-                        "type" : "variable",
-                        "value" : "d6"
-                      }
-                    ]
+                    "type" : "dice",
+                    "n" : 1,
+                    "d" : 6
                   },
                   "condition" : {
                     "type" : ">=",
@@ -1053,17 +1093,9 @@
                   "type" : "if",
                   "rhs" : {
                     "lhs" : {
-                      "type" : "multiply",
-                      "value" : [
-                        {
-                          "type" : "integer",
-                          "value" : 3
-                        },
-                        {
-                          "type" : "variable",
-                          "value" : "d6"
-                        }
-                      ]
+                      "type" : "dice",
+                      "n" : 1,
+                      "d" : 6
                     },
                     "condition" : {
                       "type" : ">=",
@@ -1078,114 +1110,9 @@
                     },
                     "type" : "if",
                     "rhs" : {
-                      "type" : "multiply",
-                      "value" : [
-                        {
-                          "type" : "integer",
-                          "value" : 2
-                        },
-                        {
-                          "type" : "variable",
-                          "value" : "d6"
-                        }
-                      ]
-                    }
-                  }
-                }
-              }
-            },
-            {
-              "variable" : "breathWeapon",
-              "operation" : {
-                "lhs" : {
-                  "type" : "multiply",
-                  "value" : [
-                    {
-                      "type" : "integer",
-                      "value" : 4
-                    },
-                    {
-                      "type" : "variable",
-                      "value" : "d6"
-                    }
-                  ]
-                },
-                "condition" : {
-                  "type" : ">=",
-                  "lhs" : {
-                    "type" : "variable",
-                    "value" : "level"
-                  },
-                  "rhs" : {
-                    "type" : "integer",
-                    "value" : 17
-                  }
-                },
-                "type" : "if",
-                "rhs" : {
-                  "lhs" : {
-                    "type" : "multiply",
-                    "value" : [
-                      {
-                        "type" : "integer",
-                        "value" : 3
-                      },
-                      {
-                        "type" : "variable",
-                        "value" : "d6"
-                      }
-                    ]
-                  },
-                  "condition" : {
-                    "type" : ">=",
-                    "lhs" : {
-                      "type" : "variable",
-                      "value" : "level"
-                    },
-                    "rhs" : {
-                      "type" : "integer",
-                      "value" : 11
-                    }
-                  },
-                  "type" : "if",
-                  "rhs" : {
-                    "lhs" : {
-                      "type" : "multiply",
-                      "value" : [
-                        {
-                          "type" : "integer",
-                          "value" : 2
-                        },
-                        {
-                          "type" : "variable",
-                          "value" : "d6"
-                        }
-                      ]
-                    },
-                    "condition" : {
-                      "type" : ">=",
-                      "lhs" : {
-                        "type" : "variable",
-                        "value" : "level"
-                      },
-                      "rhs" : {
-                        "type" : "integer",
-                        "value" : 5
-                      }
-                    },
-                    "type" : "if",
-                    "rhs" : {
-                      "type" : "multiply",
-                      "value" : [
-                        {
-                          "type" : "integer",
-                          "value" : 1
-                        },
-                        {
-                          "type" : "variable",
-                          "value" : "d6"
-                        }
-                      ]
+                      "type" : "dice",
+                      "n" : 1,
+                      "d" : 6
                     }
                   }
                 }
@@ -1436,6 +1363,20 @@
             "subactions" : [
 
             ],
+            "isExpanded" : true
+          }
+        },
+        {
+          "type" : "ability",
+          "ability" : {
+            "title" : "Old Instincts",
+            "uses" : {
+              "type" : {
+                "type" : "ki"
+              },
+              "amount" : 1
+            },
+            "description" : "You can spend 1 ki point to take an attack of opportunity when an enemy enters range if you didn’t move your legs on previous turn. Or you can choose to trip the enemy - contested DEX check.",
             "isExpanded" : true
           }
         }
