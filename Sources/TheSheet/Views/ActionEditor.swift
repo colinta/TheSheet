@@ -30,7 +30,7 @@ func ActionEditor(_ action: Action, _ editor: AtPathEditor) -> View<EditableCont
             PromptInput("Title: ", action.title, .title, path: editor.atPath, index: 0),
             levelSelector,
             PromptInput("Remaining Uses: ", action.remainingUses?.description, .current, path: editor.atPath, index: 2),
-            PromptInput("Maximum Uses:   ", action.maxUses?.description, .max, path: editor.atPath, index: 3),
+            PromptInput("Maximum Uses:   ", action.maxUses?.toEditable, .max, path: editor.atPath, index: 3),
         ]
         + descriptionEditors
         + [

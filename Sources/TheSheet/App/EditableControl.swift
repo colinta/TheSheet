@@ -96,7 +96,7 @@ enum EditableControl {
             if value == "" {
                 return .action(action.replace(maxUses: nil), editor)
             } else if let value = Int(value) {
-                return .action(action.replace(maxUses: value), editor)
+                return .action(action.replace(maxUses: .integer(value)), editor)
             } else {
                 return self
             }

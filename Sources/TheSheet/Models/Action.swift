@@ -16,14 +16,14 @@ struct Action: Codable {
     let description: String?
     let isExpanded: Bool
     let remainingUses: Int?
-    let maxUses: Int?
+    let maxUses: Operation?
     let shouldResetOnLongRest: Bool
 
     init(
         title: String, level: String? = nil, check: Operation? = nil, damage: Operation? = nil,
         type: String? = nil,
         description: String? = nil, isExpanded: Bool = false,
-        remainingUses: Int? = nil, maxUses: Int? = nil,
+        remainingUses: Int? = nil, maxUses: Operation? = nil,
         shouldResetOnLongRest: Bool = false
     ) {
         self.init(
@@ -45,7 +45,7 @@ struct Action: Codable {
     init(
         title: String, level: String? = nil, subactions: [Sub],
         description: String? = nil, isExpanded: Bool = false,
-        remainingUses: Int? = nil, maxUses: Int? = nil,
+        remainingUses: Int? = nil, maxUses: Operation? = nil,
         shouldResetOnLongRest: Bool = false
     ) {
         self.title = title
@@ -93,13 +93,18 @@ struct Action: Codable {
             shouldResetOnLongRest: shouldResetOnLongRest)
     }
 
-    func replace(maxUses: Int?) -> Action {
-        Action(
+    func replace(maxUses: Operation?) -> Action {
+        let remainingUses: Int?
+        if self.remainingUses == nil, case let .integer(value) = maxUses {
+            remainingUses = value
+        }
+        else {
+            remainingUses = self.remainingUses
+        }
+        return Action(
             title: title, level: level, subactions: subactions, description: description,
             isExpanded: isExpanded,
-            remainingUses: remainingUses == nil && maxUses != nil
-                ? maxUses
-                : remainingUses,
+            remainingUses: remainingUses,
             maxUses: maxUses,
             shouldResetOnLongRest: shouldResetOnLongRest)
     }

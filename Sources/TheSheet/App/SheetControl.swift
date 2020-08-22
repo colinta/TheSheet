@@ -94,7 +94,7 @@ enum SheetControl {
         case delegate(Delegate)
     }
 
-    func update(_ message: Message) -> (SheetControl, Sheet.Mod?) {
+    func update(sheet: Sheet, message: Message) -> (SheetControl, Sheet.Mod?) {
         var control: SheetControl = self
 
         switch (self, message) {
@@ -107,8 +107,10 @@ enum SheetControl {
             guard let remainingUses = action.remainingUses else { break }
             control = .action(action.replace(remainingUses: max(0, remainingUses + delta)))
         case let (.action(action), .resetActionUses):
-            guard let maxUses = action.maxUses else { break }
-            control = .action(action.replace(remainingUses: maxUses))
+            guard let maxUses = action.maxUses,
+                let value = maxUses.eval(sheet).toInt
+            else { break }
+            control = .action(action.replace(remainingUses: value))
         case let (.ability(ability), .toggleExpanded):
             control = .ability(ability.replace(isExpanded: !ability.isExpanded))
         case let (.ability(ability), .changeQuantity(delta)):
@@ -166,7 +168,7 @@ enum SheetControl {
             return (
                 .restButtons,
                 Sheet.mapControls { control in
-                    control.take(rest: type)
+                    control.take(rest: type, sheet: sheet)
                 }
             )
         default:
@@ -333,7 +335,7 @@ extension SheetControl: Codable {
     }
 }
 extension SheetControl {
-    private func take(rest: Rest) -> SheetControl {
+    private func take(rest: Rest, sheet: Sheet) -> SheetControl {
         var control: SheetControl = self
         switch (self, rest) {
         case let (.spellSlots(spellSlots), .long):
@@ -348,8 +350,12 @@ extension SheetControl {
             guard points.shouldResetOnLongRest, let pointsMax = points.max else { break }
             control = .pointsTracker(points.replace(current: pointsMax))
         case let (.action(action), .long):
-            guard action.shouldResetOnLongRest, let maxUses = action.maxUses else { break }
-            control = .action(action.replace(remainingUses: maxUses))
+            guard
+                action.shouldResetOnLongRest,
+                let maxUses = action.maxUses,
+                let value = maxUses.eval(sheet).toInt
+            else { break }
+            control = .action(action.replace(remainingUses: value))
         default:
             break
         }

@@ -80,7 +80,8 @@ func _ActionStatsView<Msg>(
 
     if let remainingUses = action.remainingUses {
         let actionUses: View<Msg> = _ActionUsesView(
-            action: action, remainingUses: remainingUses, onChange, onResetUses())
+            action: action, remainingUses: remainingUses, sheet: sheet,
+            onChange, onResetUses())
         actionViews.append(actionUses)
     }
 
@@ -118,16 +119,22 @@ func _ActionDescriptionView<Msg>(_ description: String) -> View<
         .fitInContainer(dimension: .width)
 }
 func _ActionUsesView<Msg>(
-    action: Action, remainingUses: Int, _ onChange: @escaping (Int) -> Msg,
+    action: Action, remainingUses: Int, sheet: Sheet,
+    _ onChange: @escaping (Int) -> Msg,
     _ onResetUses: @escaping @autoclosure SimpleEvent<Msg>
 ) -> View<Msg> {
     let remaining: View<Msg>
     if let maxUses = action.maxUses {
-        remaining = Text(" \(remainingUses) of \(maxUses) remaining")
+        remaining = Text(" \(remainingUses) of \(maxUses.eval(sheet).toReadable) remaining")
     } else {
         remaining = Text(" \(remainingUses) remaining")
     }
-    let canAdd: Bool = action.maxUses.map { remainingUses < $0 } ?? true
+    let canAdd: Bool
+    if let maxUses = action.maxUses, let value = maxUses.eval(sheet).toInt {
+        canAdd = remainingUses < value
+    } else {
+        canAdd = true
+    }
     return Flow(
         .ltr,
         [

@@ -87,7 +87,7 @@ struct Sheet {
             var mod: Mod? = nil
             let columns = self.columns.enumerated().map { (index, column) -> SheetColumn in
                 guard index == changeIndex else { return column }
-                let (newColumn, newMod) = column.update(message)
+                let (newColumn, newMod) = column.update(sheet: self, message: message)
                 mod = newMod
                 return newColumn
             }

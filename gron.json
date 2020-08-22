@@ -121,7 +121,7 @@
           "type" : "action",
           "action" : {
             "isExpanded" : true,
-            "maxUses" : 1,
+            "maxUses" : {"type":"integer","value":1},
             "title" : "Breath Weapon",
             "subactions" : [
               {
@@ -141,7 +141,7 @@
           "type" : "action",
           "action" : {
             "isExpanded" : true,
-            "maxUses" : 1,
+            "maxUses" : {"type":"integer","value":1},
             "title" : "Hat of Wizardry",
             "subactions" : [
 
@@ -155,7 +155,7 @@
           "type" : "action",
           "action" : {
             "isExpanded" : true,
-            "maxUses" : 7,
+            "maxUses" : {"type":"integer","value":7},
             "title" : "Wand of Pyrotechnics",
             "subactions" : [
 

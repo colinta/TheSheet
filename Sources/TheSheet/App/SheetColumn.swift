@@ -55,7 +55,7 @@ struct SheetColumn {
             isFormulaColumn: isFormulaColumn)
     }
 
-    func update(_ message: Message) -> (SheetColumn, Sheet.Mod?) {
+    func update(sheet: Sheet, message: Message) -> (SheetColumn, Sheet.Mod?) {
         switch message {
         case .delegate:
             return (self, nil)
@@ -79,7 +79,7 @@ struct SheetColumn {
             var mod: Sheet.Mod? = nil
             let controls = self.controls.enumerated().map { (index, control) -> SheetControl in
                 guard index == changeIndex else { return control }
-                let (newControl, newMod) = control.update(message)
+                let (newControl, newMod) = control.update(sheet: sheet, message: message)
                 mod = newMod
                 return newControl
             }
