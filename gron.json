@@ -2,17 +2,47 @@
   "visibleColumnsCount" : 3,
   "columnsOrder" : [
     0,
-    4,
-    3,
     2,
+    3,
     1,
-    6,
+    4,
     5
   ],
   "columns" : [
     {
       "title" : "Actions",
       "controls" : [
+        {
+          "type" : "restButtons"
+        },
+        {
+          "type" : "ability",
+          "ability" : {
+            "title" : "Subtle Spell",
+            "uses" : {
+              "type" : {
+                "type" : "sorcery"
+              },
+              "amount" : 1
+            },
+            "description" : "When you Cast a Spell, you can spend 1 sorcery point to cast it without any somatic or verbal Components.",
+            "isExpanded" : true
+          }
+        },
+        {
+          "type" : "ability",
+          "ability" : {
+            "title" : "Quickened Spell",
+            "uses" : {
+              "type" : {
+                "type" : "sorcery"
+              },
+              "amount" : 2
+            },
+            "description" : "When you Cast a Spell that has a Casting Time of 1 action, you can spend 2 sorcery points to change the Casting Time to 1 Bonus Action for this casting.",
+            "isExpanded" : true
+          }
+        },
         {
           "type" : "action",
           "action" : {
@@ -353,6 +383,39 @@
       "title" : "Spells",
       "controls" : [
         {
+          "type" : "pointsTracker",
+          "points" : {
+            "title" : "Sorcery Points",
+            "current" : 4,
+            "max" : 4,
+            "types" : [
+              {
+                "type" : "sorcery"
+              }
+            ],
+            "shouldResetOnLongRest" : true
+          }
+        },
+        {
+          "type" : "spellSlots",
+          "spellSlots" : {
+            "title" : "Spell Slots",
+            "slots" : [
+              {
+                "title" : "1",
+                "current" : 4,
+                "max" : 4
+              },
+              {
+                "title" : "2",
+                "current" : 3,
+                "max" : 3
+              }
+            ],
+            "shouldResetOnLongRest" : true
+          }
+        },
+        {
           "type" : "action",
           "action" : {
             "shouldResetOnLongRest" : false,
@@ -408,7 +471,7 @@
             "subactions" : [
 
             ],
-            "isExpanded" : true
+            "isExpanded" : false
           }
         },
         {
@@ -421,7 +484,7 @@
             "subactions" : [
 
             ],
-            "isExpanded" : true
+            "isExpanded" : false
           }
         },
         {
@@ -434,7 +497,7 @@
             "subactions" : [
 
             ],
-            "isExpanded" : true
+            "isExpanded" : false
           }
         },
         {
@@ -467,7 +530,7 @@
                 }
               }
             ],
-            "isExpanded" : true
+            "isExpanded" : false
           }
         },
         {
@@ -504,7 +567,7 @@
             "subactions" : [
 
             ],
-            "isExpanded" : true
+            "isExpanded" : false
           }
         },
         {
@@ -513,11 +576,11 @@
             "shouldResetOnLongRest" : false,
             "title" : "Mirror Image",
             "level" : "2",
-            "description" : "Three illusory duplicates appear in your space. Each time a creature targets you, roll a d20.\n",
+            "description" : "Duration: 1 minute\nThree illusory duplicates appear in your space. Each time a creature targets you, roll a d20. If you have three duplicates, you must roll a 6 or higher to change the attack's target to a duplicate. With two duplicates, you must roll an 8 or higher. With one duplicate, you must roll an 11 or higher.\nDC = 10 + DEX",
             "subactions" : [
 
             ],
-            "isExpanded" : true
+            "isExpanded" : false
           }
         },
         {
@@ -626,6 +689,21 @@
               }
             }
           ]
+        },
+        {
+          "type" : "pointsTracker",
+          "points" : {
+            "title" : "Sorcerer Level",
+            "current" : 4,
+            "types" : [
+              {
+                "type" : "other",
+                "variable" : "sorcererLevel",
+                "title" : "Sorcerer Level"
+              }
+            ],
+            "shouldResetOnLongRest" : false
+          }
         },
         {
           "type" : "attributes",
@@ -774,88 +852,11 @@
           ]
         },
         {
-          "type" : "pointsTracker",
-          "points" : {
-            "title" : "Sorcerer Level",
-            "current" : 4,
-            "types" : [
-              {
-                "type" : "other",
-                "variable" : "sorcererLevel",
-                "title" : "Sorcerer Level"
-              }
-            ],
-            "shouldResetOnLongRest" : false
-          }
-        }
-      ],
-      "isFormulaColumn" : false
-    },
-    {
-      "title" : "Abilities",
-      "controls" : [
-        {
-          "type" : "restButtons"
-        },
-        {
-          "type" : "spellSlots",
-          "spellSlots" : {
-            "title" : "Spell Slots",
-            "slots" : [
-              {
-                "title" : "1",
-                "current" : 4,
-                "max" : 4
-              },
-              {
-                "title" : "2",
-                "current" : 3,
-                "max" : 3
-              }
-            ],
-            "shouldResetOnLongRest" : true
-          }
-        },
-        {
-          "type" : "pointsTracker",
-          "points" : {
-            "title" : "Sorcery Points",
-            "current" : 4,
-            "max" : 4,
-            "types" : [
-              {
-                "type" : "sorcery"
-              }
-            ],
-            "shouldResetOnLongRest" : true
-          }
-        },
-        {
           "type" : "ability",
           "ability" : {
-            "title" : "Quickened Spell",
-            "uses" : {
-              "type" : {
-                "type" : "sorcery"
-              },
-              "amount" : 2
-            },
-            "description" : "When you Cast a Spell that has a Casting Time of 1 action, you can spend 2 sorcery points to change the Casting Time to 1 Bonus Action for this casting.",
-            "isExpanded" : true
-          }
-        },
-        {
-          "type" : "ability",
-          "ability" : {
-            "title" : "Subtle Spell",
-            "uses" : {
-              "type" : {
-                "type" : "sorcery"
-              },
-              "amount" : 1
-            },
-            "description" : "When you Cast a Spell, you can spend 1 sorcery point to cast it without any somatic or verbal Components.",
-            "isExpanded" : true
+            "title" : "Draconic Bloodline",
+            "isExpanded" : true,
+            "description" : "Double Proficiency Bonus to Charisma when talking with Dragons"
           }
         },
         {
@@ -873,14 +874,6 @@
             "isExpanded" : true,
             "description" : "• Common\n• Draconic\n• Sylvan\n• Giant"
           }
-        },
-        {
-          "type" : "ability",
-          "ability" : {
-            "title" : "Draconic Bloodline",
-            "isExpanded" : true,
-            "description" : "Double Proficiency Bonus to Charisma when talking with Dragons"
-          }
         }
       ],
       "isFormulaColumn" : false
@@ -891,233 +884,6 @@
         {
           "type" : "formulas",
           "formulas" : [
-            {
-              "variable" : "level",
-              "operation" : {
-                "type" : "add",
-                "value" : [
-                  {
-                    "type" : "variable",
-                    "value" : "sorcererLevel"
-                  },
-                  {
-                    "type" : "variable",
-                    "value" : "monkLevel"
-                  }
-                ]
-              }
-            },
-            {
-              "variable" : "speed",
-              "operation" : {
-                "type" : "add",
-                "value" : [
-                  {
-                    "type" : "variable",
-                    "value" : "sorcererLevel"
-                  },
-                  {
-                    "type" : "variable",
-                    "value" : "monkLevel"
-                  }
-                ]
-              }
-            },
-            {
-              "variable" : "chillTouch",
-              "operation" : {
-                "lhs" : {
-                  "type" : "dice",
-                  "n" : 1,
-                  "d" : 8
-                },
-                "condition" : {
-                  "type" : ">=",
-                  "lhs" : {
-                    "type" : "variable",
-                    "value" : "level"
-                  },
-                  "rhs" : {
-                    "type" : "integer",
-                    "value" : 17
-                  }
-                },
-                "type" : "if",
-                "rhs" : {
-                  "lhs" : {
-                    "type" : "dice",
-                    "n" : 1,
-                    "d" : 8
-                  },
-                  "condition" : {
-                    "type" : ">=",
-                    "lhs" : {
-                      "type" : "variable",
-                      "value" : "level"
-                    },
-                    "rhs" : {
-                      "type" : "integer",
-                      "value" : 11
-                    }
-                  },
-                  "type" : "if",
-                  "rhs" : {
-                    "lhs" : {
-                      "type" : "dice",
-                      "n" : 1,
-                      "d" : 8
-                    },
-                    "condition" : {
-                      "type" : ">=",
-                      "lhs" : {
-                        "type" : "variable",
-                        "value" : "level"
-                      },
-                      "rhs" : {
-                        "type" : "integer",
-                        "value" : 5
-                      }
-                    },
-                    "type" : "if",
-                    "rhs" : {
-                      "type" : "dice",
-                      "n" : 1,
-                      "d" : 8
-                    }
-                  }
-                }
-              }
-            },
-            {
-              "variable" : "frostbite",
-              "operation" : {
-                "lhs" : {
-                  "type" : "dice",
-                  "n" : 1,
-                  "d" : 6
-                },
-                "condition" : {
-                  "type" : ">=",
-                  "lhs" : {
-                    "type" : "variable",
-                    "value" : "level"
-                  },
-                  "rhs" : {
-                    "type" : "integer",
-                    "value" : 17
-                  }
-                },
-                "type" : "if",
-                "rhs" : {
-                  "lhs" : {
-                    "type" : "dice",
-                    "n" : 1,
-                    "d" : 6
-                  },
-                  "condition" : {
-                    "type" : ">=",
-                    "lhs" : {
-                      "type" : "variable",
-                      "value" : "level"
-                    },
-                    "rhs" : {
-                      "type" : "integer",
-                      "value" : 11
-                    }
-                  },
-                  "type" : "if",
-                  "rhs" : {
-                    "lhs" : {
-                      "type" : "dice",
-                      "n" : 1,
-                      "d" : 6
-                    },
-                    "condition" : {
-                      "type" : ">=",
-                      "lhs" : {
-                        "type" : "variable",
-                        "value" : "level"
-                      },
-                      "rhs" : {
-                        "type" : "integer",
-                        "value" : 5
-                      }
-                    },
-                    "type" : "if",
-                    "rhs" : {
-                      "type" : "dice",
-                      "n" : 1,
-                      "d" : 6
-                    }
-                  }
-                }
-              }
-            },
-            {
-              "variable" : "breathWeapon",
-              "operation" : {
-                "lhs" : {
-                  "type" : "dice",
-                  "n" : 1,
-                  "d" : 6
-                },
-                "condition" : {
-                  "type" : ">=",
-                  "lhs" : {
-                    "type" : "variable",
-                    "value" : "level"
-                  },
-                  "rhs" : {
-                    "type" : "integer",
-                    "value" : 16
-                  }
-                },
-                "type" : "if",
-                "rhs" : {
-                  "lhs" : {
-                    "type" : "dice",
-                    "n" : 1,
-                    "d" : 6
-                  },
-                  "condition" : {
-                    "type" : ">=",
-                    "lhs" : {
-                      "type" : "variable",
-                      "value" : "level"
-                    },
-                    "rhs" : {
-                      "type" : "integer",
-                      "value" : 11
-                    }
-                  },
-                  "type" : "if",
-                  "rhs" : {
-                    "lhs" : {
-                      "type" : "dice",
-                      "n" : 1,
-                      "d" : 6
-                    },
-                    "condition" : {
-                      "type" : ">=",
-                      "lhs" : {
-                        "type" : "variable",
-                        "value" : "level"
-                      },
-                      "rhs" : {
-                        "type" : "integer",
-                        "value" : 6
-                      }
-                    },
-                    "type" : "if",
-                    "rhs" : {
-                      "type" : "dice",
-                      "n" : 1,
-                      "d" : 6
-                    }
-                  }
-                }
-              }
-            },
             {
               "variable" : "proficiencyBonus",
               "operation" : {
@@ -1261,6 +1027,316 @@
                   }
                 ]
               }
+            },
+            {
+              "variable" : "spellSaveDC",
+              "operation" : {
+                "type" : "add",
+                "value" : [
+                  {
+                    "type" : "integer",
+                    "value" : 8
+                  },
+                  {
+                    "type" : "variable",
+                    "value" : "CHA.Mod"
+                  },
+                  {
+                    "type" : "variable",
+                    "value" : "proficiencyBonus"
+                  }
+                ]
+              }
+            },
+            {
+              "variable" : "level",
+              "operation" : {
+                "type" : "add",
+                "value" : [
+                  {
+                    "type" : "variable",
+                    "value" : "sorcererLevel"
+                  },
+                  {
+                    "type" : "variable",
+                    "value" : "monkLevel"
+                  }
+                ]
+              }
+            },
+            {
+              "variable" : "speed",
+              "operation" : {
+                "type" : "if",
+                "condition" : {
+                  "type" : "<",
+                  "lhs" : {
+                    "type" : "variable",
+                    "value" : "level"
+                  },
+                  "rhs" : {
+                    "type" : "integer",
+                    "value" : 7
+                  }
+                },
+                "lhs" : {
+                  "type" : "integer",
+                  "value" : 30
+                },
+                "rhs" : {
+                  "type" : "if",
+                  "condition" : {
+                    "type" : "<",
+                    "lhs" : {
+                      "type" : "variable",
+                      "value" : "level"
+                    },
+                    "rhs" : {
+                      "type" : "integer",
+                      "value" : 10
+                    }
+                  },
+                  "lhs":{
+                    "type" : "integer",
+                    "value" : 40
+                  },
+                  "rhs":{
+                    "type" : "if",
+                    "condition" : {
+                      "type" : "<",
+                      "lhs" : {
+                        "type" : "variable",
+                        "value" : "level"
+                      },
+                      "rhs" : {
+                        "type" : "integer",
+                        "value" : 14
+                      }
+                    },
+                    "lhs":{
+                      "type" : "integer",
+                      "value" : 45
+                    },
+                    "rhs":{
+                      "type" : "if",
+                      "condition" : {
+                        "type" : "<",
+                        "lhs" : {
+                          "type" : "variable",
+                          "value" : "level"
+                        },
+                        "rhs" : {
+                          "type" : "integer",
+                          "value" : 18
+                        }
+                      },
+                      "lhs":{
+                        "type" : "integer",
+                        "value" : 50
+                      },
+                      "rhs":{
+                        "type" : "integer",
+                        "value" : 55
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "variable" : "chillTouch",
+              "operation" : {
+                "lhs" : {
+                  "type" : "dice",
+                  "n" : 1,
+                  "d" : 8
+                },
+                "condition" : {
+                  "type" : ">=",
+                  "lhs" : {
+                    "type" : "variable",
+                    "value" : "level"
+                  },
+                  "rhs" : {
+                    "type" : "integer",
+                    "value" : 17
+                  }
+                },
+                "type" : "if",
+                "rhs" : {
+                  "lhs" : {
+                    "type" : "dice",
+                    "n" : 1,
+                    "d" : 8
+                  },
+                  "condition" : {
+                    "type" : ">=",
+                    "lhs" : {
+                      "type" : "variable",
+                      "value" : "level"
+                    },
+                    "rhs" : {
+                      "type" : "integer",
+                      "value" : 11
+                    }
+                  },
+                  "type" : "if",
+                  "rhs" : {
+                    "lhs" : {
+                      "type" : "dice",
+                      "n" : 1,
+                      "d" : 8
+                    },
+                    "condition" : {
+                      "type" : ">=",
+                      "lhs" : {
+                        "type" : "variable",
+                        "value" : "level"
+                      },
+                      "rhs" : {
+                        "type" : "integer",
+                        "value" : 5
+                      }
+                    },
+                    "type" : "if",
+                    "rhs" : {
+                      "type" : "dice",
+                      "n" : 1,
+                      "d" : 8
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "variable" : "frostbite",
+              "operation" : {
+                "lhs" : {
+                  "type" : "dice",
+                  "n" : 1,
+                  "d" : 6
+                },
+                "condition" : {
+                  "type" : ">=",
+                  "lhs" : {
+                    "type" : "variable",
+                    "value" : "level"
+                  },
+                  "rhs" : {
+                    "type" : "integer",
+                    "value" : 17
+                  }
+                },
+                "type" : "if",
+                "rhs" : {
+                  "lhs" : {
+                    "type" : "dice",
+                    "n" : 1,
+                    "d" : 6
+                  },
+                  "condition" : {
+                    "type" : ">=",
+                    "lhs" : {
+                      "type" : "variable",
+                      "value" : "level"
+                    },
+                    "rhs" : {
+                      "type" : "integer",
+                      "value" : 11
+                    }
+                  },
+                  "type" : "if",
+                  "rhs" : {
+                    "lhs" : {
+                      "type" : "dice",
+                      "n" : 1,
+                      "d" : 6
+                    },
+                    "condition" : {
+                      "type" : ">=",
+                      "lhs" : {
+                        "type" : "variable",
+                        "value" : "level"
+                      },
+                      "rhs" : {
+                        "type" : "integer",
+                        "value" : 5
+                      }
+                    },
+                    "type" : "if",
+                    "rhs" : {
+                      "type" : "dice",
+                      "n" : 1,
+                      "d" : 6
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "variable" : "breathWeapon",
+              "operation" : {
+                "lhs" : {
+                  "type" : "dice",
+                  "n" : 5,
+                  "d" : 6
+                },
+                "condition" : {
+                  "type" : ">=",
+                  "lhs" : {
+                    "type" : "variable",
+                    "value" : "level"
+                  },
+                  "rhs" : {
+                    "type" : "integer",
+                    "value" : 16
+                  }
+                },
+                "type" : "if",
+                "rhs" : {
+                  "lhs" : {
+                    "type" : "dice",
+                    "n" : 4,
+                    "d" : 6
+                  },
+                  "condition" : {
+                    "type" : ">=",
+                    "lhs" : {
+                      "type" : "variable",
+                      "value" : "level"
+                    },
+                    "rhs" : {
+                      "type" : "integer",
+                      "value" : 11
+                    }
+                  },
+                  "type" : "if",
+                  "rhs" : {
+                    "lhs" : {
+                      "type" : "dice",
+                      "n" : 3,
+                      "d" : 6
+                    },
+                    "condition" : {
+                      "type" : ">=",
+                      "lhs" : {
+                        "type" : "variable",
+                        "value" : "level"
+                      },
+                      "rhs" : {
+                        "type" : "integer",
+                        "value" : 6
+                      }
+                    },
+                    "type" : "if",
+                    "rhs" : {
+                      "type" : "dice",
+                      "n" : 2,
+                      "d" : 6
+                    }
+                  }
+                }
+              }
             }
           ]
         }
@@ -1322,7 +1398,7 @@
               },
               "amount" : 1
             },
-            "description" : "You can spend 1 ki point to take the Dodge action as a bonus action on your turn.",
+            "description" : "Take the Dodge action as a bonus action on your turn.",
             "isExpanded" : true
           }
         },
@@ -1336,7 +1412,7 @@
               },
               "amount" : 1
             },
-            "description" : "You can spend 1 ki point to take the Disengage or Dash action as a bonus action on your turn, and your jump distance is doubled for the turn.",
+            "description" : "Take the Disengage or Dash action as a bonus action on your turn, and your jump distance is doubled for the turn.",
             "isExpanded" : true
           }
         },
@@ -1359,7 +1435,7 @@
             "shouldResetOnLongRest" : false,
             "title" : "See Invisibility",
             "level" : "2",
-            "description" : "For the duration, you see invisible creatures and objects as if they were visible, and you can see into the Ethereal Plane.",
+            "description" : "Duration: 1 hour\nFor the duration, you see invisible creatures and objects as if they were visible, and you can see into the Ethereal Plane.",
             "subactions" : [
 
             ],
@@ -1376,7 +1452,136 @@
               },
               "amount" : 1
             },
-            "description" : "You can spend 1 ki point to take an attack of opportunity when an enemy enters range if you didn’t move your legs on previous turn. Or you can choose to trip the enemy - contested DEX check.",
+            "description" : "Take an attack of opportunity when an enemy enters range if you didn’t move your legs on previous turn. Or you can choose to trip the enemy - contested DEX check.",
+            "isExpanded" : true
+          }
+        },
+        {
+          "type" : "ability",
+          "ability" : {
+            "title" : "Trusty Walking Stick",
+            "isExpanded" : true,
+            "description" : "Quarterstaff becomes a 1d10 weapon when used two handed (1d8 when used one handed)."
+          }
+        },
+        {
+          "type" : "action",
+          "action" : {
+            "shouldResetOnLongRest" : false,
+            "title" : "Feather Fall",
+            "level" : "1",
+            "description" : "Range: 60' | Duration: 1 minute\nChoose up to five falling creatures within range. A falling creature's rate of descent slows to 60 feet per round until the spell ends.",
+            "subactions" : [
+
+            ],
+            "isExpanded" : true
+          }
+        },
+        {
+          "type" : "ability",
+          "ability" : {
+            "title" : "Deflect Missiles",
+            "uses" : {
+              "type" : {
+                "type" : "ki"
+              },
+              "amount" : 1
+            },
+            "description" : "Reduce ranged weapons damage by 1d10 + DEX + Monk. If damage is zero, spend 1 ki point to throw back (attack w\/ proficiency).",
+            "isExpanded" : true
+          }
+        },
+        {
+          "type" : "action",
+          "action" : {
+            "shouldResetOnLongRest" : false,
+            "title" : "Improved Minor Illusion",
+            "level" : "Cantrip",
+            "description" : "Range: 30' | Duration: 1 minute\nYou create a sound and\/or an image of an object within range that lasts for the duration, or until dismissed as an action. Volume of sound from whisper to scream, can be a voice, one repeating or many sounds. Image must fit in 5' cube. Image cannot create light, sound, touch, or smell. Successful INT (Investigation) check against spell save DC can reveal the illusion.",
+            "subactions" : [
+
+            ],
+            "isExpanded" : true
+          }
+        },
+        {
+          "type" : "action",
+          "action" : {
+            "shouldResetOnLongRest" : false,
+            "title" : "Frozen Sphere (see Fireball)",
+            "level" : "3",
+            "description" : "Range: 150'\nEach creature in a 20-foot-radius sphere centered on that point must make a DEX saving throw. A target takes 8d6 cold damage on a failed save, or half as much damage on a successful one. When you cast this spell using a spell slot of 4th level or higher, the damage increases by 1d6 for each slot level above 3rd.",
+            "subactions" : [
+
+            ],
+            "isExpanded" : true
+          }
+        },
+        {
+          "type" : "ability",
+          "ability" : {
+            "title" : "Extra Attack",
+            "isExpanded" : true,
+            "description" : ""
+          }
+        },
+        {
+          "type" : "action",
+          "action" : {
+            "shouldResetOnLongRest" : false,
+            "title" : "Back you Fiend",
+            "description" : "Immediately after any melee attack that uses your quarterstaff you can choose to launch yourself away from your opponent 10 ft, and if the opponent fails a STR saving throw they are knocked back 10 ft.",
+            "subactions" : [
+
+            ],
+            "isExpanded" : true
+          }
+        },
+        {
+          "type" : "ability",
+          "ability" : {
+            "title" : "Grumpy Old Man",
+            "uses" : {
+              "type" : {
+                "type" : "ki"
+              },
+              "amount" : 1
+            },
+            "description" : "As a bonus action the quarterstaff can be imbued with psychic magic, making it a magical weapon. After a successful attack the magic energy can be released into the target for 2d4 damage. Otherwise lasts 1 minute.",
+            "isExpanded" : true
+          }
+        },
+        {
+          "type" : "action",
+          "action" : {
+            "shouldResetOnLongRest" : false,
+            "title" : "Way of the Old Master",
+            "description" : "Quarterstaff is considered an unarmed attack for Flurry of Blows and Martial attacks.",
+            "subactions" : [
+
+            ],
+            "isExpanded" : true
+          }
+        },
+        {
+          "type" : "ability",
+          "ability" : {
+            "title" : "Meditation",
+            "isExpanded" : true,
+            "description" : "Regain 1d6 Ki points during a short rest."
+          }
+        },
+        {
+          "type" : "ability",
+          "ability" : {
+            "title" : "Who're You Calling Old!?",
+            "uses" : {
+              "type" : {
+                "type" : "ki"
+              },
+              "amount" : 1
+            },
+            "description" : "As an action or bonus action, spend 1-4 ki points to make 1-4 attacks. If they target different creatures the creatures must be within 10 feet of each other.",
             "isExpanded" : true
           }
         }

@@ -280,7 +280,8 @@ extension Formula.Editable {
             char.unicodeScalars.count == 1,
             let unicodeScalar = char.unicodeScalars.first
         else { return false }
-        return char == "." || CharacterSet.letters.contains(unicodeScalar)
+        return char == "." || char == "-" || char == "_"
+            || CharacterSet.letters.contains(unicodeScalar)
             || CharacterSet.decimalDigits.contains(unicodeScalar)
     }
 }
