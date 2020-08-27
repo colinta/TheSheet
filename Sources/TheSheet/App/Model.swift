@@ -101,7 +101,7 @@ struct Model {
     func replace(sheet: Sheet) -> Model {
         let columnScrollOffset = max(0, min(self.columnScrollOffset, columnScrollMaxOffset))
         return Model(
-            sheet: sheet, undoSheets: undoSheets + [self.sheet], fileURL: fileURL,
+            sheet: sheet, undoSheets: undoSheets.appending(self.sheet), fileURL: fileURL,
             firstVisibleColumn: firstVisibleColumn,
             columnScrollOffset: columnScrollOffset, modalScrollOffset: modalScrollOffset,
             editing: editing,
@@ -115,7 +115,7 @@ struct Model {
             sheet: sheet.replace(
                 columns: sheet.columns.modifying(
                     { column in
-                        column.replace(controls: column.controls + [control])
+                        column.replace(controls: column.controls.appending(control))
                     }, at: columnIndex)))
     }
 

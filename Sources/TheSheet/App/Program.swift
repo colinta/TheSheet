@@ -60,6 +60,9 @@ func update(model: inout Model, message: Message) -> State<Model, Message> {
     switch message {
     case let .sheetMessage(.columnMessage(columnIndex, .delegate(delegate))):
         switch delegate {
+        case .editColumn:
+            return .model(model.replace(editColumn: columnIndex))
+
         case let .showControlEditor(controlIndex):
             let control = model.sheet.columns[columnIndex].controls[controlIndex]
             guard let editor = control.editor else {

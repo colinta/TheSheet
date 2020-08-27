@@ -18,6 +18,7 @@ indirect enum Operation {
     case dice(Dice)
     case bool(Bool)
     case string(String)
+    case editing(String)
 
     case modifier(Int)
     case variable(String)
@@ -114,13 +115,13 @@ indirect enum Operation {
             case .integer:
                 return toReadable.foreground(.cyan)
             case .modifier:
-                return toReadable.foreground(.blue)
+                return toReadable.foreground(.brightCyan)
             case .diceAdd:
                 return toReadable.foreground(.brightBlue)
             case .bool:
                 return toReadable.foreground(.yellow)
             case .string:
-                return toReadable.foreground(.red)
+                return toReadable.foreground(.none)
             case .undefined:
                 return "???".foreground(.white).background(.red)
             }
@@ -143,6 +144,11 @@ indirect enum Operation {
     enum Error: Swift.Error {
         case decoding
         case div0
+    }
+
+    var isEditing: Bool {
+        guard case .editing = self else { return false }
+        return true
     }
 
     static func merge(_ formulas: [Formula], with others: [Formula]) -> [Formula] {
@@ -170,6 +176,8 @@ indirect enum Operation {
             return .diceAdd([dice], 0)
         case let .string(value):
             return .string(value)
+        case .editing:
+            return .undefined
         case let .modifier(value):
             return .modifier(value)
         case let .variable(name):
@@ -275,6 +283,8 @@ indirect enum Operation {
             return dice.toReadable.foreground(.brightBlue)
         case let .string(value):
             return ("\"\(value)\"").foreground(.red)
+        case let .editing(value):
+            return value.foreground(.red)
         case let .modifier(value):
             guard value >= 0 else {
                 return value.description.foreground(.blue).bold()
@@ -344,6 +354,8 @@ indirect enum Operation {
             return value.description
         case let .string(value):
             return "\"\(value)\""
+        case let .editing(value):
+            return value
         case let .modifier(value):
             guard value >= 0 else {
                 return value.description
@@ -411,6 +423,9 @@ extension Operation: Codable {
         case "string":
             let string = try values.decode(String.self, forKey: .value)
             self = .string(string)
+        case "editing":
+            let editing = try values.decode(String.self, forKey: .value)
+            self = .editing(editing)
         case "modifier":
             let modifier = try values.decode(Int.self, forKey: .value)
             self = .modifier(modifier)
@@ -488,6 +503,9 @@ extension Operation: Codable {
         case let .string(string):
             try container.encode("string", forKey: .type)
             try container.encode(string, forKey: .value)
+        case let .editing(editing):
+            try container.encode("editing", forKey: .type)
+            try container.encode(editing, forKey: .value)
         case let .modifier(modifier):
             try container.encode("modifier", forKey: .type)
             try container.encode(modifier, forKey: .value)

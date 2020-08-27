@@ -23,6 +23,10 @@ extension Array {
         }
     }
 
+    func appending(_ newItem: Element) -> Self {
+        self + [newItem]
+    }
+
     func removing(at: Int) -> Self {
         enumerated().filter { index, _ in
             index != at

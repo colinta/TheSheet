@@ -8,8 +8,16 @@ struct Attribute: Codable {
     let score: Int
     let isProficient: Bool
 
-    var modifier: Int {
+    var modifierInt: Int {
         (score - 10) / 2
+    }
+
+    var modifierOp: Operation {
+        .modifier(modifierInt)
+    }
+
+    var modifier: Operation.Value {
+        .modifier(modifierInt)
     }
 
     var formulas: [Formula] {
@@ -18,12 +26,16 @@ struct Attribute: Codable {
                 variable: variableName, operation: .integer(score)),
             Formula(
                 variable: "\(variableName).Mod",
-                operation: .modifier(modifier)),
+                operation: modifierOp),
         ]
     }
 
-    func save(proficiencyBonus: Int) -> Int {
-        modifier + (isProficient ? proficiencyBonus : 0)
+    func save(_ sheet: Sheet) -> Operation.Value {
+        Operation.if(
+            .bool(isProficient),
+            .add([modifierOp, .variable("proficiencyBonus")]),
+            modifierOp
+        ).eval(sheet)
     }
 
     func replace(score: Int) -> Attribute {

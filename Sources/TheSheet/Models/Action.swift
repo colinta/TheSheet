@@ -8,6 +8,22 @@ struct Action: Codable {
         let check: Operation?
         let damage: Operation?
         let type: String?
+
+        func replace(title: String?) -> Sub {
+            Sub(title: title, check: check, damage: damage, type: type)
+        }
+
+        func replace(check: Operation?) -> Sub {
+            Sub(title: title, check: check, damage: damage, type: type)
+        }
+
+        func replace(damage: Operation?) -> Sub {
+            Sub(title: title, check: check, damage: damage, type: type)
+        }
+
+        func replace(type: String?) -> Sub {
+            Sub(title: title, check: check, damage: damage, type: type)
+        }
     }
 
     let title: String

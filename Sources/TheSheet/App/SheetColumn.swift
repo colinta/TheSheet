@@ -7,6 +7,7 @@ import Ashen
 struct SheetColumn {
     enum Message {
         enum Delegate {
+            case editColumn
             case showControlEditor(Int)
             case relocateControl(Int)
             case stopEditing
@@ -107,7 +108,7 @@ struct SheetColumn {
                 } else if editingControl == controlIndex {
                     editableControlView = controlView.reversed()
                 } else {
-                    editableControlView = controlView
+                    editableControlView = OnRightClick(controlView, .delegate(.editColumn))
                 }
 
                 return [

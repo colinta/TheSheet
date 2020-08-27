@@ -224,7 +224,7 @@ enum SheetControl {
         case let .stats(title, stats):
             return StatsView(title: title, stats: stats, sheet: sheet)
         case let .attributes(attributes):
-            return AttributesView(attributes, onChange: Message.changeAttribute)
+            return AttributesView(attributes, sheet: sheet, onChange: Message.changeAttribute)
         case let .skills(skills):
             return SkillsView(skills.map { $0.resolve(sheet) })
         case let .formulas(formulas):

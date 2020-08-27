@@ -29,6 +29,9 @@ enum EditableControl {
             case current
             case max
             case resets
+            case check
+            case damage
+            case type
         }
 
         case atPath(IndexPath, Message)
@@ -102,6 +105,34 @@ enum EditableControl {
             }
         case let (.action(action, editor), .firstResponder(path)):
             return .action(action, editor.replace(path: path))
+        case let (.action(action, editor), .add):
+            let newTitlePath: IndexPath = [action.subactions.count + 1, 0]
+            let newSubaction = Action.Sub(title: nil, check: nil, damage: nil, type: nil)
+            return .action(action.replace(subactions: action.subactions.appending(newSubaction)), editor.replace(path: newTitlePath))
+        case let (.action(action, editor), .atPath(path, .changeString(.title, value))):
+            let index = path[0] - 1
+            let subaction = action.subactions[index].replace(title: value.isEmpty ? nil : value)
+            return .action(action.replace(subactions: action.subactions.replacing(subaction, at: index)), editor)
+        case let (.action(action, editor), .atPath(path, .changeString(.check, value))):
+            let index = path[0] - 1
+            let subaction = action.subactions[index]
+            guard !value.isEmpty else {
+                return .action(action.replace(subactions: action.subactions.replacing(subaction.replace(check: nil), at: index)), editor)
+            }
+            let op: Operation = (try? Formula.Editable.parse(value)) ?? .editing(value)
+            return .action(action.replace(subactions: action.subactions.replacing(subaction.replace(check: op), at: index)), editor)
+        case let (.action(action, editor), .atPath(path, .changeString(.damage, value))):
+            let index = path[0] - 1
+            let subaction = action.subactions[index]
+            guard !value.isEmpty else {
+                return .action(action.replace(subactions: action.subactions.replacing(subaction.replace(damage: nil), at: index)), editor)
+            }
+            let op: Operation = (try? Formula.Editable.parse(value)) ?? .editing(value)
+            return .action(action.replace(subactions: action.subactions.replacing(subaction.replace(damage: op), at: index)), editor)
+        case let (.action(action, editor), .atPath(path, .changeString(.type, value))):
+            let index = path[0] - 1
+            let subaction = action.subactions[index].replace(type: value.isEmpty ? nil : value)
+            return .action(action.replace(subactions: action.subactions.replacing(subaction, at: index)), editor)
 
         case let (.skills(skills, editor), .add):
             return .skills(skills + [Skill(title: "", basedOn: "", isProficient: false)], editor)
@@ -143,10 +174,10 @@ enum EditableControl {
                 return .pointsTracker(
                     points.replace(types: points.types.filter({ !$0.is(pointType) })), editor)
             } else {
-                return .pointsTracker(points.replace(types: points.types + [pointType]), editor)
+                return .pointsTracker(points.replace(types: points.types.appending(pointType)), editor)
             }
         case let (.pointsTracker(points, editor), .add):
-            return .pointsTracker(points.replace(types: points.types + [.other("", "")]), editor)
+            return .pointsTracker(points.replace(types: points.types.appending(.other("", ""))), editor)
         case let (.pointsTracker(pointsTracker, editor), .firstResponder(path)):
             return .pointsTracker(pointsTracker, editor.replace(path: path))
         case let (.pointsTracker(points, editor), .atPath(path, .changeString(.title, value))):

@@ -425,8 +425,8 @@
             "subactions" : [
               {
                 "check" : {
-                  "type" : "modifier",
-                  "value" : 5
+                  "type" : "variable",
+                  "value" : "spellAttack"
                 },
                 "type" : "Necrotic",
                 "damage" : {
@@ -435,7 +435,7 @@
                 }
               }
             ],
-            "isExpanded" : false
+            "isExpanded" : true
           }
         },
         {
@@ -448,8 +448,8 @@
             "subactions" : [
               {
                 "check" : {
-                  "type" : "modifier",
-                  "value" : 5
+                  "type" : "variable",
+                  "value" : "spellAttack"
                 },
                 "type" : "Cold",
                 "damage" : {
@@ -458,7 +458,7 @@
                 }
               }
             ],
-            "isExpanded" : false
+            "isExpanded" : true
           }
         },
         {
@@ -510,8 +510,8 @@
             "subactions" : [
               {
                 "check" : {
-                  "type" : "modifier",
-                  "value" : 5
+                  "type" : "variable",
+                  "value" : "spellAttack"
                 },
                 "type" : "Force",
                 "damage" : {
@@ -543,8 +543,8 @@
             "subactions" : [
               {
                 "check" : {
-                  "type" : "modifier",
-                  "value" : 5
+                  "type" : "variable",
+                  "value" : "spellAttack"
                 },
                 "type" : "Cold",
                 "damage" : {
@@ -554,7 +554,7 @@
                 }
               }
             ],
-            "isExpanded" : false
+            "isExpanded" : true
           }
         },
         {
@@ -567,7 +567,7 @@
             "subactions" : [
 
             ],
-            "isExpanded" : false
+            "isExpanded" : true
           }
         },
         {
@@ -593,7 +593,7 @@
             "subactions" : [
 
             ],
-            "isExpanded" : true
+            "isExpanded" : false
           }
         }
       ],
@@ -1067,7 +1067,10 @@
             {
               "variable" : "speed",
               "operation" : {
-                "type" : "if",
+                "lhs" : {
+                  "type" : "integer",
+                  "value" : 30
+                },
                 "condition" : {
                   "type" : "<",
                   "lhs" : {
@@ -1079,12 +1082,12 @@
                     "value" : 7
                   }
                 },
-                "lhs" : {
-                  "type" : "integer",
-                  "value" : 30
-                },
+                "type" : "if",
                 "rhs" : {
-                  "type" : "if",
+                  "lhs" : {
+                    "type" : "integer",
+                    "value" : 40
+                  },
                   "condition" : {
                     "type" : "<",
                     "lhs" : {
@@ -1096,12 +1099,12 @@
                       "value" : 10
                     }
                   },
-                  "lhs":{
-                    "type" : "integer",
-                    "value" : 40
-                  },
-                  "rhs":{
-                    "type" : "if",
+                  "type" : "if",
+                  "rhs" : {
+                    "lhs" : {
+                      "type" : "integer",
+                      "value" : 45
+                    },
                     "condition" : {
                       "type" : "<",
                       "lhs" : {
@@ -1113,12 +1116,12 @@
                         "value" : 14
                       }
                     },
-                    "lhs":{
-                      "type" : "integer",
-                      "value" : 45
-                    },
-                    "rhs":{
-                      "type" : "if",
+                    "type" : "if",
+                    "rhs" : {
+                      "lhs" : {
+                        "type" : "integer",
+                        "value" : 50
+                      },
                       "condition" : {
                         "type" : "<",
                         "lhs" : {
@@ -1130,11 +1133,8 @@
                           "value" : 18
                         }
                       },
-                      "lhs":{
-                        "type" : "integer",
-                        "value" : 50
-                      },
-                      "rhs":{
+                      "type" : "if",
+                      "rhs" : {
                         "type" : "integer",
                         "value" : 55
                       }
@@ -1346,6 +1346,30 @@
     {
       "title" : "Future",
       "controls" : [
+        {
+          "type" : "action",
+          "action" : {
+            "shouldResetOnLongRest" : false,
+            "title" : "Psychic Ray",
+            "level" : "2",
+            "description" : "Range: 120'\nYou create three spears of psychic energy and hurl them at targets within range. You can hurl them at one target or several.\nEach target makes an INT saving throw against your spell save DC. On a failed save, you deliver 2d6 psychic damage and the target must give up a move, an action, or a bonus action; it gets only two of the three. On a successful save, only takes half damage.\nUsing higher level spell slots, one more spear for each level >2.",
+            "subactions" : [
+              {
+                "check" : {
+                  "type" : "variable",
+                  "value" : "spellAttack"
+                },
+                "type" : "Psychic",
+                "damage" : {
+                  "type" : "dice",
+                  "n" : 2,
+                  "d" : 1
+                }
+              }
+            ],
+            "isExpanded" : false
+          }
+        },
         {
           "type" : "pointsTracker",
           "points" : {

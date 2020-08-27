@@ -53,7 +53,7 @@ struct Formula: Codable {
 }
 
 extension Formula.Editable {
-    private static func parse(_ buffer: String) throws -> Operation {
+    static func parse(_ buffer: String) throws -> Operation {
         if buffer.hasPrefix("\n") {
             throw Error.unexpectedEOL
         }

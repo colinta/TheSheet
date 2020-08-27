@@ -4,7 +4,7 @@
 
 import Ashen
 
-func AttributesView<Msg>(_ attributes: [Attribute], onChange: @escaping (Int, Int) -> Msg) -> View<
+func AttributesView<Msg>(_ attributes: [Attribute], sheet: Sheet, onChange: @escaping (Int, Int) -> Msg) -> View<
     Msg
 > {
     let (lhs, rhs) = attributes.enumerated().reduce(([Attribute](), [Attribute]())) {
@@ -18,10 +18,10 @@ func AttributesView<Msg>(_ attributes: [Attribute], onChange: @escaping (Int, In
         }
     }
     let lhsViews = lhs.enumerated().map { attrIndex, attr in
-        AttributeView(attr, onChange: { delta in onChange(attrIndex, delta) })
+        AttributeView(attr, sheet: sheet, onChange: { delta in onChange(attrIndex, delta) })
     }
     let rhsViews = rhs.enumerated().map { attrIndex, attr in
-        AttributeView(attr, onChange: { delta in onChange(lhs.count + attrIndex, delta) })
+        AttributeView(attr, sheet: sheet, onChange: { delta in onChange(lhs.count + attrIndex, delta) })
     }
     return Flow(
         .ltr,
@@ -33,14 +33,14 @@ func AttributesView<Msg>(_ attributes: [Attribute], onChange: @escaping (Int, In
         ])
 }
 
-func AttributeView<Msg>(_ attribute: Attribute, onChange: @escaping (Int) -> Msg) -> View<Msg> {
+func AttributeView<Msg>(_ attribute: Attribute, sheet: Sheet, onChange: @escaping (Int) -> Msg) -> View<Msg> {
     Stack(
         .ltr,
         [
             Stack(
                 .down,
                 [
-                    Text(attribute.title.bold().underlined()).centered(),
+                    Text(((attribute.isProficient ? "◼ " : "") + attribute.title).bold()).centered(),
                     Stack(
                         .ltr,
                         [
@@ -56,21 +56,21 @@ func AttributeView<Msg>(_ attribute: Attribute, onChange: @escaping (Int) -> Msg
                             Stack(
                                 .down,
                                 [
-                                    Text("\(attribute.score)").centered().underlined(),
+                                    Text(Operation.Value.integer(attribute.score).toAttributed).centered().underlined(),
                                     Text("Score"),
                                 ]),
                             Space().width(1),
                             Stack(
                                 .down,
                                 [
-                                    Text(attribute.modifier.toModString).centered().underlined(),
+                                    Text(attribute.modifier.toAttributed).centered().underlined(),
                                     Text("Modifier"),
                                 ]),
                             Space().width(1),
                             Stack(
                                 .down,
                                 [
-                                    Text(attribute.save(proficiencyBonus: 2).toModString).centered()
+                                    Text(attribute.save(sheet).toAttributed).centered()
                                         .underlined(),
                                     Text("Save"),
                                 ]),

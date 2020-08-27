@@ -23,7 +23,7 @@ func StatView<Msg>(_ stat: Stat, sheet: Sheet) -> View<Msg> {
     Stack(
         .down,
         [
-            Text(stat.value.eval(sheet).toReadable).centered().underlined(),
+            Text(stat.value.eval(sheet).toAttributed).centered().underlined(),
             Text(stat.title).centered(),
         ])
 }
