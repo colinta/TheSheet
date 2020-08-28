@@ -20,6 +20,7 @@ enum SheetControl {
     case stats(String, [Stat])
     case restButtons
     case formulas([Formula])
+    case journal(String, String)
 
     static var all: [(String, SheetControl)] = [
         ("Inventory", .inventory(Inventory(title: "", quantity: nil))),
@@ -42,6 +43,7 @@ enum SheetControl {
         ("Skills (Acrobatics, Stealth, …)", .skills([])),
         ("Stats (Armor, Attack, …)", .stats("", [])),
         ("Take a Short or Long Rest", .restButtons),
+        ("Journal", .journal("", "")),
     ]
 
     var canEdit: Bool { editor != nil }
@@ -72,6 +74,8 @@ enum SheetControl {
             return .skills(skills, AtPathEditor(atPath: nil))
         case let .formulas(formulas):
             return .formulas(formulas.map(\.toEditable), AtPathEditor(atPath: nil))
+        case let .journal(title, journal):
+            return .journal(title, journal, AtPathEditor(atPath: [0]))
         default:
             return nil
         }
@@ -234,6 +238,8 @@ enum SheetControl {
                 lhs.variable.lowercased() < rhs.variable.lowercased()
             }
             return FormulasView(editable: formulas, fixed: sheetFormulas, sheet: sheet)
+        case let .journal(title, journal):
+            return JournalView(journal: (title, journal))
         case .restButtons:
             return TakeRestView(Message.takeRest(.short), Message.takeRest(.long))
         }
@@ -257,6 +263,7 @@ extension SheetControl: Codable {
         case skills
         case stats
         case formulas
+        case journal
     }
 
     init(from decoder: Decoder) throws {
@@ -293,6 +300,10 @@ extension SheetControl: Codable {
         case "formulas":
             let formulas = try values.decode([Formula].self, forKey: .formulas)
             self = .formulas(formulas)
+        case "journal":
+            let title = try values.decode(String.self, forKey: .title)
+            let journal = try values.decode(String.self, forKey: .journal)
+            self = .journal(title, journal)
         default:
             throw Error.decoding
         }
@@ -331,6 +342,10 @@ extension SheetControl: Codable {
         case let .formulas(formulas):
             try container.encode("formulas", forKey: .type)
             try container.encode(formulas, forKey: .formulas)
+        case let .journal(title, journal):
+            try container.encode("journal", forKey: .type)
+            try container.encode(title, forKey: .title)
+            try container.encode(journal, forKey: .journal)
         }
     }
 }

@@ -5,8 +5,9 @@
     2,
     3,
     1,
-    4,
-    5
+    6,
+    5,
+    4
   ],
   "columns" : [
     {
@@ -221,7 +222,7 @@
           "type" : "inventory",
           "inventory" : {
             "title" : "Silver",
-            "quantity" : 40
+            "quantity" : 39
           }
         },
         {
@@ -1608,6 +1609,17 @@
             "description" : "As an action or bonus action, spend 1-4 ki points to make 1-4 attacks. If they target different creatures the creatures must be within 10 feet of each other.",
             "isExpanded" : true
           }
+        }
+      ],
+      "isFormulaColumn" : false
+    },
+    {
+      "title" : "Journal",
+      "controls" : [
+        {
+          "type" : "journal",
+          "title" : "Yartar",
+          "journal" : "Leader: Water Baron, shield of Yartar escorted us into town\n\"One Foot On the Boat\" Inn\nBarnabus C. Winthrop Library of Business History & Other Things, Were-worm?\n(with Zoara, Steven, farm boys)\nTalk to Vargis (from the Cleric boat), applying a poultice\nClerics on the boat say to use leeches, somewhere north, the evermores, used for poison\nJunt - cleric of Groosh, called everyone else assholes\nElves: Luvalar, meeting on day two?\nLearned how to slow magic with herbs\/poultice\n\"Arasmus\" from dying Luvalar"
         }
       ],
       "isFormulaColumn" : false

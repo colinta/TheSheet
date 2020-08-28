@@ -16,9 +16,11 @@ enum EditableControl {
     // case stats(String, [Stat])
     // case restButtons
     case formulas([Formula.Editable], AtPathEditor)
+    case journal(String, String, AtPathEditor)
 
     indirect enum Message {
         enum Property {
+            case type
             case title
             case level
             case description
@@ -31,7 +33,7 @@ enum EditableControl {
             case resets
             case check
             case damage
-            case type
+            case journal
         }
 
         case atPath(IndexPath, Message)
@@ -64,6 +66,8 @@ enum EditableControl {
                 formulas.compactMap {
                     $0.toFormula()
                 })
+        case let .journal(title, journal, _):
+            return .journal(title, journal)
         }
     }
 
@@ -215,6 +219,13 @@ enum EditableControl {
                     { formula in
                         formula.replace(editableFormula: value)
                     }, at: path[0]), editor)
+
+        case let (.journal(title, journal, editor), .firstResponder(path)):
+            return .journal(title, journal, editor.replace(path: path))
+        case let (.journal(_, journal, editor), .changeString(.title, value)):
+            return .journal(value, journal, editor)
+        case let (.journal(title, _, editor), .changeString(.journal, value)):
+            return .journal(title, value, editor)
         default:
             return self
         }
@@ -235,6 +246,8 @@ enum EditableControl {
             return PointsEditor(points, editor: editor)
         case let .formulas(formulas, editor):
             return FormulasEditor(formulas, editor: editor)
+        case let .journal(title, journal, editor):
+            return JournalEditor(journal: (title, journal), editor: editor)
         }
     }
 }

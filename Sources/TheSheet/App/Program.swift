@@ -320,7 +320,7 @@ func renderControlSelector(model: Model, addToColumn: Int) -> View<Message> {
         view: Stack(
             .down,
             SheetControl.all.map({ title, control in
-                OnLeftClick(Text("[+] \(title)"), Message.addControl(control, to: addToColumn))
+                OnLeftClick(Text("[+]".foreground(.green) + " \(title)"), Message.addControl(control, to: addToColumn))
             })
         ))
 }
