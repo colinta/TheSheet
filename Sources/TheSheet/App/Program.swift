@@ -154,7 +154,7 @@ func update(model: inout Model, message: Message) -> State<Model, Message> {
                         }
                     })
             )
-            .replace(changeColumn: newIndex)
+            .stopEditing()
         )
 
     case let .scrollColumns(delta):
@@ -254,8 +254,8 @@ private func _render(_ model: Model, status: String?) -> [View<Message>] {
                 (
                     .flex1,
                     Columns(
-                        (model.firstVisibleColumn..<model.sheet.visibleColumnsCount
-                            + model.firstVisibleColumn).map { ($0, model.sheet.columns[$0]) }
+                        (model.firstVisibleColumn..<model.firstVisibleColumn
+                            + model.sheet.visibleColumnsCount).map { ($0, model.sheet.columns[$0]) }
                         .map { index, column in
                             renderColumn(
                                 model, column,
