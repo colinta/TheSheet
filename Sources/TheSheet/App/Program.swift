@@ -135,17 +135,22 @@ func update(model: inout Model, message: Message) -> State<Model, Message> {
             model.replace(
                 sheet: model.sheet.replace(visibleColumnsCount: newCount)))
     case let .replaceColumn(oldIndex, newIndex):
+        guard
+            oldIndex >= 0, oldIndex < model.sheet.columns.count,
+            newIndex >= 0, newIndex < model.sheet.columns.count
+        else { return .noChange }
+
         return .model(
             model.replace(
                 sheet: model.sheet.replace(
-                    columnsOrder: model.sheet.columnsOrder.map {
-                        index in
+                    columns: model.sheet.columns.enumerated().map {
+                        index, column in
                         if index == oldIndex {
-                            return newIndex
+                            return model.sheet.columns[newIndex]
                         } else if index == newIndex {
-                            return oldIndex
+                            return model.sheet.columns[oldIndex]
                         } else {
-                            return index
+                            return column
                         }
                     })
             )
@@ -249,15 +254,10 @@ private func _render(_ model: Model, status: String?) -> [View<Message>] {
                 (
                     .flex1,
                     Columns(
-                        model.sheet.columnsOrder[
-                            model.firstVisibleColumn..<(model.sheet.visibleColumnsCount
-                                + model.firstVisibleColumn)
-                        ].compactMap { index in
-                            guard index >= 0 && index < model.sheet.columns.count else {
-                                return nil
-                            }
-                            let column = model.sheet.columns[index]
-                            return renderColumn(
+                        (model.firstVisibleColumn..<model.sheet.visibleColumnsCount
+                            + model.firstVisibleColumn).map { ($0, model.sheet.columns[$0]) }
+                        .map { index, column in
+                            renderColumn(
                                 model, column,
                                 columnIndex: index)
                         }
@@ -350,7 +350,7 @@ func renderControlEditor(
 func renderControlRelocator(model: Model, relocatingControl controlIndex: Int, inColumn columnIndex: Int) -> View<Message> {
     inModal(
         model: model,
-        view: Stack(.down, model.sheet.orderedColumns.map { index, column in
+        view: Stack(.down, model.sheet.columns.enumerated().map { index, column in
             return index == columnIndex
             ? Text(column.title.bold())
             : OnLeftClick(Text(column.title),

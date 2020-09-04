@@ -32,15 +32,12 @@ struct Model {
 
     var canUndo: Bool { !undoSheets.isEmpty }
     var columnScrollMaxOffset: Int {
-        let visibleColumns = sheet.columnsOrder[
-            firstVisibleColumn..<firstVisibleColumn + sheet.visibleColumnsCount]
-        return columnScrollMaxOffsets.reduce(
-            nil as Int?,
-            { memo, index_height in
-                let (index, height) = index_height
-                guard visibleColumns.contains(index) else { return memo }
-                return max(memo ?? 0, height)
-            }) ?? 0
+        (firstVisibleColumn..<firstVisibleColumn + sheet.visibleColumnsCount)
+            .compactMap { columnScrollMaxOffsets[$0] }
+            .reduce(0)
+                { memo, height in
+                    max(memo, height)
+                }
     }
 
     var changingColumn: Int? {
