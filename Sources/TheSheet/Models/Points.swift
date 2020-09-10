@@ -11,12 +11,13 @@ struct Points: Codable {
         case inspiration
         case other(String, String)
 
+        // the tuple is (sort, PointType), hence the negative numbers
         static func all(_ types: [PointType]) -> [(Int, PointType)] {
-            return [
-                (-1, .level),
-                (-1, .hitPoints),
-                (-1, .sorcery),
-                (-1, .ki),
+            [
+                (-5, .level),
+                (-4, .hitPoints),
+                (-3, .sorcery),
+                (-2, .ki),
                 (-1, .inspiration),
             ] + PointType.others(types)
         }
