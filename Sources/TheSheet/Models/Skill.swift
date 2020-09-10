@@ -12,7 +12,13 @@ struct Skill: Codable {
             skill: self,
             modifierString: basedOn.isEmpty
             ? ""
-            : Operation.variable(basedOn + ".Mod").eval(sheet)
+            : (isProficient
+                ? Operation.add([
+                    Operation.variable(basedOn + ".Mod"),
+                    Operation.variable("proficiencyBonus"),
+                ])
+                : Operation.variable(basedOn + ".Mod"))
+                .eval(sheet)
                 .toReadable)
     }
 
