@@ -21,8 +21,8 @@ func SkillView(_ skill: ResolvedSkill) -> View<SheetControl.Message> {
                 ? Space()
                 : Text(skill.modifierString).minWidth(1).padding(right: 1),
             skill.basedOn.isEmpty
-            ? Space()
-            : Text(skill.basedOn).padding(right: 1),
+                ? Space()
+                : Text(skill.basedOn).padding(right: 1),
             Text(skill.title),
         ])
 }

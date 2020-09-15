@@ -8,7 +8,7 @@ import Foundation
 struct AtPathEditor {
     let atPath: IndexPath?
     var atXY: Point? {
-        atPath.map { Point(x: $0[0], y: $0[1])}
+        atPath.map { Point(x: $0[0], y: $0[1]) }
     }
 
     func replace(path: IndexPath) -> AtPathEditor {

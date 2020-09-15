@@ -4,7 +4,10 @@
 
 import Ashen
 
-func AttributesView<Msg>(_ attributes: [Attribute], sheet: Sheet, onChange: @escaping (Int, Int) -> Msg) -> View<
+func AttributesView<Msg>(
+    _ attributes: [Attribute], sheet: Sheet, onChange: @escaping (Int, Int) -> Msg,
+    onRoll: @escaping (Roll) -> Msg
+) -> View<
     Msg
 > {
     let (lhs, rhs) = attributes.enumerated().reduce(([Attribute](), [Attribute]())) {
@@ -18,10 +21,16 @@ func AttributesView<Msg>(_ attributes: [Attribute], sheet: Sheet, onChange: @esc
         }
     }
     let lhsViews = lhs.enumerated().map { attrIndex, attr in
-        AttributeView(attr, sheet: sheet, onChange: { delta in onChange(attrIndex, delta) })
+        AttributeView(
+            attr, sheet: sheet, onChange: { delta in onChange(attrIndex, delta) },
+            onRoll: onRoll
+        )
     }
     let rhsViews = rhs.enumerated().map { attrIndex, attr in
-        AttributeView(attr, sheet: sheet, onChange: { delta in onChange(lhs.count + attrIndex, delta) })
+        AttributeView(
+            attr, sheet: sheet, onChange: { delta in onChange(lhs.count + attrIndex, delta) },
+            onRoll: onRoll
+        )
     }
     return Flow(
         .ltr,
@@ -33,14 +42,20 @@ func AttributesView<Msg>(_ attributes: [Attribute], sheet: Sheet, onChange: @esc
         ])
 }
 
-func AttributeView<Msg>(_ attribute: Attribute, sheet: Sheet, onChange: @escaping (Int) -> Msg) -> View<Msg> {
+func AttributeView<Msg>(
+    _ attribute: Attribute, sheet: Sheet, onChange: @escaping (Int) -> Msg,
+    onRoll: @escaping (Roll) -> Msg
+)
+    -> View<Msg>
+{
     Stack(
         .ltr,
         [
             Stack(
                 .down,
                 [
-                    Text(((attribute.isProficient ? "◼ " : "") + attribute.title).bold()).centered(),
+                    Text(((attribute.isProficient ? "◼ " : "") + attribute.title).bold())
+                        .centered(),
                     Stack(
                         .ltr,
                         [
@@ -53,27 +68,17 @@ func AttributeView<Msg>(_ attribute: Attribute, sheet: Sheet, onChange: @escapin
                                         .middleLeft),
                                 ]),
 
-                            Stack(
-                                .down,
-                                [
-                                    Text(Operation.Value.integer(attribute.score).toAttributed).centered().underlined(),
-                                    Text("Score"),
-                                ]),
+                            StatView(
+                                title: "Score", value: .integer(attribute.score),
+                                sheet: sheet, onRoll: onRoll),
                             Space().width(1),
-                            Stack(
-                                .down,
-                                [
-                                    Text(attribute.modifier.toAttributed).centered().underlined(),
-                                    Text("Modifier"),
-                                ]),
+                            StatView(
+                                title: "Modifier", value: attribute.modifier, sheet: sheet,
+                                onRoll: onRoll),
                             Space().width(1),
-                            Stack(
-                                .down,
-                                [
-                                    Text(attribute.save(sheet).toAttributed).centered()
-                                        .underlined(),
-                                    Text("Save"),
-                                ]),
+                            StatView(
+                                title: "Save", value: attribute.save, sheet: sheet,
+                                onRoll: onRoll),
                         ]),
                 ])
         ]

@@ -4,7 +4,9 @@
 
 import Ashen
 
-func SheetControlEditor(column: SheetColumn, control: SheetControl, controlIndex: Int, lastIndex: Int)
+func SheetControlEditor(
+    column: SheetColumn, control: SheetControl, controlIndex: Int, lastIndex: Int
+)
     -> View<SheetColumn.Message>
 {
     var leftHandControls: [View<SheetColumn.Message>] = []
@@ -15,20 +17,23 @@ func SheetControlEditor(column: SheetColumn, control: SheetControl, controlIndex
     }
 
     if control.canEdit {
-        rightHandControls.append(OnLeftClick(
-            Text(" Edit ").aligned(.middleRight)
-                .background(view: Text(" "))
-                .background(color: .blue),
-            .delegate(.showControlEditor(controlIndex))))
+        rightHandControls.append(
+            OnLeftClick(
+                Text(" Edit ").aligned(.middleRight)
+                    .background(view: Text(" "))
+                    .background(color: .blue),
+                .delegate(.showControlEditor(controlIndex))))
     }
 
     if column.canDelete {
-        leftHandControls.append(OnLeftClick(
+        leftHandControls.append(
+            OnLeftClick(
                 Text(" Move ").aligned(.middleRight),
                 .delegate(.relocateControl(controlIndex))
             ).background(view: Text(" ")).background(color: .green))
         rightHandControls.append(IgnoreMouse(Repeating(Text(" "))).width(column.canDelete ? 1 : 0))
-        rightHandControls.append(OnLeftClick(
+        rightHandControls.append(
+            OnLeftClick(
                 Text("  X  ").aligned(.middleRight),
                 .controlMessage(controlIndex, .delegate(.removeControl))
             ).background(view: Text(" ")).background(color: .red))
@@ -36,12 +41,13 @@ func SheetControlEditor(column: SheetColumn, control: SheetControl, controlIndex
 
     return Flow(
         .ltr,
-            leftHandControls.map { (.fixed, $0) } +
-            [
-                (.flex1, OnLeftClick(Space(), SheetColumn.Message.delegate(.stopEditing), .highlight(false)))
-            ] +
-            rightHandControls.map { (.fixed, $0) }
-        )
+        leftHandControls.map { (.fixed, $0) } + [
+            (
+                .flex1,
+                OnLeftClick(Space(), SheetColumn.Message.delegate(.stopEditing), .highlight(false))
+            )
+        ] + rightHandControls.map { (.fixed, $0) }
+    )
 }
 
 private func ReorderControls(controlIndex: Int, lastIndex: Int) -> View<SheetColumn.Message> {

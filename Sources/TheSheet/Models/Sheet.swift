@@ -42,7 +42,8 @@ struct Sheet {
     }
 
     func replace(column: SheetColumn, at columnIndex: Int) -> Sheet {
-        Sheet(visibleColumnsCount: visibleColumnsCount,
+        Sheet(
+            visibleColumnsCount: visibleColumnsCount,
             columns: columns.replacing(column, at: columnIndex))
     }
 

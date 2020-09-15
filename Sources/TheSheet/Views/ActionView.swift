@@ -6,7 +6,8 @@ import Ashen
 
 func ActionView<Msg>(
     _ action: Action, sheet: Sheet, onExpand: @escaping @autoclosure SimpleEvent<Msg>,
-    onChange: @escaping (Int) -> Msg, onResetUses: @escaping @autoclosure SimpleEvent<Msg>
+    onChange: @escaping (Int) -> Msg, onResetUses: @escaping @autoclosure SimpleEvent<Msg>,
+    onRoll: @escaping (Roll) -> Msg
 ) -> View<
     Msg
 > {
@@ -14,7 +15,7 @@ func ActionView<Msg>(
     let buttonText: String
     if action.isExpanded {
         let actionStats: View<Msg>? = _ActionStatsView(
-            action, sheet: sheet, onChange, onResetUses())
+            action, sheet: sheet, onChange, onResetUses(), onRoll)
         expandedViews = actionStats.map { [$0] } ?? []
         buttonText = "↑↑↑"
     } else {
@@ -36,13 +37,14 @@ func ActionView<Msg>(
 
 func _ActionStatsView<Msg>(
     _ action: Action, sheet: Sheet, _ onChange: @escaping (Int) -> Msg,
-    _ onResetUses: @escaping @autoclosure SimpleEvent<Msg>
+    _ onResetUses: @escaping @autoclosure SimpleEvent<Msg>,
+    _ onRoll: @escaping (Roll) -> Msg
 ) -> View<Msg>? {
     var actionViews = action.subactions.reduce([View<Msg>]()) { views, sub in
         let statViews: [View<Msg>] = [
-            sub.check.map({ _ActionCheckView($0, sheet: sheet) }) as View<Msg>?,
-            sub.damage.map({ _ActionDamageView($0, sheet: sheet) }) as View<Msg>?,
-            sub.type.map({ _ActionTypeView($0, sheet: sheet) }),
+            sub.check.map({ _ActionCheckView($0, sheet: sheet, onRoll) }) as View<Msg>?,
+            sub.damage.map({ _ActionDamageView($0, sheet: sheet, onRoll) }) as View<Msg>?,
+            sub.type.map({ _ActionTypeView($0, sheet: sheet, onRoll) }),
         ].compactMap { $0 }
 
         if statViews.isEmpty {
@@ -103,14 +105,20 @@ func _ActionTitleView<Msg>(_ title: String) -> View<Msg> {
 func _ActionLevelView<Msg>(_ level: String?) -> View<Msg> {
     level.map { Text($0) } ?? Space()
 }
-func _ActionCheckView<Msg>(_ check: Operation, sheet: Sheet) -> View<Msg> {
-    StatView(Stat(title: "Check", value: check), sheet: sheet)
+func _ActionCheckView<Msg>(_ check: Operation, sheet: Sheet, _ onRoll: @escaping (Roll) -> Msg)
+    -> View<Msg>
+{
+    StatView(title: "Check", value: check, sheet: sheet, onRoll: onRoll)
 }
-func _ActionDamageView<Msg>(_ damage: Operation, sheet: Sheet) -> View<Msg> {
-    StatView(Stat(title: "Damage", value: damage), sheet: sheet)
+func _ActionDamageView<Msg>(_ damage: Operation, sheet: Sheet, _ onRoll: @escaping (Roll) -> Msg)
+    -> View<Msg>
+{
+    StatView(title: "Damage", value: damage, sheet: sheet, onRoll: onRoll)
 }
-func _ActionTypeView<Msg>(_ type: String, sheet: Sheet) -> View<Msg> {
-    StatView(Stat(title: "Type", value: .string(type)), sheet: sheet)
+func _ActionTypeView<Msg>(_ type: String, sheet: Sheet, _ onRoll: @escaping (Roll) -> Msg) -> View<
+    Msg
+> {
+    StatView(title: "Type", value: .string(type), sheet: sheet, onRoll: onRoll)
 }
 func _ActionDescriptionView<Msg>(_ description: String) -> View<
     Msg

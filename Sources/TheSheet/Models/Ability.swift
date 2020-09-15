@@ -13,6 +13,8 @@ struct Ability: Codable {
     let uses: Uses?
     let isExpanded: Bool
 
+    static let `default` = Ability(title: "", description: "")
+
     init(title: String, description: String, uses: Uses? = nil, isExpanded: Bool = true) {
         self.title = title
         self.description = description

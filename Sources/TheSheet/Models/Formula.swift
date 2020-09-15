@@ -270,7 +270,7 @@ extension Formula.Editable {
             return (.bool(false), remainder)
         }
         if let afterD = variable.removingPrefix("d"), let dice = Int(afterD) {
-            return (.dice(Operation.Dice(n: 1, d: dice)), remainder)
+            return (.dice(Dice(n: 1, d: dice)), remainder)
         }
         return (.variable(variable), remainder)
     }

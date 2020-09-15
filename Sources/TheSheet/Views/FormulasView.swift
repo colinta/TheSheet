@@ -29,16 +29,18 @@ func FormulaView<Msg>(_ formula: Formula, sheet: Sheet, canEdit: Bool) -> View<M
             Text(formula.operation.toAttributed(sheet), .wrap(true)),
         ])
     if canEdit {
-        return Stack(.down, [
-            formulaView,
-            Stack(
-                .ltr,
-                [
-                    Text(String(repeating: " ", count: formula.variable.count)),
-                    Text("-> ".bold()),
-                    Text(formula.operation.eval(sheet).toAttributed),
-                ]),
-        ])
+        return Stack(
+            .down,
+            [
+                formulaView,
+                Stack(
+                    .ltr,
+                    [
+                        Text(String(repeating: " ", count: formula.variable.count)),
+                        Text("-> ".bold()),
+                        Text(formula.operation.eval(sheet).toAttributed),
+                    ]),
+            ])
     } else {
         return formulaView
     }

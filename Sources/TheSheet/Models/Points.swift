@@ -81,6 +81,8 @@ struct Points: Codable {
         }
     }
 
+    static let `default` = Points(title: "", current: 0, max: nil, types: [], shouldResetOnLongRest: false)
+
     func replace(title: String) -> Points {
         Points(
             title: title, current: current, max: max, types: types,

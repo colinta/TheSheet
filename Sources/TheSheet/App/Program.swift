@@ -27,6 +27,11 @@ enum Message {
     case setModalScrollSize(LocalViewport)
     case cancelModal
 
+    case addDie(Roll, Dice)
+    case removeDie(Roll, Dice)
+    case setRollModifier(Roll, Int)
+    case roll(Roll)
+
     case statusDidTimeout
     case undo
     case reloadJSON
@@ -58,6 +63,10 @@ func showStatus(model: Model, status: String?) -> State<Model, Message> {
 
 func update(model: inout Model, message: Message) -> State<Model, Message> {
     switch message {
+    case let .sheetMessage(.columnMessage(_, .controlMessage(_, .delegate(.roll(roll))))):
+        return .model(model.roll(roll))
+    case let .sheetMessage(.columnMessage(columnIndex, .controlMessage(controlIndex, .delegate(.command(command))))):
+        return .update(model, [command.map { Message.sheetMessage(.columnMessage(columnIndex, .controlMessage(controlIndex, $0)))}])
     case let .sheetMessage(.columnMessage(columnIndex, .delegate(delegate))):
         switch delegate {
         case .editColumn:
@@ -109,14 +118,17 @@ func update(model: inout Model, message: Message) -> State<Model, Message> {
         let oldColumn = model.sheet.columns[from[0]]
         let control = oldColumn.controls[from[1]]
         let newColumn = model.sheet.columns[toColumn]
-        return .model(model.replace(sheet:
-            model.sheet.replace(
-                column: oldColumn.replace(controls: oldColumn.controls.removing(at: from[1])),
-                at: from[0]
-                )
-                .replace(
-                    column: newColumn.replace(controls: [control] + newColumn.controls),
-                    at: toColumn)
+        return .model(
+            model.replace(
+                sheet:
+                    model.sheet.replace(
+                        column: oldColumn.replace(
+                            controls: oldColumn.controls.removing(at: from[1])),
+                        at: from[0]
+                    )
+                    .replace(
+                        column: newColumn.replace(controls: [control] + newColumn.controls),
+                        at: toColumn)
             ).stopEditing())
 
     case let .changeVisibleColumn(delta):
@@ -170,7 +182,16 @@ func update(model: inout Model, message: Message) -> State<Model, Message> {
         let scrollOffset = max(0, min(model.modalScrollOffset + delta, model.modalScrollMaxOffset))
         return .model(model.replace(modalScrollOffset: scrollOffset))
     case .cancelModal:
-        return .model(model.stopEditing())
+        return .model(model.stopEditing().stopRolling())
+
+    case let .addDie(roll, die):
+        return .model(model.replace(editRolling: roll.adding(die)))
+    case let .removeDie(roll, die):
+        return .model(model.replace(editRolling: roll.removing(die)))
+    case let .setRollModifier(roll, value):
+        return .model(model.replace(editRolling: roll.replace(modifier: value)))
+    case let .roll(roll):
+        return .model(model.roll(roll))
 
     case .statusDidTimeout:
         let now = Date().timeIntervalSince1970
@@ -235,7 +256,7 @@ func render(model: Model) -> [View<Message>] {
 }
 
 private func _render(_ model: Model, status: String?) -> [View<Message>] {
-    ([
+    var views: [View<Message>] = [
         OnKeyPress(.up, Message.scrollColumns(-1)),
         OnKeyPress(.down, Message.scrollColumns(1)),
         OnKeyPress(.left, Message.changeVisibleColumn(-1)),
@@ -246,6 +267,7 @@ private func _render(_ model: Model, status: String?) -> [View<Message>] {
         OnKeyPress(.ctrl(.s), Message.saveJSON),
         OnKeyPress(.ctrl(.r), Message.reloadJSON),
         OnKeyPress(.ctrl(.x), Message.quit),
+        OnKeyPress(.esc, Message.quit),
         OnKeyPress(.ctrl(.z), Message.undo),
         Flow(
             .down,
@@ -256,11 +278,11 @@ private func _render(_ model: Model, status: String?) -> [View<Message>] {
                     Columns(
                         (model.firstVisibleColumn..<model.firstVisibleColumn
                             + model.sheet.visibleColumnsCount).map { ($0, model.sheet.columns[$0]) }
-                        .map { index, column in
-                            renderColumn(
-                                model, column,
-                                columnIndex: index)
-                        }
+                            .map { index, column in
+                                renderColumn(
+                                    model, column,
+                                    columnIndex: index)
+                            }
                     )
                 ),
                 (
@@ -268,14 +290,33 @@ private func _render(_ model: Model, status: String?) -> [View<Message>] {
                     MainButtons(model: model, status: status)
                 ),
             ]),
-        !(model.isAddingToColumn() || model.isEditingControl())
-            ? OnMouseWheel(Space(), Message.scrollColumns) : nil,
-        model.editingControl.map({ column, control, editor in
-            renderControlEditor(model: model, column: column, control: control, editor: editor)
-        }),
-        model.addingToColumn.map({ renderControlSelector(model: model, addToColumn: $0) }),
-        model.relocatingControl.map({ renderControlRelocator(model: model, relocatingControl: $0.control, inColumn: $0.column) }),
-    ] as [View<Message>?]).compactMap { $0 }
+    ]
+
+    if !(model.isAddingToColumn() || model.isEditingControl()) {
+        views.append(OnMouseWheel(Space(), Message.scrollColumns))
+    }
+
+    if let info = model.editingControl {
+        views.append(
+            renderControlEditor(
+                model: model, column: info.column, control: info.control, editor: info.editor))
+    }
+
+    if let info = model.addingToColumn {
+        views.append(renderControlSelector(model: model, addToColumn: info))
+    }
+
+    if let info = model.relocatingControl {
+        views.append(
+            renderControlRelocator(
+                model: model, relocatingControl: info.control, inColumn: info.column))
+    }
+
+    if let info = model.rolling {
+        views.append(renderRoller(model: model, roll: info))
+    }
+
+    return views
 }
 
 func inModal(
@@ -284,6 +325,8 @@ func inModal(
     ZStack([
         IgnoreMouse(),
         IgnoreKeys(),
+        OnKeyPress(.ctrl(.c), Message.quit),
+        OnKeyPress(.esc, Message.cancelModal),
         OnLeftClick(
             Space().modifyCharacters { pt, size, c in
                 return AttributedCharacter(
@@ -320,7 +363,9 @@ func renderControlSelector(model: Model, addToColumn: Int) -> View<Message> {
         view: Stack(
             .down,
             SheetControl.all.map({ title, control in
-                OnLeftClick(Text("[+]".foreground(.green) + " \(title)"), Message.addControl(control, to: addToColumn))
+                OnLeftClick(
+                    Text("[+]".foreground(.green) + " \(title)"),
+                    Message.addControl(control, to: addToColumn))
             })
         ))
 }
@@ -347,15 +392,76 @@ func renderControlEditor(
     )
 }
 
-func renderControlRelocator(model: Model, relocatingControl controlIndex: Int, inColumn columnIndex: Int) -> View<Message> {
+func renderControlRelocator(
+    model: Model, relocatingControl controlIndex: Int, inColumn columnIndex: Int
+) -> View<Message> {
     inModal(
         model: model,
-        view: Stack(.down, model.sheet.columns.enumerated().map { index, column in
-            return index == columnIndex
-            ? Text(column.title.bold())
-            : OnLeftClick(Text(column.title),
-                Message.relocateControl(from: [columnIndex, controlIndex], to: index))
-        }.map { $0.centered() }).aligned(.middleCenter)
+        view: Stack(
+            .down,
+            model.sheet.columns.enumerated().map { index, column in
+                return index == columnIndex
+                    ? Text(column.title.bold())
+                    : OnLeftClick(
+                        Text(column.title),
+                        Message.relocateControl(from: [columnIndex, controlIndex], to: index))
+            }.map { $0.centered() }
+        ).aligned(.middleCenter)
+    )
+}
+
+func renderRoller(
+    model: Model, roll: Roll
+) -> View<Message> {
+    let addButtons: View<Message> = Stack(
+        .ltr,
+        [
+            OnLeftClick(Text("d4\n[+]").border(.single).foreground(color: .green), .addDie(roll, .d4)),
+            OnLeftClick(Text("d6\n[+]").border(.single).foreground(color: .green), .addDie(roll, .d6)),
+            OnLeftClick(Text("d8\n[+]").border(.single).foreground(color: .green), .addDie(roll, .d8)),
+            OnLeftClick(Text("d10\n[+]").border(.single).foreground(color: .green), .addDie(roll, .d10)),
+            OnLeftClick(Text("d12\n[+]").border(.single).foreground(color: .green), .addDie(roll, .d12)),
+            OnLeftClick(Text("d20\n[+]").border(.single).foreground(color: .green), .addDie(roll, .d20)),
+        ])
+    let removeButtons: View<Message> = Stack(
+        .ltr,
+        roll.dice.flatMap { die in
+            return (0..<die.n).map { _ -> View<Message> in
+                OnLeftClick(
+                    Text("d\(die.d)\n[-]").border(.single).foreground(color: .blue),
+                    .removeDie(roll, Dice(n: 1, d: die.d)))
+            }
+        })
+    let result: AttributedString
+    if let (rolls, total) = model.rollResult {
+        let rollsStr = rolls.map { d, v in "d\(d): \(v)" }.joined(separator: ", ")
+        result =
+            AttributedString("Rolls: \(rollsStr), Total: ")
+            + AttributedString("\(total)", attributes: [.bold])
+    } else {
+        result = AttributedString("")
+    }
+    return inModal(
+        model: model,
+        view: Stack(
+            .down,
+            [
+                addButtons.minHeight(3), removeButtons.minHeight(3),
+                Stack(
+                    .ltr,
+                    [
+                        Text("Modifier: "),
+                        PlusMinus(
+                            roll.modifier, { Message.setRollModifier(roll, $0) }),
+                    ]),
+                Text(result),
+                Flow(
+                    .ltr,
+                    [
+                        (.flex1, Space()),
+                        (.fixed, OnLeftClick(Text("Roll").border(.single), Message.roll(roll))),
+                    ]),
+            ])
     )
 }
 

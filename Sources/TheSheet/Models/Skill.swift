@@ -11,15 +11,15 @@ struct Skill: Codable {
         ResolvedSkill(
             skill: self,
             modifierString: basedOn.isEmpty
-            ? ""
-            : (isProficient
-                ? Operation.add([
-                    Operation.variable(basedOn + ".Mod"),
-                    Operation.variable("proficiencyBonus"),
-                ])
-                : Operation.variable(basedOn + ".Mod"))
-                .eval(sheet)
-                .toReadable)
+                ? ""
+                : (isProficient
+                    ? Operation.add([
+                        Operation.variable(basedOn + ".Mod"),
+                        Operation.variable("proficiencyBonus"),
+                    ])
+                    : Operation.variable(basedOn + ".Mod"))
+                    .eval(sheet)
+                    .toReadable)
     }
 
     func replace(title: String) -> Skill {

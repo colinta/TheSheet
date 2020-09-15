@@ -22,7 +22,7 @@ private func main() throws {
 }
 
 // debugSilenced(true)
-// let op: Operation = .if(.bool(true), .dice(Operation.Dice(n: 1, d: 4)), .if(.bool(true), .dice(Operation.Dice(n: 1, d: 4)), .dice(Operation.Dice(n: 1, d: 6))))
+// let op: Operation = .if(.bool(true), .dice(Dice(n: 1, d: 4)), .if(.bool(true), .dice(Dice(n: 1, d: 4)), .dice(Dice(n: 1, d: 6))))
 // let sheet = Sheet(visibleColumnsCount: 0, columns: [])
 // print("=============== \(#file) line \(#line) ===============")
 // print("op: \(op.toAttributed(sheet).string)")
@@ -47,7 +47,7 @@ func createSheet() -> Sheet {
                     .action(
                         Action(
                             title: "Dagger", check: .modifier(3),
-                            damage: .add([.dice(Operation.Dice(n: 1, d: 4)), .modifier(1)]),
+                            damage: .add([.dice(Dice(n: 1, d: 4)), .modifier(1)]),
                             type: "piercing",
                             description: "Finesse, Light, Thrown (range 20/60)")),
                     .action(
@@ -57,12 +57,12 @@ func createSheet() -> Sheet {
                                 Action.Sub(
                                     title: "One Handed",
                                     check: .modifier(3),
-                                    damage: .add([.dice(Operation.Dice(n: 1, d: 6)), .modifier(1)]),
+                                    damage: .add([.dice(Dice(n: 1, d: 6)), .modifier(1)]),
                                     type: "bludgeoning"),
                                 Action.Sub(
                                     title: "Two Handed",
                                     check: .modifier(3),
-                                    damage: .add([.dice(Operation.Dice(n: 1, d: 8)), .modifier(1)]),
+                                    damage: .add([.dice(Dice(n: 1, d: 8)), .modifier(1)]),
                                     type: "bludgeoning"),
                             ], description: "Versatile"
                         )),
@@ -83,7 +83,7 @@ func createSheet() -> Sheet {
                             title: "Chill Touch",
                             level: "Cantrip",
                             check: .modifier(5),
-                            damage: .dice(Operation.Dice(n: 1, d: 8)),
+                            damage: .dice(Dice(n: 1, d: 8)),
                             type: "necrotic",
                             description:
                                 "Target can't regain hit points, undead have disadv on attack rolls, hand clings to target"
@@ -100,7 +100,7 @@ func createSheet() -> Sheet {
             SheetColumn(
                 title: "Stats",
                 controls: [
-                    .restButtons,
+                    .restButton,
                     .pointsTracker(
                         Points(
                             title: "Level", current: 1, max: 20, types: [.level],

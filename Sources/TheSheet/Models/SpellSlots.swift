@@ -9,6 +9,8 @@ struct SpellSlots: Codable {
     let slots: [SpellSlot]
     let shouldResetOnLongRest: Bool
 
+    static let `default` = SpellSlots(title: "Spell Slots", slots: [], shouldResetOnLongRest: true)
+
     func replace(title: String) -> SpellSlots {
         SpellSlots(title: title, slots: slots, shouldResetOnLongRest: shouldResetOnLongRest)
     }

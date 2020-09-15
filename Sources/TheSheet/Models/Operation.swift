@@ -5,15 +5,6 @@
 import Ashen
 
 indirect enum Operation {
-    struct Dice: Codable {
-        let n: Int
-        let d: Int
-
-        var toReadable: String {
-            "\(n)d\(d)"
-        }
-    }
-
     case integer(Int)
     case dice(Dice)
     case bool(Bool)
@@ -42,7 +33,7 @@ indirect enum Operation {
     enum Value {
         case integer(Int)
         case modifier(Int)
-        case diceAdd([Dice], Int)
+        case roll(Roll)
         case bool(Bool)
         case string(String)
         case undefined
@@ -95,12 +86,8 @@ indirect enum Operation {
                 return value.description
             case let .modifier(value):
                 return value.toModString
-            case let .diceAdd(dice, add):
-                let diceStr = dice.map({ $0.toReadable }).joined(separator: "+")
-                if add == 0 {
-                    return diceStr
-                }
-                return "\(diceStr)+\(add)"
+            case let .roll(roll):
+                return roll.toReadable
             case let .bool(value):
                 return value.description
             case let .string(str):
@@ -116,7 +103,7 @@ indirect enum Operation {
                 return toReadable.foreground(.cyan)
             case .modifier:
                 return toReadable.foreground(.brightCyan)
-            case .diceAdd:
+            case .roll:
                 return toReadable.foreground(.brightBlue)
             case .bool:
                 return toReadable.foreground(.yellow)
@@ -124,6 +111,17 @@ indirect enum Operation {
                 return toReadable.foreground(.none)
             case .undefined:
                 return "???".foreground(.white).background(.red)
+            }
+        }
+
+        var toRollable: Roll? {
+            switch self {
+            case let .modifier(value):
+                return Roll(dice: [Dice(n: 1, d: 20)], modifier: value)
+            case let .roll(roll):
+                return roll
+            default:
+                return nil
             }
         }
 
@@ -173,7 +171,7 @@ indirect enum Operation {
         case let .bool(value):
             return .bool(value)
         case let .dice(dice):
-            return .diceAdd([dice], 0)
+            return .roll(Roll(dice: [dice], modifier: 0))
         case let .string(value):
             return .string(value)
         case .editing:
@@ -188,14 +186,13 @@ indirect enum Operation {
             }
             return operation.eval(sheet, dontRecur + [name])
         case let .add(operations):
-            var dice = [Dice]()
+            var totalRoll = Roll(dice: [], modifier: 0)
             var sum = 0
             var isModifier: Bool?
             for operation in operations {
                 let resolved = operation.eval(sheet, dontRecur)
-                if case let .diceAdd(moreDice, value) = resolved {
-                    dice += moreDice
-                    sum += value
+                if case let .roll(roll) = resolved {
+                    totalRoll = totalRoll.adding(roll)
                 } else if case let .integer(value) = resolved {
                     isModifier = isModifier ?? false
                     sum += value
@@ -207,10 +204,10 @@ indirect enum Operation {
                 }
             }
 
-            if dice.isEmpty {
-                return isModifier == true ? .modifier(sum) : .integer(sum)
+            if !totalRoll.dice.isEmpty {
+                return .roll(totalRoll.replace(modifier: totalRoll.modifier + sum))
             }
-            return .diceAdd(dice, sum)
+            return isModifier == true ? .modifier(sum) : .integer(sum)
         case let .multiply(operations):
             return reduce(toValues(operations, sheet, dontRecur), *)
         case let .divide(lhs, rhs):
@@ -316,16 +313,15 @@ indirect enum Operation {
             return attributedFunction("min", operations: operations, sheet: sheet)
 
         case let .if(condition, lhs, rhs):
-            return (
-                "if".foreground(.white)
+            return
+                ("if".foreground(.white)
                 + "(".foreground(.brightYellow)
                 + condition.toAttributed(sheet)
                 + ") {\n".foreground(.brightYellow)
                 + lhs.toAttributed(sheet).indented()
                 + "\n} else {\n"
                 + rhs.toAttributed(sheet).indented()
-                + "\n}".foreground(.brightYellow)
-                )
+                + "\n}".foreground(.brightYellow))
         case let .equal(lhs, rhs):
             return attributedOperator(
                 "=", operations: [lhs, rhs], sheet: sheet, precedence: 2, prevPrecedence)
@@ -611,7 +607,8 @@ private func toValues(_ operations: [Operation], _ sheet: Sheet, _ dontRecur: [S
     operations.map({ $0.eval(sheet, dontRecur) })
 }
 
-private func reduce(_ values: [Operation.Value], _ fn: (Int, Int) throws -> Int) -> Operation.Value {
+private func reduce(_ values: [Operation.Value], _ fn: (Int, Int) throws -> Int) -> Operation.Value
+{
     var memo: Int?
     var isModifier: Bool?
     for value in values {

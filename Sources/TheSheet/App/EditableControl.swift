@@ -8,15 +8,10 @@ import Foundation
 enum EditableControl {
     case inventory(Inventory)
     case action(Action, AtPathEditor)
-    // case ability(Ability)
-    // case spellSlots(SpellSlots)
     case pointsTracker(Points, AtPathEditor)
-    // case attributes([Attribute])
     case skills([Skill], AtPathEditor)
-    // case stats(String, [Stat])
-    // case restButtons
     case formulas([Formula.Editable], AtPathEditor)
-    case journal(String, String, AtPathEditor)
+    case journal(Journal, AtPathEditor)
 
     indirect enum Message {
         enum Property {
@@ -24,6 +19,7 @@ enum EditableControl {
             case title
             case level
             case description
+            case text
             case basedOn
             case isProficient
             case variable
@@ -33,7 +29,6 @@ enum EditableControl {
             case resets
             case check
             case damage
-            case journal
         }
 
         case atPath(IndexPath, Message)
@@ -66,8 +61,8 @@ enum EditableControl {
                 formulas.compactMap {
                     $0.toFormula()
                 })
-        case let .journal(title, journal, _):
-            return .journal(title, journal)
+        case let .journal(journal, _):
+            return .journal(journal)
         }
     }
 
@@ -112,31 +107,49 @@ enum EditableControl {
         case let (.action(action, editor), .add):
             let newTitlePath: IndexPath = [action.subactions.count + 1, 0]
             let newSubaction = Action.Sub(title: nil, check: nil, damage: nil, type: nil)
-            return .action(action.replace(subactions: action.subactions.appending(newSubaction)), editor.replace(path: newTitlePath))
+            return .action(
+                action.replace(subactions: action.subactions.appending(newSubaction)),
+                editor.replace(path: newTitlePath))
         case let (.action(action, editor), .atPath(path, .changeString(.title, value))):
             let index = path[0] - 1
             let subaction = action.subactions[index].replace(title: value.isEmpty ? nil : value)
-            return .action(action.replace(subactions: action.subactions.replacing(subaction, at: index)), editor)
+            return .action(
+                action.replace(subactions: action.subactions.replacing(subaction, at: index)),
+                editor)
         case let (.action(action, editor), .atPath(path, .changeString(.check, value))):
             let index = path[0] - 1
             let subaction = action.subactions[index]
             guard !value.isEmpty else {
-                return .action(action.replace(subactions: action.subactions.replacing(subaction.replace(check: nil), at: index)), editor)
+                return .action(
+                    action.replace(
+                        subactions: action.subactions.replacing(
+                            subaction.replace(check: nil), at: index)), editor)
             }
             let op: Operation = (try? Formula.Editable.parse(value)) ?? .editing(value)
-            return .action(action.replace(subactions: action.subactions.replacing(subaction.replace(check: op), at: index)), editor)
+            return .action(
+                action.replace(
+                    subactions: action.subactions.replacing(subaction.replace(check: op), at: index)
+                ), editor)
         case let (.action(action, editor), .atPath(path, .changeString(.damage, value))):
             let index = path[0] - 1
             let subaction = action.subactions[index]
             guard !value.isEmpty else {
-                return .action(action.replace(subactions: action.subactions.replacing(subaction.replace(damage: nil), at: index)), editor)
+                return .action(
+                    action.replace(
+                        subactions: action.subactions.replacing(
+                            subaction.replace(damage: nil), at: index)), editor)
             }
             let op: Operation = (try? Formula.Editable.parse(value)) ?? .editing(value)
-            return .action(action.replace(subactions: action.subactions.replacing(subaction.replace(damage: op), at: index)), editor)
+            return .action(
+                action.replace(
+                    subactions: action.subactions.replacing(
+                        subaction.replace(damage: op), at: index)), editor)
         case let (.action(action, editor), .atPath(path, .changeString(.type, value))):
             let index = path[0] - 1
             let subaction = action.subactions[index].replace(type: value.isEmpty ? nil : value)
-            return .action(action.replace(subactions: action.subactions.replacing(subaction, at: index)), editor)
+            return .action(
+                action.replace(subactions: action.subactions.replacing(subaction, at: index)),
+                editor)
 
         case let (.skills(skills, editor), .add):
             return .skills(skills + [Skill(title: "", basedOn: "", isProficient: false)], editor)
@@ -178,10 +191,12 @@ enum EditableControl {
                 return .pointsTracker(
                     points.replace(types: points.types.filter({ !$0.is(pointType) })), editor)
             } else {
-                return .pointsTracker(points.replace(types: points.types.appending(pointType)), editor)
+                return .pointsTracker(
+                    points.replace(types: points.types.appending(pointType)), editor)
             }
         case let (.pointsTracker(points, editor), .add):
-            return .pointsTracker(points.replace(types: points.types.appending(.other("", ""))), editor)
+            return .pointsTracker(
+                points.replace(types: points.types.appending(.other("", ""))), editor)
         case let (.pointsTracker(pointsTracker, editor), .firstResponder(path)):
             return .pointsTracker(pointsTracker, editor.replace(path: path))
         case let (.pointsTracker(points, editor), .atPath(path, .changeString(.title, value))):
@@ -220,12 +235,12 @@ enum EditableControl {
                         formula.replace(editableFormula: value)
                     }, at: path[0]), editor)
 
-        case let (.journal(title, journal, editor), .firstResponder(path)):
-            return .journal(title, journal, editor.replace(path: path))
-        case let (.journal(_, journal, editor), .changeString(.title, value)):
-            return .journal(value, journal, editor)
-        case let (.journal(title, _, editor), .changeString(.journal, value)):
-            return .journal(title, value, editor)
+        case let (.journal(journal, editor), .firstResponder(path)):
+            return .journal(journal, editor.replace(path: path))
+        case let (.journal(journal, editor), .changeString(.title, value)):
+            return .journal(journal.replace(title: value), editor)
+        case let (.journal(journal, editor), .changeString(.text, value)):
+            return .journal(journal.replace(text: value), editor)
         default:
             return self
         }
@@ -246,8 +261,8 @@ enum EditableControl {
             return PointsEditor(points, editor: editor)
         case let .formulas(formulas, editor):
             return FormulasEditor(formulas, editor: editor)
-        case let .journal(title, journal, editor):
-            return JournalEditor(journal: (title, journal), editor: editor)
+        case let .journal(journal, editor):
+            return JournalEditor(journal: journal, editor: editor)
         }
     }
 }

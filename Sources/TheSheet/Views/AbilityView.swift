@@ -11,14 +11,19 @@ func AbilityView<Msg>(
     Msg
 > {
     let expandedViews: [View<Msg>]
-    let buttonText: String
-    if ability.isExpanded {
-        let abilityStats: View<Msg>? = _AbilityDescriptionView(
-            ability, onChange)
-        expandedViews = abilityStats.map { [$0] } ?? []
-        buttonText = "↑↑↑"
+    let buttonView: View<Msg>
+    let abilityStats: View<Msg>? = _AbilityDescriptionView(
+        ability, onChange)
+    if abilityStats == nil {
+        buttonView = Space()
+        expandedViews = []
+    } else if let abilityStats = abilityStats, ability.isExpanded {
+        expandedViews = [abilityStats]
+        buttonView = OnLeftClick(
+                    Text("↑↑↑").bold().aligned(.topRight), onExpand())
     } else {
-        buttonText = "↓↓↓"
+        buttonView = OnLeftClick(
+                    Text("↓↓↓").bold().aligned(.topRight), onExpand())
         expandedViews = []
     }
     return Stack(
@@ -26,8 +31,7 @@ func AbilityView<Msg>(
         [
             ZStack(
                 _AbilityTitleView(ability.title),
-                OnLeftClick(
-                    Text(buttonText).bold().aligned(.topRight), onExpand())
+                buttonView
             ).matchContainer(dimension: .width)
         ] + expandedViews
     ).border(.single)

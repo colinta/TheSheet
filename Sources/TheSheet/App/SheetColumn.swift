@@ -90,7 +90,8 @@ struct SheetColumn {
 
     func render(_ sheet: Sheet, isEditing: Bool, editingControl: Int?) -> View<SheetColumn.Message>
     {
-        let controlViews: [View<SheetColumn.Message>] = controls
+        let controlViews: [View<SheetColumn.Message>] =
+            controls
             .enumerated().flatMap { controlIndex, control -> [View<SheetColumn.Message>] in
                 let controlView = control.render(sheet).map {
                     SheetColumn.Message.controlMessage(controlIndex, $0)

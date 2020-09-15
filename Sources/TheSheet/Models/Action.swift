@@ -83,14 +83,16 @@ struct Action: Codable {
 
     func replace(level: String) -> Action {
         Action(
-            title: title, level: level.isEmpty ? nil : level, subactions: subactions, description: description,
+            title: title, level: level.isEmpty ? nil : level, subactions: subactions,
+            description: description,
             isExpanded: isExpanded, remainingUses: remainingUses, maxUses: maxUses,
             shouldResetOnLongRest: shouldResetOnLongRest)
     }
 
     func replace(description: String) -> Action {
         Action(
-            title: title, level: level, subactions: subactions, description: description.isEmpty ? nil : description,
+            title: title, level: level, subactions: subactions,
+            description: description.isEmpty ? nil : description,
             isExpanded: isExpanded, remainingUses: remainingUses, maxUses: maxUses,
             shouldResetOnLongRest: shouldResetOnLongRest)
     }
@@ -113,8 +115,7 @@ struct Action: Codable {
         let remainingUses: Int?
         if self.remainingUses == nil, case let .integer(value) = maxUses {
             remainingUses = value
-        }
-        else {
+        } else {
             remainingUses = self.remainingUses
         }
         return Action(

@@ -5,11 +5,6 @@
 import Ashen
 
 enum SheetControl {
-    enum Rest {
-        case short
-        case long
-    }
-
     case inventory(Inventory)
     case action(Action)
     case ability(Ability)
@@ -18,32 +13,32 @@ enum SheetControl {
     case attributes([Attribute])
     case skills([Skill])
     case stats(String, [Stat])
-    case restButtons
+    case hitDice([HitDice])
+    case restButton
     case formulas([Formula])
-    case journal(String, String)
+    case journal(Journal)
 
     static var all: [(String, SheetControl)] = [
         ("Inventory", .inventory(Inventory(title: "", quantity: nil))),
         ("Action (Weapon, Spell)", .action(Action(title: ""))),
         (
             "Spell Slots",
-            .spellSlots(SpellSlots(title: "Spell Slots", slots: [], shouldResetOnLongRest: true))
+            .spellSlots(.default)
         ),
         (
             "Ability",
-            .ability(Ability(title: "", description: ""))
+            .ability(.default)
         ),
         (
             "Points Tracker (Hit Points, Ki, …)",
-            .pointsTracker(
-                Points(
-                    title: "", current: 0, max: nil, types: [], shouldResetOnLongRest: false))
+            .pointsTracker(.default)
         ),
         ("Attributes (Strength, Charisma, …)", .attributes([])),
         ("Skills (Acrobatics, Stealth, …)", .skills([])),
         ("Stats (Armor, Attack, …)", .stats("", [])),
-        ("Take a Short or Long Rest", .restButtons),
-        ("Journal", .journal("", "")),
+        ("Hit Dice", .hitDice([])),
+        ("Take a Long Rest", .restButton),
+        ("Journal", .journal(.default)),
     ]
 
     var canEdit: Bool { editor != nil }
@@ -74,8 +69,8 @@ enum SheetControl {
             return .skills(skills, AtPathEditor(atPath: nil))
         case let .formulas(formulas):
             return .formulas(formulas.map(\.toEditable), AtPathEditor(atPath: nil))
-        case let .journal(title, journal):
-            return .journal(title, journal, AtPathEditor(atPath: [0]))
+        case let .journal(journal):
+            return .journal(journal, AtPathEditor(atPath: [0]))
         default:
             return nil
         }
@@ -84,6 +79,8 @@ enum SheetControl {
     enum Message {
         enum Delegate {
             case removeControl
+            case roll(Roll)
+            case command(Command<Message>)
         }
         case updateSlotCurrent(slotIndex: Int, current: Int)
         case updateSlotMax(slotIndex: Int, max: Int)
@@ -92,9 +89,10 @@ enum SheetControl {
         case updatePoints(current: Int, max: Int?)
         case toggleExpanded
         case changeQuantity(delta: Int)
-        case changeAttribute(index: Int, delta: Int)
+        case changeQuantityAtIndex(index: Int, delta: Int)
+        case useHitDie(Int)
         case resetActionUses
-        case takeRest(Rest)
+        case takeRest
         case delegate(Delegate)
     }
 
@@ -161,20 +159,27 @@ enum SheetControl {
             return (control, SheetControl.buySlot(slotIndex: slotIndex))
         case let (.pointsTracker(points), .updatePoints(current, max)):
             control = .pointsTracker(points.replace(current: current).replace(max: max))
-        case let (.attributes(attributes), .changeAttribute(changeIndex, delta)):
+        case let (.attributes(attributes), .changeQuantityAtIndex(changeIndex, delta)):
             guard changeIndex >= 0, changeIndex < attributes.count else { break }
             control = .attributes(
                 attributes.enumerated().map { index, attribute in
                     guard index == changeIndex else { return attribute }
                     return attribute.replace(score: attribute.score + delta)
                 })
-        case let (.restButtons, .takeRest(type)):
+        case let (.hitDice(hitDice), .useHitDie(atIndex)):
+            control = .hitDice(hitDice.enumerated().map { index, hitDie in
+                guard atIndex == index else { return hitDie }
+                return hitDie.use(1)
+            })
+        case (.restButton, .takeRest):
             return (
-                .restButtons,
+                .restButton,
                 Sheet.mapControls { control in
-                    control.take(rest: type, sheet: sheet)
+                    control.takeRest(sheet: sheet)
                 }
             )
+        case let (.journal(journal), .toggleExpanded):
+            control = .journal(journal.replace(isExpanded: !journal.isExpanded))
         default:
             break
         }
@@ -192,10 +197,12 @@ enum SheetControl {
                 action, sheet: sheet,
                 onExpand: Message.toggleExpanded,
                 onChange: Message.changeQuantity,
-                onResetUses: Message.resetActionUses)
+                onResetUses: Message.resetActionUses,
+                onRoll: { Message.delegate(.roll($0)) })
         case let .ability(ability):
             return AbilityView(
-                ability, onExpand: Message.toggleExpanded, onChange: Message.changeQuantity)
+                ability, onExpand: Message.toggleExpanded, onChange: Message.changeQuantity
+            )
         case let .spellSlots(spellSlots):
             let sorceryPoints = sheet.columns.reduce(0) { memo, column in
                 column.controls.reduce(memo) { memo, control in
@@ -226,9 +233,12 @@ enum SheetControl {
             return PointsTracker(
                 points: points, onChange: { c, m in Message.updatePoints(current: c, max: m) })
         case let .stats(title, stats):
-            return StatsView(title: title, stats: stats, sheet: sheet)
+            return StatsView(
+                title: title, stats: stats, sheet: sheet, onRoll: { Message.delegate(.roll($0)) })
         case let .attributes(attributes):
-            return AttributesView(attributes, sheet: sheet, onChange: Message.changeAttribute)
+            return AttributesView(
+                attributes, sheet: sheet, onChange: Message.changeQuantityAtIndex,
+                onRoll: { Message.delegate(.roll($0)) })
         case let .skills(skills):
             return SkillsView(skills.map { $0.resolve(sheet) })
         case let .formulas(formulas):
@@ -238,10 +248,21 @@ enum SheetControl {
                 lhs.variable.lowercased() < rhs.variable.lowercased()
             }
             return FormulasView(editable: formulas, fixed: sheetFormulas, sheet: sheet)
-        case let .journal(title, journal):
-            return JournalView(journal: (title, journal))
-        case .restButtons:
-            return TakeRestView(Message.takeRest(.short), Message.takeRest(.long))
+        case let .journal(journal):
+            return JournalView(journal: journal, onExpand: Message.toggleExpanded)
+        case let .hitDice(hitDice):
+            return HitDiceView(hitDice: hitDice, sheet: sheet,
+                onUse: { index, roll in
+                    .delegate(.command(
+                        Command<SheetControl.Message>.list([
+                            Send(.useHitDie(index)),
+                            Send(.delegate(.roll(roll))),
+                        ])
+                    ))
+                }
+            )
+        case .restButton:
+            return TakeRestView(Message.takeRest)
         }
     }
 }
@@ -262,8 +283,10 @@ extension SheetControl: Codable {
         case attributes
         case skills
         case stats
+        case hitDice
         case formulas
         case journal
+        case isExpanded
     }
 
     init(from decoder: Decoder) throws {
@@ -295,15 +318,17 @@ extension SheetControl: Codable {
             let title = try values.decode(String.self, forKey: .title)
             let stats = try values.decode([Stat].self, forKey: .stats)
             self = .stats(title, stats)
-        case "restButtons":
-            self = .restButtons
+        case "hitDice":
+            let hitDice = try values.decode([HitDice].self, forKey: .hitDice)
+            self = .hitDice(hitDice)
+        case "restButton":
+            self = .restButton
         case "formulas":
             let formulas = try values.decode([Formula].self, forKey: .formulas)
             self = .formulas(formulas)
         case "journal":
-            let title = try values.decode(String.self, forKey: .title)
-            let journal = try values.decode(String.self, forKey: .journal)
-            self = .journal(title, journal)
+            let journal = try values.decode(Journal.self, forKey: .journal)
+            self = .journal(journal)
         default:
             throw Error.decoding
         }
@@ -337,23 +362,25 @@ extension SheetControl: Codable {
             try container.encode("stats", forKey: .type)
             try container.encode(title, forKey: .title)
             try container.encode(stats, forKey: .stats)
-        case .restButtons:
-            try container.encode("restButtons", forKey: .type)
+        case let .hitDice(hitDice):
+            try container.encode("hitDice", forKey: .type)
+            try container.encode(hitDice, forKey: .hitDice)
+        case .restButton:
+            try container.encode("restButton", forKey: .type)
         case let .formulas(formulas):
             try container.encode("formulas", forKey: .type)
             try container.encode(formulas, forKey: .formulas)
-        case let .journal(title, journal):
+        case let .journal(journal):
             try container.encode("journal", forKey: .type)
-            try container.encode(title, forKey: .title)
             try container.encode(journal, forKey: .journal)
         }
     }
 }
 extension SheetControl {
-    private func take(rest: Rest, sheet: Sheet) -> SheetControl {
+    private func takeRest(sheet: Sheet) -> SheetControl {
         var control: SheetControl = self
-        switch (self, rest) {
-        case let (.spellSlots(spellSlots), .long):
+        switch self {
+        case let .spellSlots(spellSlots):
             guard spellSlots.shouldResetOnLongRest else { break }
             control = .spellSlots(
                 spellSlots.replace(
@@ -361,16 +388,21 @@ extension SheetControl {
                         return SpellSlot(
                             title: slot.title, current: slot.max, max: slot.max)
                     }))
-        case let (.pointsTracker(points), .long):
+        case let .pointsTracker(points):
             guard points.shouldResetOnLongRest, let pointsMax = points.max else { break }
             control = .pointsTracker(points.replace(current: pointsMax))
-        case let (.action(action), .long):
+        case let .action(action):
             guard
                 action.shouldResetOnLongRest,
                 let maxUses = action.maxUses,
                 let value = maxUses.eval(sheet).toInt
             else { break }
             control = .action(action.replace(remainingUses: value))
+        case let .hitDice(hitDice):
+            control = .hitDice(hitDice.map { hitDie in
+                guard let maxDice = hitDie.maximum.eval(sheet).toInt else { return hitDie }
+                return hitDie.replace(remaining: maxDice)
+            })
         default:
             break
         }
