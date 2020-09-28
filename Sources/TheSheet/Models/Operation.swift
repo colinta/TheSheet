@@ -314,12 +314,11 @@ indirect enum Operation {
 
         case let .if(condition, lhs, rhs):
             return
-                ("if".foreground(.white)
-                + "(".foreground(.brightYellow)
+                ("if(".foreground(.brightYellow)
                 + condition.toAttributed(sheet)
                 + ") {\n".foreground(.brightYellow)
                 + lhs.toAttributed(sheet).indented()
-                + "\n} else {\n"
+                + "\n} else {\n".foreground(.brightYellow)
                 + rhs.toAttributed(sheet).indented()
                 + "\n}".foreground(.brightYellow))
         case let .equal(lhs, rhs):
@@ -349,7 +348,12 @@ indirect enum Operation {
         case let .bool(value):
             return value.description
         case let .string(value):
-            return "\"\(value)\""
+            let quoted = value
+                .replacingOccurrences(of: "\\", with: "\\\\")
+                .replacingOccurrences(of: "\n", with: "\\n")
+                .replacingOccurrences(of: "\t", with: "\\t")
+                .replacingOccurrences(of: "\"", with: "\\\"")
+            return "\"\(quoted)\""
         case let .editing(value):
             return value
         case let .modifier(value):
