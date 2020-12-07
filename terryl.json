@@ -1,0 +1,769 @@
+{
+  "visibleColumnsCount" : 3,
+  "columns" : [
+    {
+      "title" : "Actions",
+      "controls" : [
+        {
+          "type" : "restButton"
+        },
+        {
+          "type" : "action",
+          "action" : {
+            "shouldResetOnLongRest" : false,
+            "title" : "Sneak Attack",
+            "description" : "Deal extra damage when you hit with an attack if you have advantage OR if another enemy of the target is within 5 ft of target and you don't have disadvantage.  Attack must use a finesse or a ranged weapon.",
+            "subactions" : [
+              {
+                "damage" : {
+                  "type" : "variable",
+                  "value" : "sneakAttack"
+                }
+              }
+            ],
+            "isExpanded" : true
+          }
+        },
+        {
+          "type" : "action",
+          "action" : {
+            "isExpanded" : true,
+            "maxUses" : {
+              "type" : "integer",
+              "value" : 1
+            },
+            "title" : "Fey Step",
+            "subactions" : [
+
+            ],
+            "shouldResetOnLongRest" : true,
+            "description" : "Once per short rest as a bonus action you can teleport up to 30' to an unoccupied space you can see.",
+            "remainingUses" : 1
+          }
+        },
+        {
+          "type" : "ability",
+          "ability" : {
+            "title" : "Defensive Duelist",
+            "isExpanded" : true,
+            "description" : "When you are wielding a finesse weapon with which you are proficient and another creature hits you with a melee attack, you can use your reaction to add 2 to your AC for that attack."
+          }
+        },
+        {
+          "type" : "action",
+          "action" : {
+            "shouldResetOnLongRest" : false,
+            "title" : "Rapier",
+            "description" : "Finesse, Range 5",
+            "subactions" : [
+              {
+                "check" : {
+                  "type" : "add",
+                  "value" : [
+                    {
+                      "type" : "dice",
+                      "n" : 1,
+                      "d" : 20
+                    },
+                    {
+                      "type" : "variable",
+                      "value" : "dexterityAttackBonus"
+                    },
+                    {
+                      "type" : "variable",
+                      "value" : "proficiencyBonus"
+                    }
+                  ]
+                },
+                "damage" : {
+                  "type" : "add",
+                  "value" : [
+                    {
+                      "type" : "dice",
+                      "n" : 1,
+                      "d" : 8
+                    },
+                    {
+                      "type" : "variable",
+                      "value" : "dexterityAttackBonus"
+                    }
+                  ]
+                },
+                "title" : "One Handed",
+                "type" : "Bludgeoning"
+              }
+            ],
+            "isExpanded" : true
+          }
+        },
+        {
+          "type" : "action",
+          "action" : {
+            "shouldResetOnLongRest" : false,
+            "title" : "Dagger",
+            "description" : "Finesse, Light, Thrown, Range 20\/60",
+            "subactions" : [
+              {
+                "check" : {
+                  "type" : "add",
+                  "value" : [
+                    {
+                      "type" : "dice",
+                      "n" : 1,
+                      "d" : 20
+                    },
+                    {
+                      "type" : "variable",
+                      "value" : "dexterityAttackBonus"
+                    },
+                    {
+                      "type" : "variable",
+                      "value" : "proficiencyBonus"
+                    }
+                  ]
+                },
+                "type" : "Piercing",
+                "damage" : {
+                  "type" : "add",
+                  "value" : [
+                    {
+                      "type" : "dice",
+                      "n" : 1,
+                      "d" : 4
+                    },
+                    {
+                      "type" : "variable",
+                      "value" : "dexterityAttackBonus"
+                    }
+                  ]
+                }
+              }
+            ],
+            "isExpanded" : true
+          }
+        },
+        {
+          "type" : "ability",
+          "ability" : {
+            "title" : "Two-Weapon Fighting",
+            "isExpanded" : true,
+            "description" : "After an attack with a light weapon you can use a bonus action to attack with another light weapon (e.g. attack with two daggers)"
+          }
+        },
+        {
+          "type" : "ability",
+          "ability" : {
+            "title" : "Cunning Action",
+            "isExpanded" : true,
+            "description" : "You can take a bonus action on each of your turns to take the Dash, Disengage, or Hide action."
+          }
+        }
+      ],
+      "isFormulaColumn" : false
+    },
+    {
+      "title" : "Stats",
+      "controls" : [
+        {
+          "type" : "pointsTracker",
+          "points" : {
+            "title" : "Hit Points",
+            "current" : 22,
+            "max" : 23,
+            "types" : [
+              {
+                "type" : "hitPoints"
+              }
+            ],
+            "shouldResetOnLongRest" : true
+          }
+        },
+        {
+          "type" : "pointsTracker",
+          "points" : {
+            "title" : "Inspiration",
+            "current" : 0,
+            "types" : [
+              {
+                "type" : "inspiration"
+              }
+            ],
+            "shouldResetOnLongRest" : false
+          }
+        },
+        {
+          "type" : "stats",
+          "title" : "Stats",
+          "stats" : [
+            {
+              "title" : "A.C.",
+              "value" : {
+                "type" : "variable",
+                "value" : "armorClass"
+              }
+            },
+            {
+              "title" : "Duel.",
+              "value" : {
+                "type" : "variable",
+                "value" : "duelistArmorClass"
+              }
+            },
+            {
+              "title" : "Prof.",
+              "value" : {
+                "type" : "variable",
+                "value" : "proficiencyBonus"
+              }
+            },
+            {
+              "title" : "Speed",
+              "value" : {
+                "type" : "variable",
+                "value" : "speed"
+              }
+            },
+            {
+              "title" : "Attack",
+              "value" : {
+                "type" : "variable",
+                "value" : "dexterityAttackBonus"
+              }
+            },
+            {
+              "title" : "Init.",
+              "value" : {
+                "type" : "variable",
+                "value" : "DEX.Mod"
+              }
+            }
+          ]
+        },
+        {
+          "type" : "hitDice",
+          "hitDice" : [
+            {
+              "d" : 8,
+              "maximum" : {
+                "type" : "variable",
+                "value" : "level"
+              },
+              "modifier" : {
+                "type" : "variable",
+                "value" : "CON.Mod"
+              },
+              "remaining" : 2
+            }
+          ]
+        },
+        {
+          "type" : "pointsTracker",
+          "points" : {
+            "title" : "Level",
+            "current" : 3,
+            "types" : [
+              {
+                "type" : "other",
+                "variable" : "level",
+                "title" : "Level"
+              }
+            ],
+            "shouldResetOnLongRest" : false
+          }
+        },
+        {
+          "type" : "attributes",
+          "attributes" : [
+            {
+              "isProficient" : false,
+              "title" : "Strength",
+              "variableName" : "STR",
+              "score" : 8
+            },
+            {
+              "isProficient" : true,
+              "title" : "Dexterity",
+              "variableName" : "DEX",
+              "score" : 16
+            },
+            {
+              "isProficient" : true,
+              "title" : "Constitution",
+              "variableName" : "CON",
+              "score" : 14
+            },
+            {
+              "isProficient" : true,
+              "title" : "Intelligence",
+              "variableName" : "INT",
+              "score" : 12
+            },
+            {
+              "isProficient" : false,
+              "title" : "Wisdom",
+              "variableName" : "WIS",
+              "score" : 12
+            },
+            {
+              "isProficient" : false,
+              "title" : "Charisma",
+              "variableName" : "CHA",
+              "score" : 14
+            }
+          ]
+        },
+        {
+          "type" : "skills",
+          "skills" : [
+            {
+              "title" : "Athletics",
+              "basedOn" : "STR",
+              "expertise" : "none"
+            },
+            {
+              "title" : "Acrobatics",
+              "basedOn" : "DEX",
+              "expertise" : "proficient"
+            },
+            {
+              "title" : "Sleight of Hand",
+              "basedOn" : "DEX",
+              "expertise" : "proficient"
+            },
+            {
+              "title" : "Stealth",
+              "basedOn" : "DEX",
+              "expertise" : "expert"
+            },
+            {
+              "title" : "Arcana",
+              "basedOn" : "INT",
+              "expertise" : "none"
+            },
+            {
+              "title" : "History",
+              "basedOn" : "INT",
+              "expertise" : "none"
+            },
+            {
+              "title" : "Investigation",
+              "basedOn" : "INT",
+              "expertise" : "none"
+            },
+            {
+              "title" : "Nature",
+              "basedOn" : "INT",
+              "expertise" : "none"
+            },
+            {
+              "title" : "Religion",
+              "basedOn" : "INT",
+              "expertise" : "none"
+            },
+            {
+              "title" : "Animal Handling",
+              "basedOn" : "WIS",
+              "expertise" : "none"
+            },
+            {
+              "title" : "Insight",
+              "basedOn" : "WIS",
+              "expertise" : "proficient"
+            },
+            {
+              "title" : "Medicine",
+              "basedOn" : "WIS",
+              "expertise" : "none"
+            },
+            {
+              "title" : "Perception",
+              "basedOn" : "WIS",
+              "expertise" : "proficient"
+            },
+            {
+              "title" : "Survival",
+              "basedOn" : "WIS",
+              "expertise" : "none"
+            },
+            {
+              "title" : "Deception",
+              "basedOn" : "CHA",
+              "expertise" : "expert"
+            },
+            {
+              "title" : "Intimidation",
+              "basedOn" : "CHA",
+              "expertise" : "none"
+            },
+            {
+              "title" : "Performance",
+              "basedOn" : "CHA",
+              "expertise" : "none"
+            },
+            {
+              "title" : "Persuasion",
+              "basedOn" : "CHA",
+              "expertise" : "proficient"
+            },
+            {
+              "title" : "",
+              "basedOn" : "",
+              "expertise" : "none"
+            },
+            {
+              "title" : "Thieves' Tools",
+              "basedOn" : "",
+              "expertise" : "proficient"
+            },
+            {
+              "title" : "Disguise kit",
+              "basedOn" : "",
+              "expertise" : "proficient"
+            },
+            {
+              "title" : "Forgery kit",
+              "basedOn" : "",
+              "expertise" : "proficient"
+            }
+          ]
+        },
+        {
+          "type" : "ability",
+          "ability" : {
+            "title" : "Eladrin Elf",
+            "isExpanded" : true,
+            "description" : "Advantage against being charmed, and magic can't put me to sleep. Darkvision, 60 ft."
+          }
+        },
+        {
+          "type" : "ability",
+          "ability" : {
+            "title" : "Charlatan: False Identity",
+            "isExpanded" : true,
+            "description" : "You have a second identity that includes documentation, acquaintances, and disquises. You can forge documents including official papers and personal letters, as long as you have seen an example of the kind of document or handwriting you are trying to copy."
+          }
+        },
+        {
+          "type" : "ability",
+          "ability" : {
+            "title" : "Languages",
+            "isExpanded" : true,
+            "description" : "• Common\n• Elvish\n• Understands some Sylvan\n• Thieves' Cant"
+          }
+        }
+      ],
+      "isFormulaColumn" : false
+    },
+    {
+      "title" : "Journal",
+      "controls" : [
+        {
+          "type" : "journal",
+          "journal" : {
+            "title" : "10\/22\/2020 - Day 1",
+            "text" : "Shannon: Natalia high elf wizard\nAlbert: Vanloomen (van) Drow half elf sorcerer\nMaryam: Antiquity tiefling paladin\n\nSword coast, near waterdeep, baldur's deep, guard duty, etc, in a bar in daggerford. Person dressed in red clothing, gold chains, gold hoop earings, eye shadow. \n\nMary needs adventurers to rescue her daughter, Gertruda, from haunted house. 50 GP to each. Go to Eragol's wagon, he's a nomad. It is FOGGY outside suddenly, to our knees. Borovia.\n\nMists grow thick and cold.  The road is no longer cobblestone, but dirt ruts. Forest outside, even though we've hardly left the town. Howls in the distance, yellow eyes in the bushes.  Arrive at gates, broken statues on either side of the gates. Eragol will wait at pub.\n\nKids: Thorn and Rose. \n\nWent through the first floor, not much there, second floor had a secret door and deed\/windmill\/will.\nBless, Protection from Poison, spiritual weapon.\n",
+            "isExpanded" : true
+          }
+        },
+        {
+          "type" : "journal",
+          "journal" : {
+            "title" : "11\/5\/2020 - Day 2",
+            "text" : "",
+            "isExpanded" : true
+          }
+        },
+        {
+          "type" : "journal",
+          "journal" : {
+            "title" : "11\/12\/2020 - Day 3",
+            "text" : "",
+            "isExpanded" : true
+          }
+        }
+      ],
+      "isFormulaColumn" : false
+    },
+    {
+      "title" : "Inventory",
+      "controls" : [
+        {
+          "type" : "inventory",
+          "inventory" : {
+            "title" : "Gold",
+            "quantity" : 15
+          }
+        },
+        {
+          "type" : "inventory",
+          "inventory" : {
+            "title" : "Silver",
+            "quantity" : 0
+          }
+        },
+        {
+          "type" : "inventory",
+          "inventory" : {
+            "title" : "Copper",
+            "quantity" : 0
+          }
+        },
+        {
+          "type" : "inventory",
+          "inventory" : {
+            "title" : "Rapier"
+          }
+        },
+        {
+          "type" : "inventory",
+          "inventory" : {
+            "title" : "Daggers",
+            "quantity" : 2
+          }
+        },
+        {
+          "type" : "inventory",
+          "inventory" : {
+            "title" : "Short Bow"
+          }
+        },
+        {
+          "type" : "inventory",
+          "inventory" : {
+            "title" : "Arrows",
+            "quantity" : 20
+          }
+        },
+        {
+          "type" : "inventory",
+          "inventory" : {
+            "title" : "Backpack"
+          }
+        },
+        {
+          "type" : "inventory",
+          "inventory" : {
+            "title" : "Ball Bearings (bag of 1000)"
+          }
+        },
+        {
+          "type" : "inventory",
+          "inventory" : {
+            "title" : "Bell & String"
+          }
+        },
+        {
+          "type" : "inventory",
+          "inventory" : {
+            "title" : "Candle",
+            "quantity" : 5
+          }
+        },
+        {
+          "type" : "inventory",
+          "inventory" : {
+            "title" : "Crowbar"
+          }
+        },
+        {
+          "type" : "inventory",
+          "inventory" : {
+            "title" : "Disguise Kit (Trishana)"
+          }
+        },
+        {
+          "type" : "inventory",
+          "inventory" : {
+            "title" : "Signet ring of an imaginary duke (the Coure of the winter sphere in the Feywild, Jarhanna Irexis)"
+          }
+        },
+        {
+          "type" : "inventory",
+          "inventory" : {
+            "title" : "Leather Armor (+1 AC)"
+          }
+        },
+        {
+          "type" : "inventory",
+          "inventory" : {
+            "title" : "Oil flask",
+            "quantity" : 2
+          }
+        },
+        {
+          "type" : "inventory",
+          "inventory" : {
+            "title" : "Piton",
+            "quantity" : 10
+          }
+        },
+        {
+          "type" : "inventory",
+          "inventory" : {
+            "title" : "Hempen Rope, 50'"
+          }
+        },
+        {
+          "type" : "inventory",
+          "inventory" : {
+            "title" : "Thieves' Tools"
+          }
+        },
+        {
+          "type" : "inventory",
+          "inventory" : {
+            "title" : "Tinderbox"
+          }
+        },
+        {
+          "type" : "inventory",
+          "inventory" : {
+            "title" : "Waterskin"
+          }
+        },
+        {
+          "type" : "inventory",
+          "inventory" : {
+            "title" : "Rations",
+            "quantity" : 5
+          }
+        },
+        {
+          "type" : "inventory",
+          "inventory" : {
+            "title" : "3 gold rings, 1 platinum necklace w\/ topaz pendant."
+          }
+        }
+      ],
+      "isFormulaColumn" : false
+    },
+    {
+      "title" : "Formulas",
+      "controls" : [
+        {
+          "type" : "formulas",
+          "formulas" : [
+            {
+              "variable" : "proficiencyBonus",
+              "operation" : {
+                "type" : "add",
+                "value" : [
+                  {
+                    "type" : "modifier",
+                    "value" : 1
+                  },
+                  {
+                    "type" : "ceil",
+                    "value" : {
+                      "type" : "divide",
+                      "lhs" : {
+                        "type" : "variable",
+                        "value" : "level"
+                      },
+                      "rhs" : {
+                        "type" : "integer",
+                        "value" : 4
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "variable" : "dexterityAttackBonus",
+              "operation" : {
+                "type" : "variable",
+                "value" : "DEX.Mod"
+              }
+            },
+            {
+              "variable" : "strengthAttackBonus",
+              "operation" : {
+                "type" : "variable",
+                "value" : "STR.Mod"
+              }
+            },
+            {
+              "variable" : "armorClass",
+              "operation" : {
+                "type" : "add",
+                "value" : [
+                  {
+                    "type" : "integer",
+                    "value" : 10
+                  },
+                  {
+                    "type" : "integer",
+                    "value" : 1
+                  },
+                  {
+                    "type" : "variable",
+                    "value" : "DEX.Mod"
+                  }
+                ]
+              }
+            },
+            {
+              "variable" : "duelistArmorClass",
+              "operation" : {
+                "type" : "add",
+                "value" : [
+                  {
+                    "type" : "variable",
+                    "value" : "armorClass"
+                  },
+                  {
+                    "type" : "integer",
+                    "value" : 2
+                  }
+                ]
+              }
+            },
+            {
+              "variable" : "sneakAttack",
+              "operation" : {
+                "type" : "multiply",
+                "value" : [
+                  {
+                    "type" : "ceil",
+                    "value" : {
+                      "type" : "divide",
+                      "lhs" : {
+                        "type" : "variable",
+                        "value" : "level"
+                      },
+                      "rhs" : {
+                        "type" : "integer",
+                        "value" : 2
+                      }
+                    }
+                  },
+                  {
+                    "type" : "dice",
+                    "n" : 1,
+                    "d" : 6
+                  }
+                ]
+              }
+            },
+            {
+              "variable" : "level",
+              "operation" : {
+                "type" : "integer",
+                "value" : 1
+              }
+            },
+            {
+              "variable" : "speed",
+              "operation" : {
+                "type" : "integer",
+                "value" : 30
+              }
+            }
+          ]
+        }
+      ],
+      "isFormulaColumn" : true
+    }
+  ]
+}
