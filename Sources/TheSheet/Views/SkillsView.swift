@@ -16,7 +16,7 @@ func SkillView(_ skill: ResolvedSkill) -> View<SheetControl.Message> {
     return Stack(
         .ltr,
         [
-            skill.isProficient ? Text(" ◼ ") : Text(" ◦ "),
+            Text(" \(skill.expertise.check) "),
             skill.modifierString.isEmpty
                 ? Space()
                 : Text(skill.modifierString).minWidth(1).padding(right: 1),

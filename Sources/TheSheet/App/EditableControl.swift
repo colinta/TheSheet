@@ -21,7 +21,7 @@ enum EditableControl {
             case description
             case text
             case basedOn
-            case isProficient
+            case expertise
             case variable
             case operation
             case current
@@ -39,6 +39,7 @@ enum EditableControl {
         case changeString(Property, String)
         case changeInt(Property, Int)
         case changeBool(Property, Bool)
+        case changeExpertise(Property, Skill.Expertise)
         case togglePointType(Points.PointType)
 
         static func atIndex(_ index: Int, _ message: Message) -> Message {
@@ -152,7 +153,7 @@ enum EditableControl {
                 editor)
 
         case let (.skills(skills, editor), .add):
-            return .skills(skills + [Skill(title: "", basedOn: "", isProficient: false)], editor)
+            return .skills(skills + [Skill(title: "", basedOn: "", expertise: .none)], editor)
         case let (.skills(skills, editor), .atPath(path, .remove)):
             return .skills(skills.removing(at: path[0]), editor)
         case let (.skills(skills, editor), .atPath(path, .changeString(.title, value))):
@@ -162,9 +163,9 @@ enum EditableControl {
         case let (.skills(skills, editor), .atPath(path, .changeString(.basedOn, value))):
             return .skills(
                 skills.modifying({ $0.replace(basedOn: value) }, at: path[0]), editor.deselect())
-        case let (.skills(skills, editor), .atPath(path, .changeBool(.isProficient, value))):
+        case let (.skills(skills, editor), .atPath(path, .changeExpertise(.expertise, value))):
             return .skills(
-                skills.modifying({ $0.replace(isProficient: value) }, at: path[0]),
+                skills.modifying({ $0.replace(expertise: value) }, at: path[0]),
                 editor)
         case let (.skills(skills, editor), .firstResponder(path)):
             return .skills(skills, editor.replace(path: path))

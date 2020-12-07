@@ -283,14 +283,7 @@ struct Model {
     }
 
     func replace(status: String) -> Model {
-        Model(
-            sheet: sheet, undoSheets: undoSheets, fileURL: fileURL,
-            firstVisibleColumn: firstVisibleColumn,
-            columnScrollOffset: columnScrollOffset, modalScrollOffset: modalScrollOffset,
-            editing: editing,
-            columnScrollMaxOffsets: columnScrollMaxOffsets,
-            modalScrollMaxOffset: modalScrollMaxOffset,
-            status: (msg: status, timeout: Date().timeIntervalSince1970 + STATUS_TIMEOUT))
+        replace(status: (msg: status, timeout: Date().timeIntervalSince1970 + STATUS_TIMEOUT))
     }
 
     func replace(editRolling rolling: Roll) -> Model {

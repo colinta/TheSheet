@@ -91,6 +91,7 @@ enum SheetControl {
         case changeQuantity(delta: Int)
         case changeQuantityAtIndex(index: Int, delta: Int)
         case useHitDie(Int)
+        case changeHitDie(Int, delta: Int)
         case resetActionUses
         case takeRest
         case delegate(Delegate)
@@ -170,6 +171,11 @@ enum SheetControl {
             control = .hitDice(hitDice.enumerated().map { index, hitDie in
                 guard atIndex == index else { return hitDie }
                 return hitDie.use(1)
+            })
+        case let (.hitDice(hitDice), .changeHitDie(atIndex, delta)):
+            control = .hitDice(hitDice.enumerated().map { index, hitDie in
+                guard atIndex == index else { return hitDie }
+                return hitDie.use(-delta)
             })
         case (.restButton, .takeRest):
             return (
@@ -259,7 +265,8 @@ enum SheetControl {
                             Send(.delegate(.roll(roll))),
                         ])
                     ))
-                }
+                },
+                onChange: SheetControl.Message.changeHitDie
             )
         case .restButton:
             return TakeRestView(Message.takeRest)

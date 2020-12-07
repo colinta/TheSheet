@@ -209,6 +209,16 @@ indirect enum Operation {
             }
             return isModifier == true ? .modifier(sum) : .integer(sum)
         case let .multiply(operations):
+            if operations.count == 2, case let .dice(dice) = operations[1] {
+                let resolved = operations[0].eval(sheet, dontRecur)
+                if case let .integer(value) = resolved {
+                    return .roll(Roll(dice: [Dice(n: value * dice.n, d: dice.d)], modifier: 0))
+                } else if case let .modifier(value) = resolved {
+                    return .roll(Roll(dice: [Dice(n: value * dice.n, d: dice.d)], modifier: 0))
+                } else {
+                    return .undefined
+                }
+            }
             return reduce(toValues(operations, sheet, dontRecur), *)
         case let .divide(lhs, rhs):
             return reduce(

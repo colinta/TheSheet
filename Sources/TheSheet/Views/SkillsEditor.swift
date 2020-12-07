@@ -22,12 +22,27 @@ func SkillsEditor(_ skills: [Skill], basedOn: [String], editor: AtPathEditor) ->
     let enumeratedSkills = skills.enumerated()
     let profiencyColumn = Stack(
         .down,
-        enumeratedSkills.map { index, skill in
-            OnLeftClick(
-                Text(skill.isProficient ? "[◼]" : "[◦]"),
-                EditableControl.Message.atIndex(
-                    index, .changeBool(.isProficient, !skill.isProficient))
-            ).height(1)
+        enumeratedSkills.map { index, skill -> View<EditableControl.Message> in
+            switch skill.expertise {
+            case .none:
+                return OnLeftClick(
+                    Text(skill.expertise.checkbox),
+                    EditableControl.Message.atIndex(
+                        index, .changeExpertise(.expertise, .proficient))
+                ).height(1)
+            case .proficient:
+                return OnLeftClick(
+                    Text(skill.expertise.checkbox),
+                    EditableControl.Message.atIndex(
+                        index, .changeExpertise(.expertise, .expert))
+                ).height(1)
+            case .expert:
+                return OnLeftClick(
+                    Text(skill.expertise.checkbox),
+                    EditableControl.Message.atIndex(
+                        index, .changeExpertise(.expertise, .none))
+                ).height(1)
+            }
         }
     ).padding(right: 1)
 
@@ -91,7 +106,7 @@ func SkillsBasedOnSelector(skills: [Skill], index skillIndex: Int, basedOn: [Str
             Flow(
                 .ltr,
                 [
-                    (.fixed, Text(skill.isProficient ? "[◼]" : "[◦]").padding(right: 1)),
+                    (.fixed, Text(skill.expertise.checkbox).padding(right: 1)),
                     (.flex1, Text(skill.title).padding(right: 1)),
                     (.fixed, Text(skill.basedOn).padding(right: 1)),
                     (

@@ -11,11 +11,10 @@ let package = Package(
     ],
     dependencies: [
         // .package(url: "https://github.com/colinta/Ashen.git", .branch("master")),
-        // .package(url: "https://github.com/apple/swift-argument-parser", .branch("master")),
+        .package(url: "https://github.com/apple/swift-argument-parser", from: "0.3.0"),
         .package(path: "../Ashen"),
     ],
     targets: [
-        // .target(name: "TheSheet", dependencies: ["Ashen", "ArgumentParser"]),
-        .target(name: "TheSheet", dependencies: ["Ashen"]),
+        .target(name: "TheSheet", dependencies: ["Ashen", "ArgumentParser"]),
     ]
 )

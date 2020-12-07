@@ -39,25 +39,19 @@ enum Message {
     case quit
 }
 
-func initial(sheet: Sheet, fileURL: URL?) -> () -> Initial<Model, Message> {
+func initial(sheet: Sheet, fileURL: URL?, status: String? = nil) -> () -> Initial<Model, Message> {
     // let command: Command<Message> = HttpRequest.get(url: "https://www.dnd5eapi.co/api/spells/acid-arrow/")
     //     .decodeJson(Dnd5eSpell.self)
     //     .start(onComplete: Message.httpResult)
+    var model = Model(sheet: sheet, fileURL: fileURL)
+    if let status = status {
+        model = model.replace(status: status)
+    }
     return {
         Initial(
-            Model(sheet: sheet, fileURL: fileURL),
+            model,
             commands: []
         )
-    }
-}
-
-func showStatus(model: Model, status: String?) -> State<Model, Message> {
-    if let status = status {
-        return .update(
-            model.replace(status: status),
-            [Timeout(STATUS_TIMEOUT, Message.statusDidTimeout)])
-    } else {
-        return .model(model.replace(status: nil))
     }
 }
 
@@ -251,11 +245,18 @@ func update(model: inout Model, message: Message) -> State<Model, Message> {
     }
 }
 
-func render(model: Model) -> [View<Message>] {
-    _render(model, status: model.status.map { $0.0 })
+private func showStatus(model: Model, status: String?) -> State<Model, Message> {
+    if let status = status {
+        return .update(
+            model.replace(status: status),
+            [Timeout(STATUS_TIMEOUT, Message.statusDidTimeout)])
+    } else {
+        return .model(model.replace(status: nil))
+    }
 }
 
-private func _render(_ model: Model, status: String?) -> [View<Message>] {
+func render(model: Model) -> [View<Message>] {
+    let status = model.status.map { $0.0 }
     var views: [View<Message>] = [
         OnKeyPress(.up, Message.scrollColumns(-1)),
         OnKeyPress(.down, Message.scrollColumns(1)),
@@ -319,7 +320,7 @@ private func _render(_ model: Model, status: String?) -> [View<Message>] {
     return views
 }
 
-func inModal(
+private func inModal(
     model: Model, view: View<Message>, header: View<Message>? = nil, footer: View<Message>? = nil
 ) -> View<Message> {
     ZStack([
@@ -357,7 +358,7 @@ func inModal(
     ])
 }
 
-func renderControlSelector(model: Model, addToColumn: Int) -> View<Message> {
+private func renderControlSelector(model: Model, addToColumn: Int) -> View<Message> {
     inModal(
         model: model,
         view: Stack(
@@ -370,7 +371,7 @@ func renderControlSelector(model: Model, addToColumn: Int) -> View<Message> {
         ))
 }
 
-func renderControlEditor(
+private func renderControlEditor(
     model: Model, column columnIndex: Int, control controlIndex: Int, editor: EditableControl
 ) -> View<Message> {
     inModal(
@@ -392,7 +393,7 @@ func renderControlEditor(
     )
 }
 
-func renderControlRelocator(
+private func renderControlRelocator(
     model: Model, relocatingControl controlIndex: Int, inColumn columnIndex: Int
 ) -> View<Message> {
     inModal(
@@ -410,7 +411,7 @@ func renderControlRelocator(
     )
 }
 
-func renderRoller(
+private func renderRoller(
     model: Model, roll: Roll
 ) -> View<Message> {
     let addButtons: View<Message> = Stack(
@@ -465,7 +466,7 @@ func renderRoller(
     )
 }
 
-func renderColumn(_ model: Model, _ column: SheetColumn, columnIndex: Int) -> View<Message> {
+private func renderColumn(_ model: Model, _ column: SheetColumn, columnIndex: Int) -> View<Message> {
     let columnView = column.render(
         model.sheet,
         isEditing: model.isEditingColumn(columnIndex),
@@ -489,7 +490,7 @@ func renderColumn(_ model: Model, _ column: SheetColumn, columnIndex: Int) -> Vi
     )
 }
 
-func renderColumnEditor(_ model: Model, _ columnIndex: Int) -> [View<Message>] {
+private func renderColumnEditor(_ model: Model, _ columnIndex: Int) -> [View<Message>] {
     let currentColumn = model.sheet.columns[columnIndex]
 
     let isChanging = model.isChangingColumn(columnIndex)
@@ -539,7 +540,7 @@ func renderColumnEditor(_ model: Model, _ columnIndex: Int) -> [View<Message>] {
     }
 }
 
-func MainButtons(model: Model, status: String?) -> View<Message> {
+private func MainButtons(model: Model, status: String?) -> View<Message> {
     let columnCountControls = Stack(
         .ltr,
         [
