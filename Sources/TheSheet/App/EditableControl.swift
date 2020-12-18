@@ -188,30 +188,24 @@ enum EditableControl {
         case let (.pointsTracker(points, editor), .changeBool(.resets, enabled)):
             return .pointsTracker(points.replace(shouldResetOnLongRest: enabled), editor)
         case let (.pointsTracker(points, editor), .togglePointType(pointType)):
-            if points.types.contains(where: { $0.is(pointType) }) {
+            if points.type?.is(pointType) == true {
                 return .pointsTracker(
-                    points.replace(types: points.types.filter({ !$0.is(pointType) })), editor)
+                    points.replace(type: nil), editor)
             } else {
                 return .pointsTracker(
-                    points.replace(types: points.types.appending(pointType)), editor)
+                    points.replace(type: pointType), editor)
             }
         case let (.pointsTracker(points, editor), .add):
             return .pointsTracker(
-                points.replace(types: points.types.appending(.other("", ""))), editor)
+                points.replace(type: .other("", "")), editor)
         case let (.pointsTracker(pointsTracker, editor), .firstResponder(path)):
             return .pointsTracker(pointsTracker, editor.replace(path: path))
-        case let (.pointsTracker(points, editor), .atPath(path, .changeString(.title, value))):
-            let types: [Points.PointType] = points.types.enumerated().map { index, type in
-                guard index == path[0], case let .other(variable, _) = type else { return type }
-                return .other(variable, value)
-            }
-            return .pointsTracker(points.replace(types: types), editor)
-        case let (.pointsTracker(points, editor), .atPath(path, .changeString(.variable, value))):
-            let types: [Points.PointType] = points.types.enumerated().map { index, type in
-                guard index == path[0], case let .other(_, title) = type else { return type }
-                return .other(value, title)
-            }
-            return .pointsTracker(points.replace(types: types), editor)
+        case let (.pointsTracker(points, editor), .atPath(_, .changeString(.title, title))):
+            guard case let .other(variable, _) = points.type else { return .pointsTracker(points, editor) }
+            return .pointsTracker(points.replace(type: .other(variable, title)), editor)
+        case let (.pointsTracker(points, editor), .atPath(_, .changeString(.variable, variable))):
+            guard case let .other(_, title) = points.type else { return .pointsTracker(points, editor) }
+            return .pointsTracker(points.replace(type: .other(variable, title)), editor)
 
         case let (.formulas(formulas, editor), .add):
             return .formulas(

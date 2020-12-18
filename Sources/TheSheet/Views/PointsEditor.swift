@@ -81,7 +81,7 @@ func PointsEditor(_ points: Points, editor: AtPathEditor) -> View<EditableContro
                 [
                     Text("Point Types:".underlined())
                 ]
-                    + Points.PointType.all(points.types).map { (index, pointType) in
+                    + Points.PointType.all(points.type).map { (index, pointType) in
                         let titlePath = 1
                         let variablePath = 2
                         let isEditingTitle = editor.atXY?.x == titlePath && editor.atXY?.y == index
@@ -117,10 +117,10 @@ func PointsEditor(_ points: Points, editor: AtPathEditor) -> View<EditableContro
                                     ).minWidth(4),
                                 Text(" ("),
                                 pointType.isBuiltIn
-                                    ? Text(pointType.toVariable.underlined().foreground(.green))
+                                    ? Text(pointType.toVariableName.underlined().foreground(.green))
                                     : OnLeftClick(
                                         Input(
-                                            pointType.toVariable,
+                                            pointType.toVariableName,
                                             onChange: {
                                                 value in
                                                 EditableControl.Message.atIndex(

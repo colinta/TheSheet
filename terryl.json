@@ -169,12 +169,13 @@
           "points" : {
             "title" : "Hit Points",
             "current" : 22,
+            "readonly":false,
             "max" : 23,
-            "types" : [
+            "type" :
               {
                 "type" : "hitPoints"
               }
-            ],
+            ,
             "shouldResetOnLongRest" : true
           }
         },
@@ -182,12 +183,13 @@
           "type" : "pointsTracker",
           "points" : {
             "title" : "Inspiration",
+            "readonly":false,
             "current" : 0,
-            "types" : [
+            "type" :
               {
                 "type" : "inspiration"
               }
-            ],
+            ,
             "shouldResetOnLongRest" : false
           }
         },
@@ -260,14 +262,13 @@
           "type" : "pointsTracker",
           "points" : {
             "title" : "Level",
+            "readonly":false,
             "current" : 3,
-            "types" : [
+            "type" :
               {
-                "type" : "other",
-                "variable" : "level",
-                "title" : "Level"
+                "type" : "level"
               }
-            ],
+            ,
             "shouldResetOnLongRest" : false
           }
         },

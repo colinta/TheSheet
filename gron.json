@@ -7,15 +7,27 @@
         {
           "type" : "pointsTracker",
           "points" : {
+            "shouldResetOnLongRest" : true,
             "title" : "Ki Points",
             "current" : 0,
             "max" : 0,
-            "types" : [
-              {
-                "type" : "ki"
-              }
-            ],
-            "shouldResetOnLongRest" : true
+            "type" : {
+              "type" : "ki"
+            },
+            "readonly" : false
+          }
+        },
+        {
+          "type" : "pointsTracker",
+          "points" : {
+            "shouldResetOnLongRest" : true,
+            "title" : "Ki Points",
+            "current" : 0,
+            "max" : 0,
+            "type" : {
+              "type" : "ki"
+            },
+            "readonly" : true
           }
         },
         {
@@ -305,15 +317,14 @@
         {
           "type" : "pointsTracker",
           "points" : {
+            "shouldResetOnLongRest" : true,
             "title" : "Sorcery Points",
             "current" : 1,
             "max" : 4,
-            "types" : [
-              {
-                "type" : "sorcery"
-              }
-            ],
-            "shouldResetOnLongRest" : true
+            "type" : {
+              "type" : "sorcery"
+            },
+            "readonly" : false
           }
         },
         {
@@ -477,9 +488,9 @@
           "type" : "action",
           "action" : {
             "shouldResetOnLongRest" : false,
-            "title" : "Disguise Self",
+            "title" : "Silent Image",
             "level" : "1",
-            "description" : "Duration: 1 hour\nYou make yourself – including your clothing, armor, weapons, and other belongings on your person – look different until the spell ends or until you use your action to dismiss it. You can seem 1 foot shorter or taller and can appear thin, fat, or in between. You can't change your body type, so you must adopt a form that has the same basic arrangement of limbs.\nTo discern that you are disguised, a creature can use its action to inspect your appearance and must succeed on an Intelligence (Investigation) check against your spell save DC.",
+            "description" : "Range: 60'\nDuration: Concentration, 10 minutes\nYou create the image of an object, creature, or visible phenomenon that is no larger than a 15-foot cube. The image is purely visual, but moves and as an action it can move to another spot in range. Physical interaction or investigation (INT) check vs spell save DC makes the spell transparent.",
             "subactions" : [
 
             ],
@@ -654,15 +665,14 @@
         {
           "type" : "pointsTracker",
           "points" : {
+            "shouldResetOnLongRest" : true,
             "title" : "Hit Points",
             "current" : 27,
             "max" : 44,
-            "types" : [
-              {
-                "type" : "hitPoints"
-              }
-            ],
-            "shouldResetOnLongRest" : true
+            "type" : {
+              "type" : "hitPoints"
+            },
+            "readonly" : false
           }
         },
         {
@@ -670,11 +680,10 @@
           "points" : {
             "title" : "Inspiration",
             "current" : 0,
-            "types" : [
-              {
-                "type" : "inspiration"
-              }
-            ],
+            "type" : {
+              "type" : "inspiration"
+            },
+            "readonly" : false,
             "shouldResetOnLongRest" : false
           }
         },
@@ -743,6 +752,13 @@
                 "type" : "variable",
                 "value" : "kiSaveDC"
               }
+            },
+            {
+              "title" : "Slow Fall",
+              "value" : {
+                "type" : "variable",
+                "value" : "slowFall"
+              }
             }
           ]
         },
@@ -780,13 +796,12 @@
           "points" : {
             "title" : "Sorcerer Level",
             "current" : 4,
-            "types" : [
-              {
-                "type" : "other",
-                "variable" : "sorcererLevel",
-                "title" : "Sorcerer Level"
-              }
-            ],
+            "type" : {
+              "type" : "other",
+              "variable" : "sorcererLevel",
+              "title" : "Sorcerer Level"
+            },
+            "readonly" : false,
             "shouldResetOnLongRest" : false
           }
         },
@@ -795,13 +810,24 @@
           "points" : {
             "title" : "Monk Level",
             "current" : 1,
-            "types" : [
-              {
-                "type" : "other",
-                "variable" : "monkLevel",
-                "title" : "Monk Level"
-              }
-            ],
+            "type" : {
+              "type" : "other",
+              "variable" : "monkLevel",
+              "title" : "Monk Level"
+            },
+            "readonly" : false,
+            "shouldResetOnLongRest" : false
+          }
+        },
+        {
+          "type" : "pointsTracker",
+          "points" : {
+            "title" : "Level",
+            "current" : 0,
+            "type" : {
+              "type" : "level"
+            },
+            "readonly" : true,
             "shouldResetOnLongRest" : false
           }
         },
@@ -1157,9 +1183,9 @@
           "type" : "action",
           "action" : {
             "shouldResetOnLongRest" : false,
-            "title" : "Silent Image",
-            "level" : "1",
-            "description" : "You create the image of an object, a creature, or some other visible phenomenon that is no larger than a 15-foot cube. The image appears at a spot within range and lasts for the duration. The image is purely visual; it isn't accompanied by sound, smell, or other sensory effects. You can use your action to cause the image to move to any spot within range. As the image changes location, you can alter its appearance so that its movements appear natural for the image. Physical interaction with the image reveals it to be an illusion, because things can pass through it. A creature that uses its action to examine the image can determine that it is an illusion with a successful Investigation (INT) check against your spell save DC.",
+            "title" : "Spider Climb",
+            "level" : "2",
+            "description" : "Duration: Concentration, 1 hour\nA willing creature you touch gains the ability to move up, down, and across vertical surfaces and upside down along ceilings, while leaving its hands free. The target also gains a climbing speed equal to its walking speed.",
             "subactions" : [
 
             ],
@@ -1214,7 +1240,7 @@
             "shouldResetOnLongRest" : false,
             "title" : "Major Image",
             "level" : "3",
-            "description" : "Duration: Concentration, 10 minutes\nCreate image that is no larger than a 20' cube.  Appears completely real, including sounds, smells, and temperature, and is animated.  As an action you can move it to another spot. Physical interaction or a successful investigation check against spell save DC makes the spell transparent.\nAt level 6+ the spell lasts until dispelled without requiring concentration.",
+            "description" : "Range: 120'\nDuration: Concentration, 10 minutes\nCreate image that is no larger than a 20' cube. Appears completely real, including sounds, smells, and temperature, and is animated. As an action you can move it to another spot. Physical interaction or investigation (INT) check vs spell save DC makes the spell transparent.\nAt level 6+ the spell lasts until dispelled without requiring concentration.",
             "subactions" : [
 
             ],
@@ -1268,6 +1294,14 @@
 
             ],
             "isExpanded" : true
+          }
+        },
+        {
+          "type" : "ability",
+          "ability" : {
+            "title" : "Slow Fall",
+            "isExpanded" : true,
+            "description" : "Beginning at 4th level, you can use your reaction when you fall to reduce any falling damage you take by an amount equal to five times your monk level."
           }
         },
         {
@@ -1510,6 +1544,26 @@
               }
             },
             {
+              "variable" : "armorClass",
+              "operation" : {
+                "type" : "max",
+                "value" : [
+                  {
+                    "type" : "variable",
+                    "value" : "defaultArmor"
+                  },
+                  {
+                    "type" : "variable",
+                    "value" : "draconicArmor"
+                  },
+                  {
+                    "type" : "variable",
+                    "value" : "monkArmor"
+                  }
+                ]
+              }
+            },
+            {
               "variable" : "kiSaveDC",
               "operation" : {
                 "type" : "add",
@@ -1530,21 +1584,17 @@
               }
             },
             {
-              "variable" : "armorClass",
+              "variable" : "slowFall",
               "operation" : {
-                "type" : "max",
+                "type" : "multiply",
                 "value" : [
                   {
-                    "type" : "variable",
-                    "value" : "defaultArmor"
+                    "type" : "integer",
+                    "value" : 5
                   },
                   {
                     "type" : "variable",
-                    "value" : "draconicArmor"
-                  },
-                  {
-                    "type" : "variable",
-                    "value" : "monkArmor"
+                    "value" : "monkLevel"
                   }
                 ]
               }

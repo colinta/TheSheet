@@ -237,7 +237,7 @@ enum SheetControl {
             )
         case let .pointsTracker(points):
             return PointsTracker(
-                points: points, onChange: { c, m in Message.updatePoints(current: c, max: m) })
+                points: points, sheet: sheet, onChange: { c, m in Message.updatePoints(current: c, max: m) })
         case let .stats(title, stats):
             return StatsView(
                 title: title, stats: stats, sheet: sheet, onRoll: { Message.delegate(.roll($0)) })

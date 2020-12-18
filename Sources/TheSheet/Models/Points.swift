@@ -11,15 +11,14 @@ struct Points: Codable {
         case inspiration
         case other(String, String)
 
-        // the tuple is (sort, PointType), hence the negative numbers
-        static func all(_ types: [PointType]) -> [(Int, PointType)] {
+        static func all(_ type: PointType?) -> [(Int, PointType)] {
             [
                 (-5, .level),
                 (-4, .hitPoints),
                 (-3, .sorcery),
                 (-2, .ki),
                 (-1, .inspiration),
-            ] + PointType.others(types)
+            ] + PointType.others(type)
         }
 
         var isBuiltIn: Bool {
@@ -27,7 +26,11 @@ struct Points: Codable {
             return false
         }
 
-        var toVariable: String {
+        var toVariable: Operation {
+            .variable(toVariableName)
+        }
+
+        var toVariableName: String {
             switch self {
             case .level:
                 return "level"
@@ -62,59 +65,71 @@ struct Points: Codable {
         }
 
         func `is`(_ type: PointType) -> Bool {
-            return self.toVariable == type.toVariable
+            return self.toVariableName == type.toVariableName
         }
     }
 
     let title: String
     let current: Int
     let max: Int?
-    let types: [PointType]
+    let type: PointType?
+    let readonly: Bool
     let shouldResetOnLongRest: Bool
 
+    var toVariable: Operation? {
+        type.map{ .variable($0.toVariableName) }
+    }
+
     var formulas: [Formula] {
-        types.map(\.toVariable).flatMap { name in
+        guard !readonly else { return [] }
+        return type.map(\.toVariableName).map { name in
             [
                 Formula(variable: name, operation: .integer(current)),
                 (max.map { Formula(variable: "\(name).Max", operation: .integer($0)) }),
             ].compactMap { $0 }
-        }
+        } ?? []
     }
 
-    static let `default` = Points(title: "", current: 0, max: nil, types: [], shouldResetOnLongRest: false)
+    static let `default` = Points(title: "", current: 0, max: nil, type: nil, readonly: false, shouldResetOnLongRest: false)
 
     func replace(title: String) -> Points {
         Points(
-            title: title, current: current, max: max, types: types,
-            shouldResetOnLongRest: shouldResetOnLongRest)
+            title: title, current: current, max: max, type: type,
+            readonly: readonly, shouldResetOnLongRest: shouldResetOnLongRest)
     }
 
     func replace(current: Int) -> Points {
         Points(
-            title: title, current: current, max: max, types: types,
-            shouldResetOnLongRest: shouldResetOnLongRest)
+            title: title, current: current, max: max, type: type,
+            readonly: readonly, shouldResetOnLongRest: shouldResetOnLongRest)
     }
 
     func replace(max: Int?) -> Points {
         Points(
-            title: title, current: current, max: max, types: types,
-            shouldResetOnLongRest: shouldResetOnLongRest)
+            title: title, current: current, max: max, type: type,
+            readonly: readonly, shouldResetOnLongRest: shouldResetOnLongRest)
     }
 
-    func replace(types: [PointType]) -> Points {
+    func replace(type: PointType?) -> Points {
         Points(
-            title: title, current: current, max: max, types: types,
-            shouldResetOnLongRest: shouldResetOnLongRest)
+            title: title, current: current, max: max, type: type,
+            readonly: readonly, shouldResetOnLongRest: shouldResetOnLongRest)
+    }
+
+    func replace(readonly: Bool) -> Points {
+        Points(
+            title: title, current: current, max: max, type: type,
+            readonly: readonly, shouldResetOnLongRest: shouldResetOnLongRest)
     }
 
     func replace(shouldResetOnLongRest: Bool) -> Points {
         Points(
-            title: title, current: current, max: max, types: types,
-            shouldResetOnLongRest: shouldResetOnLongRest)
+            title: title, current: current, max: max, type: type,
+            readonly: readonly, shouldResetOnLongRest: shouldResetOnLongRest)
     }
 
     func `is`(_ type: Points.PointType) -> Bool {
-        types.contains(where: { $0.is(type) })
+        self.type?.is(type) ?? false
     }
 }
 
@@ -183,11 +198,8 @@ extension Points.PointType: Codable {
 }
 
 extension Points.PointType {
-    private static func others(_ types: [Points.PointType]) -> [(Int, Points.PointType)] {
-        types.enumerated().reduce([(Int, Points.PointType)]()) { memo, index_type in
-            let (_, type) = index_type
-            guard case .other = type else { return memo }
-            return memo + [index_type]
-        }
+    private static func others(_ type: Points.PointType?) -> [(Int, Points.PointType)] {
+        guard let type = type, case .other = type else { return [] }
+        return [(0, type)]
     }
 }
