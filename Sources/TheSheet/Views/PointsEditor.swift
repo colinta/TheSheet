@@ -13,7 +13,7 @@ func PointsEditor(_ points: Points, editor: AtPathEditor) -> View<EditableContro
     // case ki
     // case other(String, String)
     // case many([PointType])
-    // shouldResetOnLongRest: Bool
+    // shouldResetOn == .long: Bool
 
     let isEditingTitle = editor.atXY?.x == 0
     let titleEditor = OnLeftClick(
@@ -55,27 +55,23 @@ func PointsEditor(_ points: Points, editor: AtPathEditor) -> View<EditableContro
                     ),
                     (.fixed, Text(" Max:".foreground(maxEnabled ? .none : .black))),
                     (.flex1, Space()),
-                    (
-                        .fixed,
-                        PlusMinus(
-                            points.max, { EditableControl.Message.changeInt(.max, $0) },
-                            .isEnabled(maxEnabled))
-                    ),
+                    // (
+                    //     .fixed,
+                    //     PlusMinus(
+                    //         points.max, { EditableControl.Message.changeInt(.max, $0) },
+                    //         .isEnabled(maxEnabled))
+                    // ),
                 ]),
-            Flow(
-                .ltr,
-                [
-                    (
-                        .fixed,
-                        OnLeftClick(
-                            Text(maxEnabled && points.shouldResetOnLongRest ? "[◼]" : "[ ]")
-                                .foreground(color: maxEnabled ? .none : .black),
-                            EditableControl.Message.changeBool(
-                                .resets, !points.shouldResetOnLongRest), .isEnabled(maxEnabled)
-                        )
-                    ),
-                    (.fixed, Text(" Resets on Long Rest".foreground(maxEnabled ? .none : .black))),
-                ]),
+            OnLeftClick(
+                Text("\(maxEnabled && points.shouldResetOn == .long ? "[◼]" : "[ ]") Resets on Long Rest".foreground(maxEnabled ? .none : .black)),
+                EditableControl.Message.changeRest(
+                    .resets, points.shouldResetOn == .long ? .none : .long), .isEnabled(maxEnabled)
+            ),
+            OnLeftClick(
+                Text("\(maxEnabled && points.shouldResetOn == .short ? "[◼]" : "[ ]") Resets on Short Rest".foreground(maxEnabled ? .none : .black)),
+                EditableControl.Message.changeRest(
+                    .resets, points.shouldResetOn == .short ? .none : .short), .isEnabled(maxEnabled)
+            ),
             Stack(
                 .down,
                 [

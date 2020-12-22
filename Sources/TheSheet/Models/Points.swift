@@ -47,6 +47,10 @@ struct Points: Codable {
             }
         }
 
+        var toMaxVariableName: String {
+            "\(toVariableName).Max"
+        }
+
         var toReadable: String {
             switch self {
             case .level:
@@ -71,61 +75,64 @@ struct Points: Codable {
 
     let title: String
     let current: Int
-    let max: Int?
+    let max: Operation?
     let type: PointType?
     let readonly: Bool
-    let shouldResetOnLongRest: Bool
+    let shouldResetOn: Rest?
 
     var toVariable: Operation? {
-        type.map{ .variable($0.toVariableName) }
+        type.map { .variable($0.toVariableName) }
+    }
+    var toMaxVariable: Operation? {
+        type.map { .variable($0.toMaxVariableName) }
     }
 
     var formulas: [Formula] {
         guard !readonly else { return [] }
-        return type.map(\.toVariableName).map { name in
+        return type.map { type in
             [
-                Formula(variable: name, operation: .integer(current)),
-                (max.map { Formula(variable: "\(name).Max", operation: .integer($0)) }),
+                Formula(variable: type.toVariableName, operation: .integer(current)),
+                (max.map { Formula(variable: type.toMaxVariableName, operation: $0) }),
             ].compactMap { $0 }
         } ?? []
     }
 
-    static let `default` = Points(title: "", current: 0, max: nil, type: nil, readonly: false, shouldResetOnLongRest: false)
+    static let `default` = Points(title: "", current: 0, max: nil, type: .hitPoints, readonly: false, shouldResetOn: nil)
 
     func replace(title: String) -> Points {
         Points(
             title: title, current: current, max: max, type: type,
-            readonly: readonly, shouldResetOnLongRest: shouldResetOnLongRest)
+            readonly: readonly, shouldResetOn: shouldResetOn)
     }
 
     func replace(current: Int) -> Points {
         Points(
             title: title, current: current, max: max, type: type,
-            readonly: readonly, shouldResetOnLongRest: shouldResetOnLongRest)
+            readonly: readonly, shouldResetOn: shouldResetOn)
     }
 
-    func replace(max: Int?) -> Points {
+    func replace(max: Operation?) -> Points {
         Points(
             title: title, current: current, max: max, type: type,
-            readonly: readonly, shouldResetOnLongRest: shouldResetOnLongRest)
+            readonly: readonly, shouldResetOn: shouldResetOn)
     }
 
     func replace(type: PointType?) -> Points {
         Points(
             title: title, current: current, max: max, type: type,
-            readonly: readonly, shouldResetOnLongRest: shouldResetOnLongRest)
+            readonly: readonly, shouldResetOn: shouldResetOn)
     }
 
     func replace(readonly: Bool) -> Points {
         Points(
             title: title, current: current, max: max, type: type,
-            readonly: readonly, shouldResetOnLongRest: shouldResetOnLongRest)
+            readonly: readonly, shouldResetOn: shouldResetOn)
     }
 
-    func replace(shouldResetOnLongRest: Bool) -> Points {
+    func replace(shouldResetOn: Rest?) -> Points {
         Points(
             title: title, current: current, max: max, type: type,
-            readonly: readonly, shouldResetOnLongRest: shouldResetOnLongRest)
+            readonly: readonly, shouldResetOn: shouldResetOn)
     }
 
     func `is`(_ type: Points.PointType) -> Bool {

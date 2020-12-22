@@ -6,15 +6,16 @@ import Ashen
 
 indirect enum Operation {
     case integer(Int)
+    case modifier(Int)
     case dice(Dice)
     case bool(Bool)
     case string(String)
-    case editing(String)
 
-    case modifier(Int)
+    case editing(String)
     case variable(String)
 
     case add([Operation])
+    case subtract([Operation])
     case multiply([Operation])
     case divide(Operation, Operation)
     case max([Operation])
@@ -149,6 +150,15 @@ indirect enum Operation {
         return true
     }
 
+    var isScalar: Bool {
+        switch self {
+        case .integer, .modifier, .dice, .bool, .string:
+            return true
+        default:
+            return false
+        }
+    }
+
     static func merge(_ formulas: [Formula], with others: [Formula]) -> [Formula] {
         formulas
             + others.filter { formula in
@@ -202,6 +212,39 @@ indirect enum Operation {
                 } else {
                     return .undefined
                 }
+            }
+
+            if !totalRoll.dice.isEmpty {
+                return .roll(totalRoll.replace(modifier: totalRoll.modifier + sum))
+            }
+            return isModifier == true ? .modifier(sum) : .integer(sum)
+        case let .subtract(operations):
+            var totalRoll = Roll(dice: [], modifier: 0)
+            var sum = 0
+            var isFirst = true
+            var isModifier: Bool?
+            for operation in operations {
+                let resolved = operation.eval(sheet, dontRecur)
+                if case let .roll(roll) = resolved {
+                    totalRoll = totalRoll.subtracting(roll)
+                } else if case let .integer(value) = resolved {
+                    isModifier = isModifier ?? false
+                    if isFirst {
+                        sum = value
+                    } else {
+                        sum -= value
+                    }
+                } else if case let .modifier(value) = resolved {
+                    isModifier = isModifier ?? true
+                    if isFirst {
+                        sum = value
+                    } else {
+                        sum -= value
+                    }
+                } else {
+                    return .undefined
+                }
+                isFirst = false
             }
 
             if !totalRoll.dice.isEmpty {
@@ -305,6 +348,9 @@ indirect enum Operation {
         case let .add(operations):
             return attributedOperator(
                 "+", operations: operations, sheet: sheet, precedence: 1, prevPrecedence)
+        case let .subtract(operations):
+            return attributedOperator(
+                "-", operations: operations, sheet: sheet, precedence: 1, prevPrecedence)
         case let .multiply(operations):
             return attributedOperator(
                 "×", operations: operations, sheet: sheet, precedence: 3, prevPrecedence)
@@ -375,6 +421,8 @@ indirect enum Operation {
             return name
         case let .add(operations):
             return "(+ \(operations.map(\.toEditable).joined(separator: " ")))"
+        case let .subtract(operations):
+            return "(- \(operations.map(\.toEditable).joined(separator: " ")))"
         case let .multiply(operations):
             return "(× \(operations.map(\.toEditable).joined(separator: " ")))"
         case let .divide(lhs, rhs):
@@ -445,6 +493,9 @@ extension Operation: Codable {
         case "add":
             let operations = try values.decode([Operation].self, forKey: .value)
             self = .add(operations)
+        case "subtract":
+            let operations = try values.decode([Operation].self, forKey: .value)
+            self = .subtract(operations)
         case "multiply":
             let operations = try values.decode([Operation].self, forKey: .value)
             self = .multiply(operations)
@@ -524,6 +575,9 @@ extension Operation: Codable {
             try container.encode(variable, forKey: .value)
         case let .add(operations):
             try container.encode("add", forKey: .type)
+            try container.encode(operations, forKey: .value)
+        case let .subtract(operations):
+            try container.encode("subtract", forKey: .type)
             try container.encode(operations, forKey: .value)
         case let .multiply(operations):
             try container.encode("multiply", forKey: .type)

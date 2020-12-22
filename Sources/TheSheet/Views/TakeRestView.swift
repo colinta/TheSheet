@@ -4,8 +4,21 @@
 
 import Ashen
 
-func TakeRestView<Msg>(
-    _ onRest: @escaping @autoclosure SimpleEvent<Msg>
-) -> View<Msg> {
-    OnLeftClick(Text("Take a Long Rest".bold()).centered(), onRest()).border(.single)
+func TakeRestView(
+    _ onRest: @escaping (Rest) -> SheetControl.Message
+) -> View<SheetControl.Message> {
+    Stack(
+        .down,
+        [
+            Text("Take a Rest".bold()).centered().underlined(),
+            Flow(
+                .ltr,
+                Rest.all.enumerated().flatMap { index, rest in
+                    (index == 0
+                    ? []
+                    : [(FlowSize.fixed, Text("|"))])
+                    + [(FlowSize.flex1, OnLeftClick(Text(rest.toString).centered(), onRest(rest)))]
+                }
+            ).height(1),
+        ])
 }

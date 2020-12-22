@@ -33,14 +33,14 @@ struct Action: Codable {
     let isExpanded: Bool
     let remainingUses: Int?
     let maxUses: Operation?
-    let shouldResetOnLongRest: Bool
+    let shouldResetOn: Rest?
 
     init(
         title: String, level: String? = nil, check: Operation? = nil, damage: Operation? = nil,
         type: String? = nil,
         description: String? = nil, isExpanded: Bool = false,
         remainingUses: Int? = nil, maxUses: Operation? = nil,
-        shouldResetOnLongRest: Bool = false
+        shouldResetOn: Bool = false
     ) {
         self.init(
             title: title,
@@ -62,7 +62,7 @@ struct Action: Codable {
         title: String, level: String? = nil, subactions: [Sub],
         description: String? = nil, isExpanded: Bool = false,
         remainingUses: Int? = nil, maxUses: Operation? = nil,
-        shouldResetOnLongRest: Bool = false
+        shouldResetOn: Rest? = nil
     ) {
         self.title = title
         self.level = level
@@ -71,14 +71,14 @@ struct Action: Codable {
         self.isExpanded = isExpanded
         self.remainingUses = remainingUses
         self.maxUses = maxUses
-        self.shouldResetOnLongRest = shouldResetOnLongRest
+        self.shouldResetOn = shouldResetOn
     }
 
     func replace(title: String) -> Action {
         Action(
             title: title, level: level, subactions: subactions, description: description,
             isExpanded: isExpanded, remainingUses: remainingUses, maxUses: maxUses,
-            shouldResetOnLongRest: shouldResetOnLongRest)
+            shouldResetOn: shouldResetOn)
     }
 
     func replace(level: String) -> Action {
@@ -86,7 +86,7 @@ struct Action: Codable {
             title: title, level: level.isEmpty ? nil : level, subactions: subactions,
             description: description,
             isExpanded: isExpanded, remainingUses: remainingUses, maxUses: maxUses,
-            shouldResetOnLongRest: shouldResetOnLongRest)
+            shouldResetOn: shouldResetOn)
     }
 
     func replace(description: String) -> Action {
@@ -94,21 +94,21 @@ struct Action: Codable {
             title: title, level: level, subactions: subactions,
             description: description.isEmpty ? nil : description,
             isExpanded: isExpanded, remainingUses: remainingUses, maxUses: maxUses,
-            shouldResetOnLongRest: shouldResetOnLongRest)
+            shouldResetOn: shouldResetOn)
     }
 
     func replace(isExpanded: Bool) -> Action {
         Action(
             title: title, level: level, subactions: subactions, description: description,
             isExpanded: isExpanded, remainingUses: remainingUses, maxUses: maxUses,
-            shouldResetOnLongRest: shouldResetOnLongRest)
+            shouldResetOn: shouldResetOn)
     }
 
     func replace(remainingUses: Int?) -> Action {
         Action(
             title: title, level: level, subactions: subactions, description: description,
             isExpanded: isExpanded, remainingUses: remainingUses, maxUses: maxUses,
-            shouldResetOnLongRest: shouldResetOnLongRest)
+            shouldResetOn: shouldResetOn)
     }
 
     func replace(maxUses: Operation?) -> Action {
@@ -123,20 +123,20 @@ struct Action: Codable {
             isExpanded: isExpanded,
             remainingUses: remainingUses,
             maxUses: maxUses,
-            shouldResetOnLongRest: shouldResetOnLongRest)
+            shouldResetOn: shouldResetOn)
     }
 
-    func replace(shouldResetOnLongRest: Bool) -> Action {
+    func replace(shouldResetOn: Rest?) -> Action {
         Action(
             title: title, level: level, subactions: subactions, description: description,
             isExpanded: isExpanded, remainingUses: remainingUses, maxUses: maxUses,
-            shouldResetOnLongRest: shouldResetOnLongRest)
+            shouldResetOn: shouldResetOn)
     }
 
     func replace(subactions: [Sub]) -> Action {
         Action(
             title: title, level: level, subactions: subactions, description: description,
             isExpanded: isExpanded, remainingUses: remainingUses, maxUses: maxUses,
-            shouldResetOnLongRest: shouldResetOnLongRest)
+            shouldResetOn: shouldResetOn)
     }
 }

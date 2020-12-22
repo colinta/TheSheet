@@ -7,10 +7,58 @@
         {
           "type" : "pointsTracker",
           "points" : {
-            "shouldResetOnLongRest" : true,
+            "shouldResetOn" : "short",
             "title" : "Ki Points",
             "current" : 0,
-            "max" : 0,
+            "max" : {
+              "lhs" : {
+                "type" : "integer",
+                "value" : 0
+              },
+              "condition" : {
+                "type" : "=",
+                "lhs" : {
+                  "type" : "variable",
+                  "value" : "monkLevel"
+                },
+                "rhs" : {
+                  "type" : "integer",
+                  "value" : 1
+                }
+              },
+              "type" : "if",
+              "rhs" : {
+                "lhs" : {
+                  "type" : "variable",
+                  "value" : "monkLevel"
+                },
+                "condition" : {
+                  "type" : "<",
+                  "lhs" : {
+                    "type" : "variable",
+                    "value" : "monkLevel"
+                  },
+                  "rhs" : {
+                    "type" : "integer",
+                    "value" : 4
+                  }
+                },
+                "type" : "if",
+                "rhs" : {
+                  "type" : "subtract",
+                  "value" : [
+                    {
+                      "type" : "variable",
+                      "value" : "weavePoints.Max"
+                    },
+                    {
+                      "type" : "variable",
+                      "value" : "sorceryPoints"
+                    }
+                  ]
+                }
+              }
+            },
             "type" : {
               "type" : "ki"
             },
@@ -20,12 +68,17 @@
         {
           "type" : "pointsTracker",
           "points" : {
-            "shouldResetOnLongRest" : true,
-            "title" : "Ki Points",
+            "shouldResetOn" : "short",
+            "title" : "Weave Points",
             "current" : 0,
-            "max" : 0,
+            "max" : {
+              "type" : "integer",
+              "value" : 0
+            },
             "type" : {
-              "type" : "ki"
+              "type" : "other",
+              "variable" : "weavePoints",
+              "title" : "Weave Points"
             },
             "readonly" : true
           }
@@ -64,7 +117,6 @@
         {
           "type" : "action",
           "action" : {
-            "shouldResetOnLongRest" : false,
             "title" : "Dagger",
             "description" : "Finesse, Light, Thrown (range 20\/60)",
             "subactions" : [
@@ -110,7 +162,6 @@
         {
           "type" : "action",
           "action" : {
-            "shouldResetOnLongRest" : false,
             "title" : "Quarterstaff",
             "subactions" : [
               {
@@ -192,7 +243,6 @@
         {
           "type" : "action",
           "action" : {
-            "shouldResetOnLongRest" : false,
             "title" : "Unarmed Bonus Attack",
             "description" : "When you use the Attack action a monk weapon on your turn, you can make one Unarmed Strike as a Bonus Action.",
             "subactions" : [
@@ -237,7 +287,7 @@
         {
           "type" : "action",
           "action" : {
-            "isExpanded" : false,
+            "isExpanded" : true,
             "maxUses" : {
               "type" : "integer",
               "value" : 1
@@ -269,15 +319,15 @@
                 }
               }
             ],
-            "shouldResetOnLongRest" : true,
             "description" : "Range: 15' cone\nAffected creatures roll Constitution save, take half damage on successful save.",
+            "shouldResetOn" : "long",
             "remainingUses" : 1
           }
         },
         {
           "type" : "action",
           "action" : {
-            "isExpanded" : false,
+            "isExpanded" : true,
             "maxUses" : {
               "type" : "integer",
               "value" : 1
@@ -286,26 +336,25 @@
             "subactions" : [
 
             ],
-            "shouldResetOnLongRest" : true,
             "description" : "Try to cast a wizard cantrip, make Arcana check. Once per long rest.",
+            "shouldResetOn" : "long",
             "remainingUses" : 1
           }
         },
         {
           "type" : "action",
           "action" : {
-            "isExpanded" : false,
+            "remainingUses" : 7,
             "maxUses" : {
               "type" : "integer",
               "value" : 7
             },
             "title" : "Wand of Pyrotechnics",
+            "description" : "You can use an action to expend 1 of its charges and create a harmless burst of multicolored light at a point you can see up to 60 feet away. The burst of light is accompanied by a crackling noise that can be heard up to 300 feet away.\nThe wand regains 1d6 + 1 expended charges daily at dawn (max: 7).\nIf you expend the wand's last charge, roll a d20. On a 1, the wand erupts in a harmless pyrotechnic display and is destroyed.",
             "subactions" : [
 
             ],
-            "shouldResetOnLongRest" : false,
-            "description" : "You can use an action to expend 1 of its charges and create a harmless burst of multicolored light at a point you can see up to 60 feet away. The burst of light is accompanied by a crackling noise that can be heard up to 300 feet away.\nThe wand regains 1d6 + 1 expended charges daily at dawn (max: 7).\nIf you expend the wand's last charge, roll a d20. On a 1, the wand erupts in a harmless pyrotechnic display and is destroyed.",
-            "remainingUses" : 7
+            "isExpanded" : true
           }
         }
       ],
@@ -317,10 +366,58 @@
         {
           "type" : "pointsTracker",
           "points" : {
-            "shouldResetOnLongRest" : true,
+            "shouldResetOn" : "long",
             "title" : "Sorcery Points",
             "current" : 1,
-            "max" : 4,
+            "max" : {
+              "lhs" : {
+                "type" : "integer",
+                "value" : 0
+              },
+              "condition" : {
+                "type" : "=",
+                "lhs" : {
+                  "type" : "variable",
+                  "value" : "sorcererLevel"
+                },
+                "rhs" : {
+                  "type" : "integer",
+                  "value" : 1
+                }
+              },
+              "type" : "if",
+              "rhs" : {
+                "lhs" : {
+                  "type" : "variable",
+                  "value" : "sorcererLevel"
+                },
+                "condition" : {
+                  "type" : "<",
+                  "lhs" : {
+                    "type" : "variable",
+                    "value" : "monkLevel"
+                  },
+                  "rhs" : {
+                    "type" : "integer",
+                    "value" : 4
+                  }
+                },
+                "type" : "if",
+                "rhs" : {
+                  "type" : "subtract",
+                  "value" : [
+                    {
+                      "type" : "variable",
+                      "value" : "weavePoints.Max"
+                    },
+                    {
+                      "type" : "variable",
+                      "value" : "kiPoints"
+                    }
+                  ]
+                }
+              }
+            },
             "type" : {
               "type" : "sorcery"
             },
@@ -349,7 +446,6 @@
         {
           "type" : "action",
           "action" : {
-            "shouldResetOnLongRest" : false,
             "title" : "Chill Touch",
             "level" : "Cantrip",
             "description" : "Range: 120'\nOn a hit, target can't regain hit points. Hit undead: they have disadvantage on attack rolls. Hand clings to target.",
@@ -382,7 +478,6 @@
         {
           "type" : "action",
           "action" : {
-            "shouldResetOnLongRest" : false,
             "title" : "Frostbite",
             "level" : "Cantrip",
             "description" : "Range: 60'\nOn failed CON save, takes cold damage and disadvantage on next weapon attack",
@@ -405,7 +500,6 @@
         {
           "type" : "action",
           "action" : {
-            "shouldResetOnLongRest" : false,
             "title" : "Mage Hand",
             "level" : "Cantrip",
             "description" : "Range: 30' | Duration: 1 minute\nYou can use the hand to manipulate an object, open an unlocked door or container, stow or retrieve an item from an open container, or pour the contents out of a vial. You can move the hand up to 30 feet each time you use it.",
@@ -418,7 +512,6 @@
         {
           "type" : "action",
           "action" : {
-            "shouldResetOnLongRest" : false,
             "title" : "Minor Illusion",
             "level" : "Cantrip",
             "description" : "Range: 30' | Duration: 1 minute\nYou create a sound or an image of an object within range that lasts for the duration, or until dismissed as an action. Volume of sound from whisper to scream, can be a voice, one repeating or many sounds. Image must fit in 5' cube. Image cannot create light, sound, touch, or smell. Successful INT (Investigation) check against spell save DC can reveal the illusion.",
@@ -431,7 +524,6 @@
         {
           "type" : "action",
           "action" : {
-            "shouldResetOnLongRest" : false,
             "title" : "Shape Water",
             "level" : "Cantrip",
             "description" : "Range: 30' | Duration: 1 hour\nYou can manipulate up to a 5' cube of water in range:\n- You can instantaneously move or change the flow of the water as you direct, up to 5 feet in any direction.\n- You cause the water to form into simple shapes and animate at your direction (1hr).\n- You change the water’s color or opacity (1hr).\n- You can freeze the water provided there are no creatures in it (1hr).",
@@ -444,7 +536,6 @@
         {
           "type" : "action",
           "action" : {
-            "shouldResetOnLongRest" : false,
             "title" : "Magic Missile",
             "level" : "1",
             "description" : "Range: 120'\nYou create darts of magical force, each dart deals the rolled force damage to a creature that you can see in range.\nUsing higher level spell slots, one more dart for each level >1.",
@@ -487,7 +578,6 @@
         {
           "type" : "action",
           "action" : {
-            "shouldResetOnLongRest" : false,
             "title" : "Silent Image",
             "level" : "1",
             "description" : "Range: 60'\nDuration: Concentration, 10 minutes\nYou create the image of an object, creature, or visible phenomenon that is no larger than a 15-foot cube. The image is purely visual, but moves and as an action it can move to another spot in range. Physical interaction or investigation (INT) check vs spell save DC makes the spell transparent.",
@@ -500,7 +590,6 @@
         {
           "type" : "action",
           "action" : {
-            "shouldResetOnLongRest" : false,
             "title" : "Ice Spear",
             "level" : "2",
             "description" : "Range: 120'\nYou create three spears of ice and hurl them at targets within range. You can hurl them at one target or several.\nMake a ranged spell attack for each spear. On a hit, the target takes 2d6 cold damage.\nUsing higher level spell slots, one more spear for each level >2.",
@@ -534,7 +623,6 @@
         {
           "type" : "action",
           "action" : {
-            "shouldResetOnLongRest" : false,
             "title" : "Invisibility",
             "level" : "2",
             "description" : "Range: Touch | Duration: Concentration, 1 hour\nA creature you touch becomes invisible until the spell ends. Anything the target is wearing or carrying is invisible as long as it is on the target’s person. The spell ends for a target that attacks or casts a spell.\nUsing higher level spell slots, you can target one additional creature for each level >2.",
@@ -547,7 +635,6 @@
         {
           "type" : "action",
           "action" : {
-            "shouldResetOnLongRest" : false,
             "title" : "Mirror Image",
             "level" : "2",
             "description" : "Duration: 1 minute\nThree illusory duplicates appear in your space. Each time a creature targets you, roll a d20. If you have three duplicates, you must roll a 6 or higher to change the attack's target to a duplicate. With two duplicates, you must roll an 8 or higher. With one duplicate, you must roll an 11 or higher.\nDC = 10 + DEX",
@@ -560,7 +647,6 @@
         {
           "type" : "action",
           "action" : {
-            "shouldResetOnLongRest" : false,
             "title" : "Misty Step",
             "level" : "2",
             "description" : "Briefly surrounded by silvery mist, you teleport up to 30 feet to an unoccupied space that you can see.",
@@ -574,101 +660,18 @@
       "isFormulaColumn" : false
     },
     {
-      "title" : "Journal",
-      "controls" : [
-        {
-          "type" : "journal",
-          "journal" : {
-            "title" : "2020\/11\/10 - Day 10",
-            "text" : "We untie the goblin, Urzo, and trust\/intimidate him to help us, we follow the stream, it widens as we approach a cliff edge.  At the bottom is a pool, which lines up well with the treasure map.\nWe decide to cross the stream, which is '15 wide, so Eldrin shoots an arrow across (nat' 20!) and then walks across the tightrope.  Lu has some trouble getting across, Gron freezes water and Eldrin shoots another rope across to help.  As Jolly Jon crosses 2 giant eagle \/ horse creatures (Gron remembers\/knows they are \"Perytons\" aka \"Pelotons\").\nEldrin tries to calm one down – it has an injured wing – by offering it some healing water.  Jolly Jon speaks with animals! What!? He convinces it we mean no harm.  Lu heals it, and Eldrin gives it berries.  We ask them to take us to the pond, but they are nervous – the blue dragon lives down there.  So they take us 1\/4 mi away, at the bottom of the cliff, and we send in Eldrin using invisibility.  The dragon shows up and goes in the water, and then 10 orcs appear from boulder illusions and follow the dragon, saying they need to capture it while it eats.\nWe discuss, decide that we need to prevent them from capturing the dragon (Osilith wants a dragon), so we eat our magic breathing mushrooms and follow.  Urzo comes with us!\nWe sneak past one orc, who is posted up as guard, using Eldrin's \"Pass Undetected\" spell, reach the dragon.  Only two orcs remain, the leader and one fighter.  We charge in, tell the dragon we are there to help.\nWe defeat the leader (with an arrow from Eldrin), then the dragon dispatches the fighter.  When we return: we need to talk to the dragon (Araugauthos) and set a bear trap for the orc that was guarding the entrance.",
-            "isExpanded" : true
-          }
-        },
-        {
-          "type" : "journal",
-          "journal" : {
-            "title" : "2020\/09\/09 - Day 9",
-            "text" : "We fought the rest of the fire orcs, they grew a ton, but Jolly Jon thankfully became mega strong. Zoarah and Lu turned into dragons, became Gruumsch, we tried to fight, but most of us died, except Jolly Jon, he met Gruumsch's son, who gives him a sword. Crossguard made of lumps of steely, jagged shard of a blade (broken).\nGruumsch's son Korag says he was captured by dwarves, imprisoned. The sword handle looks like muscle (carved stone). The crossed hammer and chisel is carved into it.\nThe dwarves \"split his soul into blood and bone\" (Jon holds Blood). In rage, the rest of the blade forms. \"The more pain you receive the more you dole out.\" (in a battle, Jon can stab himself with the sword, and if he survives he regains all the HP he has inflicted so far).\n\"Look to the north\", Jon sees a beacon of light far to the north. Flash of an image: crag of a mountain, a cave billowing flame.\n\"Find my bones, find your destiny, free me from this dwarven prison\".\n\"As long as you're swinging that sword, I'll be around\".\nWe're back in the circle. Jon holds a huge blood sword, like out of FF7.\nChunt is super happy, everone cheers. Big party.\nLevel Up!\nWe ask Chunt about Arasmus, maybe in Waterdeep, ask cleric headquarters.\nLu shows Chunt a magic-ass-wood-looking amulet. \"Touched by Sylvanis, it would make you better at knowing the world around you\" (+1 on Nature and Animal Handling checks).\nTreasure chest map! Triple forking river in the sword mountains, starting point is near that. We met a goblin, Uzo, who wants to help us, so we tied him up and fed him food.",
-            "isExpanded" : true
-          }
-        },
-        {
-          "type" : "journal",
-          "journal" : {
-            "title" : "2020\/08\/27 - Yartar",
-            "text" : "We are met by the Shield of Yartar, who escort us into town. The Leader is the Water Baron.\nWe go to the information desk and learn about the health district, \"One Foot On the Boat\" Inn, a Cleric convention, and the Barnabus C. Winthrop Library of Business History & Other Things. Gron meets with Krrtck there and they think the bite is a Were-worm curse.\nOn the Cleric boat, the others talk to Vargis who recommends applying a poultice\nClerics on the boat say to use leeches from somewhere north, the Evermores, used for poison\nJunt - cleric of Groosh, called everyone else assholes, says he has a better idea, meet him north of town.\nElves: Luvalar, meeting on day two?\nLearned how to slow magic with herbs\/poultice\nLu meets w\/ Luvalar during the night, hears the name \"Arasmus\" from dying Luvalar after poisoned arrows are shot from across the river.\nWe meet Groosh at his hut, he sends us all through a fire portal and we fight fire-orcs in some other plane. Killing one gives us a kind of rage ability, but as they get knocked out the remaining foes get stronger, too.",
-            "isExpanded" : true
-          }
-        },
-        {
-          "type" : "journal",
-          "journal" : {
-            "title" : "2020\/08\/08 - Day 7",
-            "text" : "We start in the Ice Spires, meet Ryan's goofy worm character Kevin Everyman, travel (magically?) to some woods - very quiet until we notice it's quiet, then the animal sounds begin. We see the town that Lu saw in her vision, and fight a wraith, Lu smashes it no problem with a maul. Go into a dark cave where Kevin says he is from. Then to Eldrin's school (Tools'n'brats). We went to a dwarven settlement where we were led to a cave, out of the cave came a Silver dragon, which after some fighting turned into Gron. Then Kevin Everyman awoke as Osilith, and took us to his \"birthplace\" where he was created, some sort of weapon against – maybe – Skynet. Gron did a fun crazy monk attack before throwing an unconscious Jolly Jon through a door that Osilith had stepped through.\nWe traveled to Yartar to hopefully get the worm disease dealt with.",
-            "isExpanded" : true
-          }
-        },
-        {
-          "type" : "journal",
-          "journal" : {
-            "title" : "2020\/07\/29 - Day 6",
-            "text" : "We take stock of everyone, Steve is OK, one farm hand, Simon, has a worm leg which Jolly Jon cuts off (nat 20!), the other, Billy, is OK. But Jolly Jon, Zoarah, and Hatharal were bit by Bothsworm and so they also have the worm sickness. We explored the caves, found rock rubble, Lu took a staff and went ragey and saw through time, snapped out of it and has a sweet staff now. Back in the main area Gron is trapped in a block of ice, and 4 dragonborn arrive: Hghrron (Gron's mom, and a monk), Krrtck (powerful sorcerer), and Chigh (powerful monk), dunno about the 4th (an extra? Ryan didn't use him). The sorcerer explains about Gron \/ Patternist, opens a door to \"The Shadow of the Pattern\".",
-            "isExpanded" : true
-          }
-        },
-        {
-          "type" : "journal",
-          "journal" : {
-            "title" : "2020\/07\/16 - Day 5",
-            "text" : "We go into the cave. Just outside is a journal that says they were trying to find the cave of seasons. This is that temple - built by dwarves and \"keeps the seasons\". They heard strange noises under the earth. We went in the well, a path led to a big room. Stone carvings of moon and sun. Found a \"berry key\" but then fire exploded, we ran out and climbed back out of the well. We go through the caves and found a room with healing water (each drink = d4), and a key at the bottom of the water. In the main room we found Steve tied to a column, and the two farm hands, and 1 dwarf (too far gone). The drawf from episode 1 is half worm - Sir Bothsworm! After we kill him (Zoarah helps) he says \"You can kill me, but Osilith will still take this whole world.\"",
-            "isExpanded" : true
-          }
-        },
-        {
-          "type" : "journal",
-          "journal" : {
-            "title" : "2020\/06\/18 - Day 4",
-            "text" : "We left the Dwarven town and go through the southern side of the sword mountains (towards a camp we heard about?). We find a nice arrow, colors are house Marbury. We hear a horn and a pig runs out. Gron conjures a log to make it turn and Jolly Jon smashes it with his maul. We meet Jorn Jonah Marbury, Fenric Marbury (son), and Zoarah Marbury, introduced as his daughter but maybe adopted. Their guide is an Elf named Falcon. We join them to their hunting lodge. Falcon agrees that \"Araugauthos\" sounds draconic, no other information, no dragon sightings. We stay at the lodge that night, Gron has a dream of a silver *or white* dragon that says \"You magic will grow.\"\nThe next day we go through the woods an come across a boulder and Gron jumps onto it, it turns out to be a troll and it quickly knocks Gron unconscious, but someone heals him. The troll regenerates but casting Chill Touch stops the regeneration.\nAt the camp the tents are empty. Gron casts an illusion of a worm to trick Hatharal, and then a wormy arm thing attacks Gron. Hilarious arm battle.",
-            "isExpanded" : true
-          }
-        },
-        {
-          "type" : "journal",
-          "journal" : {
-            "title" : "2020\/05\/28 - Day 3",
-            "text" : "A monster appears out of the wall, a shape shifting mass with eyes and teeth and tentacles, and makes the sounds of gnomes it ate. Jon Rogers delt the death blow, and it turned into an orc w\/ a hole in its chest, like the first orc. Wears a necklace w\/ symbol of Talos, has a map w\/ an X on it, and has a note that says \"Find the font of magic...Osolith (who?) demands...Araugauthos (dragon name)...\". Eldrin gets a 10'  extending pole, Jolly Jon got \"Clockwork amulet\" (Auto roll a 10 instead of rolling a d20 for attack check).\nGron takes a walk and sees the blue dragon again, sees a chain hanging from its neck, one wing is damaged.\nSlime analysis: slime from the field is not from the shape shifter. It had sediment that wouldn't be found in a farm field - a mine maybe (flecks of metal).\nWe run into a group of 4 harpies and almost get wiped out. They have the mark of Talos - maybe there are more orcs in this area. Found a metal spike in the club, worth 10gp, 10 perfect harpy feathers, 2 harpy talons.\nWe travel to the mushroom-growing dwarves' area and stay in the inn. Jolly Jon pours mushroom oil in Eldrin's drink, to much amusement. The dwarves give us each 15g of \"wetshrooms\" to try out, let us breathe underwater.",
-            "isExpanded" : true
-          }
-        },
-        {
-          "type" : "journal",
-          "journal" : {
-            "title" : "2020\/05\/07 - Day 2",
-            "text" : "Leaving the tower we got away from Daggermaw by casting illusions, which gave Gron and Ludavisia inspiration! We made our way back to Leilon, saw a blue\/lightning dragon far away, which is a rare sight. In Leilon, talking to Steve, we learned about dwarves harvesting mushrooms in a town south of Leilon. We visited Wilburton farm and talked to the mom of Billy, in the field there were some misc. shoes, and lots of mucus\/slime, and disturbed soil in a roughly circular shape. We learn about Korbaz in Gnomengaard who might know about the slime.\nWe travel to Gnomengaard and meet Morbo at the entrance. Korbaz is locked away in the throne room, Morbo recommends we talk to Fibbelstib and Dabbledob.\nA gnome attacks us w\/ a turret, we meet Factoray. We explored Gnomengaard, got past spinning blades, met lots of gnomes, they think there's a shape shifter hiding somewhere. In the throne room we open a chest and took a Hat of Wizardry and a Wand of Pyrotechnics, which are are allowed to borrow. One of the Kings (Korbaz or Nerkley) says the rug grew teeth and tried to attack him.",
-            "isExpanded" : true
-          }
-        },
-        {
-          "type" : "journal",
-          "journal" : {
-            "title" : "2020\/04\/23 - Day 1",
-            "text" : "We start in the Slumbering Bear Inn, in Leilon. Janelle is the bartender. Sir Botswane the Dwarf is there (red beard, badass).\nSteve invites us to the town hall for quests. There's an apothecary and a church.\nQuests:\n• Shipwrecks - eerie light, 4 ships gone\n• Disappearing people (~12 people)\n• Goblins messed up some caravans, maybe there's loot.\nWe chose the shipwrecks\/lighthouse. At the apothecary is Grolk, a half-orc. Looking for Witchwort, grompstool, and honeylight.\nOn the road we ran into Harris and Beardsley from the Hogs Mead Brewery.\nAt the lighthouse we met Halfred the crab, learned about Marrol the elf and Daggermaw the shark. Jolly Jon tried to attack Marrol's ghost form, Gron settled her down, Marrol lost her arcane focus, we should find it. We got lightning power from an altar to Talos, fought harpies, rested, and fought Muesko the orc necromancer, who had a hole in his chest. We found \"Hasselhommer\" and \"Cloak of Many Fashions\". Ships that were damaged: \"Golden Gull, Orca\"",
-            "isExpanded" : true
-          }
-        }
-      ],
-      "isFormulaColumn" : false
-    },
-    {
       "title" : "Stats",
       "controls" : [
         {
           "type" : "pointsTracker",
           "points" : {
-            "shouldResetOnLongRest" : true,
+            "shouldResetOn" : "long",
             "title" : "Hit Points",
             "current" : 27,
-            "max" : 44,
+            "max" : {
+              "type" : "integer",
+              "value" : 42
+            },
             "type" : {
               "type" : "hitPoints"
             },
@@ -683,8 +686,7 @@
             "type" : {
               "type" : "inspiration"
             },
-            "readonly" : false,
-            "shouldResetOnLongRest" : false
+            "readonly" : false
           }
         },
         {
@@ -796,13 +798,25 @@
           "points" : {
             "title" : "Sorcerer Level",
             "current" : 4,
+            "max" : {
+              "type" : "subtract",
+              "value" : [
+                {
+                  "type" : "integer",
+                  "value" : 20
+                },
+                {
+                  "type" : "variable",
+                  "value" : "level"
+                }
+              ]
+            },
             "type" : {
               "type" : "other",
               "variable" : "sorcererLevel",
               "title" : "Sorcerer Level"
             },
-            "readonly" : false,
-            "shouldResetOnLongRest" : false
+            "readonly" : false
           }
         },
         {
@@ -810,13 +824,25 @@
           "points" : {
             "title" : "Monk Level",
             "current" : 1,
+            "max" : {
+              "type" : "subtract",
+              "value" : [
+                {
+                  "type" : "integer",
+                  "value" : 20
+                },
+                {
+                  "type" : "variable",
+                  "value" : "level"
+                }
+              ]
+            },
             "type" : {
               "type" : "other",
               "variable" : "monkLevel",
               "title" : "Monk Level"
             },
-            "readonly" : false,
-            "shouldResetOnLongRest" : false
+            "readonly" : false
           }
         },
         {
@@ -827,8 +853,7 @@
             "type" : {
               "type" : "level"
             },
-            "readonly" : true,
-            "shouldResetOnLongRest" : false
+            "readonly" : true
           }
         },
         {
@@ -999,6 +1024,92 @@
             "title" : "Languages",
             "isExpanded" : true,
             "description" : "• Common\n• Draconic\n• Sylvan\n• Giant"
+          }
+        }
+      ],
+      "isFormulaColumn" : false
+    },
+    {
+      "title" : "Journal",
+      "controls" : [
+        {
+          "type" : "journal",
+          "journal" : {
+            "title" : "2020\/11\/10 - Day 10",
+            "text" : "We untie the goblin, Urzo, and trust\/intimidate him to help us, we follow the stream, it widens as we approach a cliff edge.  At the bottom is a pool, which lines up well with the treasure map.\nWe decide to cross the stream, which is '15 wide, so Eldrin shoots an arrow across (nat' 20!) and then walks across the tightrope.  Lu has some trouble getting across, Gron freezes water and Eldrin shoots another rope across to help.  As Jolly Jon crosses 2 giant eagle \/ horse creatures (Gron remembers\/knows they are \"Perytons\" aka \"Pelotons\").\nEldrin tries to calm one down – it has an injured wing – by offering it some healing water.  Jolly Jon speaks with animals! What!? He convinces it we mean no harm.  Lu heals it, and Eldrin gives it berries.  We ask them to take us to the pond, but they are nervous – the blue dragon lives down there.  So they take us 1\/4 mi away, at the bottom of the cliff, and we send in Eldrin using invisibility.  The dragon shows up and goes in the water, and then 10 orcs appear from boulder illusions and follow the dragon, saying they need to capture it while it eats.\nWe discuss, decide that we need to prevent them from capturing the dragon (Osilith wants a dragon), so we eat our magic breathing mushrooms and follow.  Urzo comes with us!\nWe sneak past one orc, who is posted up as guard, using Eldrin's \"Pass Undetected\" spell, reach the dragon.  Only two orcs remain, the leader and one fighter.  We charge in, tell the dragon we are there to help.\nWe defeat the leader (with an arrow from Eldrin), then the dragon dispatches the fighter.  When we return: we need to talk to the dragon (Araugauthos) and set a bear trap for the orc that was guarding the entrance.",
+            "isExpanded" : true
+          }
+        },
+        {
+          "type" : "journal",
+          "journal" : {
+            "title" : "2020\/09\/09 - Day 9",
+            "text" : "We fought the rest of the fire orcs, they grew a ton, but Jolly Jon thankfully became mega strong. Zoarah and Lu turned into dragons, became Gruumsch, we tried to fight, but most of us died, except Jolly Jon, he met Gruumsch's son, who gives him a sword. Crossguard made of lumps of steely, jagged shard of a blade (broken).\nGruumsch's son Korag says he was captured by dwarves, imprisoned. The sword handle looks like muscle (carved stone). The crossed hammer and chisel is carved into it.\nThe dwarves \"split his soul into blood and bone\" (Jon holds Blood). In rage, the rest of the blade forms. \"The more pain you receive the more you dole out.\" (in a battle, Jon can stab himself with the sword, and if he survives he regains all the HP he has inflicted so far).\n\"Look to the north\", Jon sees a beacon of light far to the north. Flash of an image: crag of a mountain, a cave billowing flame.\n\"Find my bones, find your destiny, free me from this dwarven prison\".\n\"As long as you're swinging that sword, I'll be around\".\nWe're back in the circle. Jon holds a huge blood sword, like out of FF7.\nChunt is super happy, everone cheers. Big party.\nLevel Up!\nWe ask Chunt about Arasmus, maybe in Waterdeep, ask cleric headquarters.\nLu shows Chunt a magic-ass-wood-looking amulet. \"Touched by Sylvanis, it would make you better at knowing the world around you\" (+1 on Nature and Animal Handling checks).\nTreasure chest map! Triple forking river in the sword mountains, starting point is near that. We met a goblin, Uzo, who wants to help us, so we tied him up and fed him food.",
+            "isExpanded" : true
+          }
+        },
+        {
+          "type" : "journal",
+          "journal" : {
+            "title" : "2020\/08\/27 - Yartar",
+            "text" : "We are met by the Shield of Yartar, who escort us into town. The Leader is the Water Baron.\nWe go to the information desk and learn about the health district, \"One Foot On the Boat\" Inn, a Cleric convention, and the Barnabus C. Winthrop Library of Business History & Other Things. Gron meets with Krrtck there and they think the bite is a Were-worm curse.\nOn the Cleric boat, the others talk to Vargis who recommends applying a poultice\nClerics on the boat say to use leeches from somewhere north, the Evermores, used for poison\nJunt - cleric of Groosh, called everyone else assholes, says he has a better idea, meet him north of town.\nElves: Luvalar, meeting on day two?\nLearned how to slow magic with herbs\/poultice\nLu meets w\/ Luvalar during the night, hears the name \"Arasmus\" from dying Luvalar after poisoned arrows are shot from across the river.\nWe meet Groosh at his hut, he sends us all through a fire portal and we fight fire-orcs in some other plane. Killing one gives us a kind of rage ability, but as they get knocked out the remaining foes get stronger, too.",
+            "isExpanded" : true
+          }
+        },
+        {
+          "type" : "journal",
+          "journal" : {
+            "title" : "2020\/08\/08 - Day 7",
+            "text" : "We start in the Ice Spires, meet Ryan's goofy worm character Kevin Everyman, travel (magically?) to some woods - very quiet until we notice it's quiet, then the animal sounds begin. We see the town that Lu saw in her vision, and fight a wraith, Lu smashes it no problem with a maul. Go into a dark cave where Kevin says he is from. Then to Eldrin's school (Tools'n'brats). We went to a dwarven settlement where we were led to a cave, out of the cave came a Silver dragon, which after some fighting turned into Gron. Then Kevin Everyman awoke as Osilith, and took us to his \"birthplace\" where he was created, some sort of weapon against – maybe – Skynet. Gron did a fun crazy monk attack before throwing an unconscious Jolly Jon through a door that Osilith had stepped through.\nWe traveled to Yartar to hopefully get the worm disease dealt with.",
+            "isExpanded" : true
+          }
+        },
+        {
+          "type" : "journal",
+          "journal" : {
+            "title" : "2020\/07\/29 - Day 6",
+            "text" : "We take stock of everyone, Steve is OK, one farm hand, Simon, has a worm leg which Jolly Jon cuts off (nat 20!), the other, Billy, is OK. But Jolly Jon, Zoarah, and Hatharal were bit by Bothsworm and so they also have the worm sickness. We explored the caves, found rock rubble, Lu took a staff and went ragey and saw through time, snapped out of it and has a sweet staff now. Back in the main area Gron is trapped in a block of ice, and 4 dragonborn arrive: Hghrron (Gron's mom, and a monk), Krrtck (powerful sorcerer), and Chigh (powerful monk), dunno about the 4th (an extra? Ryan didn't use him). The sorcerer explains about Gron \/ Patternist, opens a door to \"The Shadow of the Pattern\".",
+            "isExpanded" : true
+          }
+        },
+        {
+          "type" : "journal",
+          "journal" : {
+            "title" : "2020\/07\/16 - Day 5",
+            "text" : "We go into the cave. Just outside is a journal that says they were trying to find the cave of seasons. This is that temple - built by dwarves and \"keeps the seasons\". They heard strange noises under the earth. We went in the well, a path led to a big room. Stone carvings of moon and sun. Found a \"berry key\" but then fire exploded, we ran out and climbed back out of the well. We go through the caves and found a room with healing water (each drink = d4), and a key at the bottom of the water. In the main room we found Steve tied to a column, and the two farm hands, and 1 dwarf (too far gone). The drawf from episode 1 is half worm - Sir Bothsworm! After we kill him (Zoarah helps) he says \"You can kill me, but Osilith will still take this whole world.\"",
+            "isExpanded" : true
+          }
+        },
+        {
+          "type" : "journal",
+          "journal" : {
+            "title" : "2020\/06\/18 - Day 4",
+            "text" : "We left the Dwarven town and go through the southern side of the sword mountains (towards a camp we heard about?). We find a nice arrow, colors are house Marbury. We hear a horn and a pig runs out. Gron conjures a log to make it turn and Jolly Jon smashes it with his maul. We meet Jorn Jonah Marbury, Fenric Marbury (son), and Zoarah Marbury, introduced as his daughter but maybe adopted. Their guide is an Elf named Falcon. We join them to their hunting lodge. Falcon agrees that \"Araugauthos\" sounds draconic, no other information, no dragon sightings. We stay at the lodge that night, Gron has a dream of a silver *or white* dragon that says \"You magic will grow.\"\nThe next day we go through the woods an come across a boulder and Gron jumps onto it, it turns out to be a troll and it quickly knocks Gron unconscious, but someone heals him. The troll regenerates but casting Chill Touch stops the regeneration.\nAt the camp the tents are empty. Gron casts an illusion of a worm to trick Hatharal, and then a wormy arm thing attacks Gron. Hilarious arm battle.",
+            "isExpanded" : true
+          }
+        },
+        {
+          "type" : "journal",
+          "journal" : {
+            "title" : "2020\/05\/28 - Day 3",
+            "text" : "A monster appears out of the wall, a shape shifting mass with eyes and teeth and tentacles, and makes the sounds of gnomes it ate. Jon Rogers delt the death blow, and it turned into an orc w\/ a hole in its chest, like the first orc. Wears a necklace w\/ symbol of Talos, has a map w\/ an X on it, and has a note that says \"Find the font of magic...Osolith (who?) demands...Araugauthos (dragon name)...\". Eldrin gets a 10'  extending pole, Jolly Jon got \"Clockwork amulet\" (Auto roll a 10 instead of rolling a d20 for attack check).\nGron takes a walk and sees the blue dragon again, sees a chain hanging from its neck, one wing is damaged.\nSlime analysis: slime from the field is not from the shape shifter. It had sediment that wouldn't be found in a farm field - a mine maybe (flecks of metal).\nWe run into a group of 4 harpies and almost get wiped out. They have the mark of Talos - maybe there are more orcs in this area. Found a metal spike in the club, worth 10gp, 10 perfect harpy feathers, 2 harpy talons.\nWe travel to the mushroom-growing dwarves' area and stay in the inn. Jolly Jon pours mushroom oil in Eldrin's drink, to much amusement. The dwarves give us each 15g of \"wetshrooms\" to try out, let us breathe underwater.",
+            "isExpanded" : true
+          }
+        },
+        {
+          "type" : "journal",
+          "journal" : {
+            "title" : "2020\/05\/07 - Day 2",
+            "text" : "Leaving the tower we got away from Daggermaw by casting illusions, which gave Gron and Ludavisia inspiration! We made our way back to Leilon, saw a blue\/lightning dragon far away, which is a rare sight. In Leilon, talking to Steve, we learned about dwarves harvesting mushrooms in a town south of Leilon. We visited Wilburton farm and talked to the mom of Billy, in the field there were some misc. shoes, and lots of mucus\/slime, and disturbed soil in a roughly circular shape. We learn about Korbaz in Gnomengaard who might know about the slime.\nWe travel to Gnomengaard and meet Morbo at the entrance. Korbaz is locked away in the throne room, Morbo recommends we talk to Fibbelstib and Dabbledob.\nA gnome attacks us w\/ a turret, we meet Factoray. We explored Gnomengaard, got past spinning blades, met lots of gnomes, they think there's a shape shifter hiding somewhere. In the throne room we open a chest and took a Hat of Wizardry and a Wand of Pyrotechnics, which are are allowed to borrow. One of the Kings (Korbaz or Nerkley) says the rug grew teeth and tried to attack him.",
+            "isExpanded" : true
+          }
+        },
+        {
+          "type" : "journal",
+          "journal" : {
+            "title" : "2020\/04\/23 - Day 1",
+            "text" : "We start in the Slumbering Bear Inn, in Leilon. Janelle is the bartender. Sir Botswane the Dwarf is there (red beard, badass).\nSteve invites us to the town hall for quests. There's an apothecary and a church.\nQuests:\n• Shipwrecks - eerie light, 4 ships gone\n• Disappearing people (~12 people)\n• Goblins messed up some caravans, maybe there's loot.\nWe chose the shipwrecks\/lighthouse. At the apothecary is Grolk, a half-orc. Looking for Witchwort, grompstool, and honeylight.\nOn the road we ran into Harris and Beardsley from the Hogs Mead Brewery.\nAt the lighthouse we met Halfred the crab, learned about Marrol the elf and Daggermaw the shark. Jolly Jon tried to attack Marrol's ghost form, Gron settled her down, Marrol lost her arcane focus, we should find it. We got lightning power from an altar to Talos, fought harpies, rested, and fought Muesko the orc necromancer, who had a hole in his chest. We found \"Hasselhommer\" and \"Cloak of Many Fashions\". Ships that were damaged: \"Golden Gull, Orca\"",
+            "isExpanded" : true
           }
         }
       ],
@@ -1182,7 +1293,6 @@
         {
           "type" : "action",
           "action" : {
-            "shouldResetOnLongRest" : false,
             "title" : "Spider Climb",
             "level" : "2",
             "description" : "Duration: Concentration, 1 hour\nA willing creature you touch gains the ability to move up, down, and across vertical surfaces and upside down along ceilings, while leaving its hands free. The target also gains a climbing speed equal to its walking speed.",
@@ -1237,7 +1347,6 @@
         {
           "type" : "action",
           "action" : {
-            "shouldResetOnLongRest" : false,
             "title" : "Major Image",
             "level" : "3",
             "description" : "Range: 120'\nDuration: Concentration, 10 minutes\nCreate image that is no larger than a 20' cube. Appears completely real, including sounds, smells, and temperature, and is animated. As an action you can move it to another spot. Physical interaction or investigation (INT) check vs spell save DC makes the spell transparent.\nAt level 6+ the spell lasts until dispelled without requiring concentration.",
@@ -1286,7 +1395,6 @@
         {
           "type" : "action",
           "action" : {
-            "shouldResetOnLongRest" : false,
             "title" : "Counterspell",
             "level" : "3",
             "description" : "",
@@ -1307,7 +1415,6 @@
         {
           "type" : "action",
           "action" : {
-            "shouldResetOnLongRest" : false,
             "title" : "Psychic Ray",
             "level" : "2",
             "description" : "Range: 120'\nYou create three spears of psychic energy and hurl them at targets within range. You can hurl them at one target or several.\nEach target makes an INT saving throw against your spell save DC. On a failed save, you deliver 2d6 psychic damage and the target must give up a move, an action, or a bonus action; it gets only two of the three.\nOne more spear for each spell slot > 2nd level.",
@@ -1331,7 +1438,6 @@
         {
           "type" : "action",
           "action" : {
-            "shouldResetOnLongRest" : false,
             "title" : "Improved Minor Illusion",
             "level" : "Cantrip",
             "description" : "Range: 30' | Duration: 1 minute\nYou create a sound and\/or an image of an object within range that lasts for the duration, or until dismissed as an action. Volume of sound from whisper to scream, can be a voice, one repeating or many sounds. Image must fit in 5' cube. Image cannot create light, sound, touch, or smell. Successful INT (Investigation) check against spell save DC can reveal the illusion.",
@@ -1352,7 +1458,6 @@
         {
           "type" : "action",
           "action" : {
-            "shouldResetOnLongRest" : false,
             "title" : "Frozen Sphere (see Fireball)",
             "level" : "3",
             "description" : "Range: 150'\nEach creature in a 20-foot-radius sphere centered on that point must make a DEX saving throw. A target takes 8d6 cold damage on a failed save, or half as much damage on a successful one. When you cast this spell using a spell slot of 4th level or higher, the damage increases by 1d6 for each slot level above 3rd.",
@@ -1365,7 +1470,6 @@
         {
           "type" : "action",
           "action" : {
-            "shouldResetOnLongRest" : false,
             "title" : "Back you Fiend",
             "description" : "Immediately after any melee attack that uses your quarterstaff you can choose to launch yourself away from your opponent 10 ft, and if the opponent fails a STR saving throw they are knocked back 10 ft.",
             "subactions" : [
@@ -1391,7 +1495,6 @@
         {
           "type" : "action",
           "action" : {
-            "shouldResetOnLongRest" : false,
             "title" : "Way of the Old Master",
             "description" : "Quarterstaff is considered an unarmed attack for Flurry of Blows and Martial attacks.",
             "subactions" : [
@@ -1405,7 +1508,7 @@
           "ability" : {
             "title" : "Meditation",
             "isExpanded" : true,
-            "description" : "Regain 1d6 Ki points during a short rest."
+            "description" : "Regain 1d6 Sorcery points during a short rest."
           }
         },
         {
@@ -1416,9 +1519,9 @@
               "type" : {
                 "type" : "ki"
               },
-              "amount" : 1
+              "amount" : 2
             },
-            "description" : "As an action or bonus action, spend 1-4 ki points to make 1-4 attacks. If they target different creatures the creatures must be within 10 feet of each other.",
+            "description" : "As an action or bonus action, spend 2-10 ki points to make 1-5 attacks. If they target different creatures the creatures must be within 10 feet of each other.",
             "isExpanded" : true
           }
         }
@@ -1649,6 +1752,92 @@
                     "value" : "monkLevel"
                   }
                 ]
+              }
+            },
+            {
+              "variable" : "weavePoints.Max",
+              "operation" : {
+                "lhs" : {
+                  "type" : "integer",
+                  "value" : 0
+                },
+                "condition" : {
+                  "type" : "<",
+                  "lhs" : {
+                    "type" : "variable",
+                    "value" : "monkLevel"
+                  },
+                  "rhs" : {
+                    "type" : "integer",
+                    "value" : 4
+                  }
+                },
+                "type" : "if",
+                "rhs" : {
+                  "type" : "add",
+                  "value" : [
+                    {
+                      "type" : "variable",
+                      "value" : "sorcererLevel"
+                    },
+                    {
+                      "lhs" : {
+                        "type" : "variable",
+                        "value" : "monkLevel"
+                      },
+                      "condition" : {
+                        "type" : ">=",
+                        "lhs" : {
+                          "type" : "variable",
+                          "value" : "monkLevel"
+                        },
+                        "rhs" : {
+                          "type" : "integer",
+                          "value" : 2
+                        }
+                      },
+                      "type" : "if",
+                      "rhs" : {
+                        "type" : "integer",
+                        "value" : 0
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "variable" : "weavePoints",
+              "operation" : {
+                "lhs" : {
+                  "type" : "integer",
+                  "value" : 0
+                },
+                "condition" : {
+                  "type" : "=",
+                  "lhs" : {
+                    "type" : "variable",
+                    "value" : "weavePoints.Max"
+                  },
+                  "rhs" : {
+                    "type" : "integer",
+                    "value" : 0
+                  }
+                },
+                "type" : "if",
+                "rhs" : {
+                  "type" : "add",
+                  "value" : [
+                    {
+                      "type" : "variable",
+                      "value" : "kiPoints"
+                    },
+                    {
+                      "type" : "variable",
+                      "value" : "sorceryPoints"
+                    }
+                  ]
+                }
               }
             },
             {

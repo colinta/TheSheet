@@ -10,7 +10,7 @@
         {
           "type" : "action",
           "action" : {
-            "shouldResetOnLongRest" : false,
+            "shouldResetOn" : null,
             "title" : "Sneak Attack",
             "description" : "Deal extra damage when you hit with an attack if you have advantage OR if another enemy of the target is within 5 ft of target and you don't have disadvantage.  Attack must use a finesse or a ranged weapon.",
             "subactions" : [
@@ -36,7 +36,7 @@
             "subactions" : [
 
             ],
-            "shouldResetOnLongRest" : true,
+            "shouldResetOn" : "short",
             "description" : "Once per short rest as a bonus action you can teleport up to 30' to an unoccupied space you can see.",
             "remainingUses" : 1
           }
@@ -52,7 +52,7 @@
         {
           "type" : "action",
           "action" : {
-            "shouldResetOnLongRest" : false,
+            "shouldResetOn" : null,
             "title" : "Rapier",
             "description" : "Finesse, Range 5",
             "subactions" : [
@@ -99,7 +99,7 @@
         {
           "type" : "action",
           "action" : {
-            "shouldResetOnLongRest" : false,
+            "shouldResetOn" : null,
             "title" : "Dagger",
             "description" : "Finesse, Light, Thrown, Range 20\/60",
             "subactions" : [
@@ -170,13 +170,13 @@
             "title" : "Hit Points",
             "current" : 22,
             "readonly":false,
-            "max" : 23,
+            "max" : {"type":"integer", "value": 23},
             "type" :
               {
                 "type" : "hitPoints"
               }
             ,
-            "shouldResetOnLongRest" : true
+            "shouldResetOn" : "long"
           }
         },
         {
@@ -190,7 +190,7 @@
                 "type" : "inspiration"
               }
             ,
-            "shouldResetOnLongRest" : false
+            "shouldResetOn" : null
           }
         },
         {
@@ -269,7 +269,7 @@
                 "type" : "level"
               }
             ,
-            "shouldResetOnLongRest" : false
+            "shouldResetOn" : null
           }
         },
         {

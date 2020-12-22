@@ -40,6 +40,7 @@ enum EditableControl {
         case changeInt(Property, Int)
         case changeBool(Property, Bool)
         case changeExpertise(Property, Skill.Expertise)
+        case changeRest(Property, Rest?)
         case togglePointType(Points.PointType)
 
         static func atIndex(_ index: Int, _ message: Message) -> Message {
@@ -176,17 +177,17 @@ enum EditableControl {
             return .pointsTracker(points.replace(title: value), editor)
         case let (.pointsTracker(points, editor), .changeInt(.current, value)):
             return .pointsTracker(points.replace(current: max(0, value)), editor)
-        case let (.pointsTracker(points, editor), .changeInt(.max, value)):
-            guard points.max != nil else { return self }
-            return .pointsTracker(points.replace(max: max(0, value)), editor)
+        // case let (.pointsTracker(points, editor), .changeInt(.max, value)):
+        //     guard points.max != nil else { return self }
+        //     return .pointsTracker(points.replace(max: max(0, value)), editor)
         case let (.pointsTracker(points, editor), .changeBool(.max, enabled)):
-            var newPoints = points.replace(max: enabled ? points.max ?? points.current : nil)
+            var newPoints = points.replace(max: enabled ? points.max ?? .integer(points.current) : nil)
             if !enabled {
-                newPoints = newPoints.replace(shouldResetOnLongRest: false)
+                newPoints = newPoints.replace(shouldResetOn: nil)
             }
             return .pointsTracker(newPoints, editor)
-        case let (.pointsTracker(points, editor), .changeBool(.resets, enabled)):
-            return .pointsTracker(points.replace(shouldResetOnLongRest: enabled), editor)
+        case let (.pointsTracker(points, editor), .changeRest(.resets, rest)):
+            return .pointsTracker(points.replace(shouldResetOn: rest), editor)
         case let (.pointsTracker(points, editor), .togglePointType(pointType)):
             if points.type?.is(pointType) == true {
                 return .pointsTracker(

@@ -37,6 +37,29 @@ struct Roll {
         return Roll(dice: newDice.sorted { $0.d < $1.d }, modifier: modifier + roll.modifier)
     }
 
+    func subtracting(_ roll: Roll) -> Roll {
+        var newDice: [Dice] = []
+        // for every die already accounted for, just subtract N dice of the same type.
+        for die in dice {
+            var newDie = die
+            for moreDie in roll.dice {
+                if newDie.d == moreDie.d {
+                    newDie = Dice(n: max(0, newDie.n - moreDie.n), d: newDie.d)
+                    break
+                }
+            }
+            newDice.append(newDie)
+        }
+
+        // add every new die
+        for moreDie in roll.dice {
+            guard !newDice.contains(where: { $0.d == moreDie.d }) else { continue }
+            newDice.append(moreDie)
+        }
+
+        return Roll(dice: newDice.sorted { $0.d < $1.d }, modifier: modifier - roll.modifier)
+    }
+
     func adding(_ die: Dice) -> Roll {
         adding(Roll(dice: [die], modifier: 0))
     }

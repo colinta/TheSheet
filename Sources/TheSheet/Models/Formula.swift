@@ -30,9 +30,6 @@ struct Formula: Codable {
                 let parsed = try Editable.parse(editableFormula)
                 return Formula(variable: variable, operation: parsed)
             } catch {
-                // debug("=============== \(#file) line \(#line) ===============")
-                // debug("editableFormula: \(editableFormula)")
-                // debug("error: \(error)")
                 return nil
             }
         }
@@ -92,6 +89,7 @@ extension Formula.Editable {
 
     private static let functions: [(String, ([Operation]) -> Operation)] = [
         ("+", Operation.add),
+        ("-", Operation.subtract),
         ("*", Operation.multiply),
         ("×", Operation.multiply),
         ("max", Operation.max),

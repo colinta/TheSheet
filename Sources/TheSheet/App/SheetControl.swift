@@ -37,7 +37,7 @@ enum SheetControl {
         ("Skills (Acrobatics, Stealth, …)", .skills([])),
         ("Stats (Armor, Attack, …)", .stats("", [])),
         ("Hit Dice", .hitDice([])),
-        ("Take a Long Rest", .restButton),
+        ("Take a Rest", .restButton),
         ("Journal", .journal(.default)),
     ]
 
@@ -86,14 +86,14 @@ enum SheetControl {
         case updateSlotMax(slotIndex: Int, max: Int)
         case burnSlot(slotIndex: Int)
         case buySlot(slotIndex: Int)
-        case updatePoints(current: Int, max: Int?)
+        case updatePoints(current: Int)
         case toggleExpanded
         case changeQuantity(delta: Int)
         case changeQuantityAtIndex(index: Int, delta: Int)
         case useHitDie(Int)
         case changeHitDie(Int, delta: Int)
         case resetActionUses
-        case takeRest
+        case takeRest(Rest)
         case delegate(Delegate)
     }
 
@@ -158,8 +158,8 @@ enum SheetControl {
             return (control, SheetControl.burnSlot(slotIndex: slotIndex))
         case let (.spellSlots, .buySlot(slotIndex)):
             return (control, SheetControl.buySlot(slotIndex: slotIndex))
-        case let (.pointsTracker(points), .updatePoints(current, max)):
-            control = .pointsTracker(points.replace(current: current).replace(max: max))
+        case let (.pointsTracker(points), .updatePoints(current)):
+            control = .pointsTracker(points.replace(current: current))
         case let (.attributes(attributes), .changeQuantityAtIndex(changeIndex, delta)):
             guard changeIndex >= 0, changeIndex < attributes.count else { break }
             control = .attributes(
@@ -177,11 +177,11 @@ enum SheetControl {
                 guard atIndex == index else { return hitDie }
                 return hitDie.use(-delta)
             })
-        case (.restButton, .takeRest):
+        case let (.restButton, .takeRest(rest)):
             return (
                 .restButton,
                 Sheet.mapControls { control in
-                    control.takeRest(sheet: sheet)
+                    control.takeRest(sheet: sheet, rest: rest)
                 }
             )
         case let (.journal(journal), .toggleExpanded):
@@ -237,7 +237,7 @@ enum SheetControl {
             )
         case let .pointsTracker(points):
             return PointsTracker(
-                points: points, sheet: sheet, onChange: { c, m in Message.updatePoints(current: c, max: m) })
+                points: points, sheet: sheet, onChange: Message.updatePoints)
         case let .stats(title, stats):
             return StatsView(
                 title: title, stats: stats, sheet: sheet, onRoll: { Message.delegate(.roll($0)) })
@@ -384,11 +384,11 @@ extension SheetControl: Codable {
     }
 }
 extension SheetControl {
-    private func takeRest(sheet: Sheet) -> SheetControl {
+    private func takeRest(sheet: Sheet, rest: Rest) -> SheetControl {
         var control: SheetControl = self
         switch self {
         case let .spellSlots(spellSlots):
-            guard spellSlots.shouldResetOnLongRest else { break }
+            guard spellSlots.shouldResetOnLongRest, rest == .long else { break }
             control = .spellSlots(
                 spellSlots.replace(
                     slots: spellSlots.slots.map { slot in
@@ -396,11 +396,11 @@ extension SheetControl {
                             title: slot.title, current: slot.max, max: slot.max)
                     }))
         case let .pointsTracker(points):
-            guard points.shouldResetOnLongRest, let pointsMax = points.max else { break }
+            guard points.shouldResetOn == rest, let pointsMax = points.max?.eval(sheet).toInt else { break }
             control = .pointsTracker(points.replace(current: pointsMax))
         case let .action(action):
             guard
-                action.shouldResetOnLongRest,
+                action.shouldResetOn == rest,
                 let maxUses = action.maxUses,
                 let value = maxUses.eval(sheet).toInt
             else { break }
