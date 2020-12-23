@@ -475,7 +475,7 @@ indirect enum Operation {
 
 extension Operation: Codable {
     enum CodingKeys: String, CodingKey {
-        case type
+        case `class`
         case value
         case n
         case d
@@ -486,7 +486,7 @@ extension Operation: Codable {
 
     init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
-        let type = try values.decode(String.self, forKey: .type)
+        let type = try values.decode(String.self, forKey: .class)
         switch type {
         case "integer":
             let integer = try values.decode(Int.self, forKey: .value)
@@ -575,81 +575,81 @@ extension Operation: Codable {
         var container = encoder.container(keyedBy: CodingKeys.self)
         switch self {
         case let .integer(integer):
-            try container.encode("integer", forKey: .type)
+            try container.encode("integer", forKey: .class)
             try container.encode(integer, forKey: .value)
         case let .dice(dice):
-            try container.encode("dice", forKey: .type)
+            try container.encode("dice", forKey: .class)
             try container.encode(dice.n, forKey: .n)
             try container.encode(dice.d, forKey: .d)
         case let .bool(bool):
-            try container.encode("bool", forKey: .type)
+            try container.encode("bool", forKey: .class)
             try container.encode(bool, forKey: .value)
         case let .string(string):
-            try container.encode("string", forKey: .type)
+            try container.encode("string", forKey: .class)
             try container.encode(string, forKey: .value)
         case let .editing(editing):
-            try container.encode("editing", forKey: .type)
+            try container.encode("editing", forKey: .class)
             try container.encode(editing, forKey: .value)
         case let .modifier(modifier):
-            try container.encode("modifier", forKey: .type)
+            try container.encode("modifier", forKey: .class)
             try container.encode(modifier, forKey: .value)
         case let .variable(variable):
-            try container.encode("variable", forKey: .type)
+            try container.encode("variable", forKey: .class)
             try container.encode(variable, forKey: .value)
         case let .add(operations):
-            try container.encode("add", forKey: .type)
+            try container.encode("add", forKey: .class)
             try container.encode(operations, forKey: .value)
         case let .subtract(operations):
-            try container.encode("subtract", forKey: .type)
+            try container.encode("subtract", forKey: .class)
             try container.encode(operations, forKey: .value)
         case let .multiply(operations):
-            try container.encode("multiply", forKey: .type)
+            try container.encode("multiply", forKey: .class)
             try container.encode(operations, forKey: .value)
         case let .negate(operation):
-            try container.encode("negate", forKey: .type)
+            try container.encode("negate", forKey: .class)
             try container.encode(operation, forKey: .value)
         case let .divide(lhs, rhs):
-            try container.encode("divide", forKey: .type)
+            try container.encode("divide", forKey: .class)
             try container.encode(lhs, forKey: .lhs)
             try container.encode(rhs, forKey: .rhs)
         case let .floor(operation):
-            try container.encode("floor", forKey: .type)
+            try container.encode("floor", forKey: .class)
             try container.encode(operation, forKey: .value)
         case let .round(operation):
-            try container.encode("round", forKey: .type)
+            try container.encode("round", forKey: .class)
             try container.encode(operation, forKey: .value)
         case let .ceil(operation):
-            try container.encode("ceil", forKey: .type)
+            try container.encode("ceil", forKey: .class)
             try container.encode(operation, forKey: .value)
         case let .max(operations):
-            try container.encode("max", forKey: .type)
+            try container.encode("max", forKey: .class)
             try container.encode(operations, forKey: .value)
         case let .min(operations):
-            try container.encode("min", forKey: .type)
+            try container.encode("min", forKey: .class)
             try container.encode(operations, forKey: .value)
         case let .if(condition, lhs, rhs):
-            try container.encode("if", forKey: .type)
+            try container.encode("if", forKey: .class)
             try container.encode(condition, forKey: .condition)
             try container.encode(lhs, forKey: .lhs)
             try container.encode(rhs, forKey: .rhs)
         case let .equal(lhs, rhs):
-            try container.encode("=", forKey: .type)
+            try container.encode("=", forKey: .class)
             try container.encode(lhs, forKey: .lhs)
             try container.encode(rhs, forKey: .rhs)
         case let .greaterThan(lhs, rhs):
-            try container.encode(">", forKey: .type)
+            try container.encode(">", forKey: .class)
             try container.encode(lhs, forKey: .lhs)
             try container.encode(rhs, forKey: .rhs)
         case let .greaterThanEqual(lhs, rhs):
-            try container.encode(">=", forKey: .type)
+            try container.encode(">=", forKey: .class)
             try container.encode(lhs, forKey: .lhs)
             try container.encode(rhs, forKey: .rhs)
         case let .lessThan(lhs, rhs):
-            try container.encode("<", forKey: .type)
+            try container.encode("<", forKey: .class)
             try container.encode(lhs, forKey: .lhs)
             try container.encode(rhs, forKey: .rhs)
         case let .lessThanEqual(lhs, rhs):
-            try container.encode("<=", forKey: .type)
+            try container.encode("<=", forKey: .class)
             try container.encode(lhs, forKey: .lhs)
             try container.encode(rhs, forKey: .rhs)
         }

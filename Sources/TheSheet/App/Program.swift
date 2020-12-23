@@ -220,7 +220,7 @@ func update(model: inout Model, message: Message) -> State<Model, Message> {
         }
 
         let coder = JSONEncoder()
-        coder.outputFormatting = .prettyPrinted
+        coder.outputFormatting = [.prettyPrinted, .sortedKeys]
         do {
             let data = try coder.encode(model.sheet)
             try data.write(to: fileURL, options: [.atomic])
@@ -234,7 +234,7 @@ func update(model: inout Model, message: Message) -> State<Model, Message> {
         }
 
         let coder = JSONEncoder()
-        coder.outputFormatting = .prettyPrinted
+        coder.outputFormatting = [.prettyPrinted, .sortedKeys]
         do {
             let data = try coder.encode(model.sheet)
             try data.write(to: fileURL, options: [.atomic])
