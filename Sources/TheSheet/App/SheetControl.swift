@@ -396,11 +396,11 @@ extension SheetControl {
                             title: slot.title, current: slot.max, max: slot.max)
                     }))
         case let .pointsTracker(points):
-            guard points.shouldResetOn == rest, let pointsMax = points.max?.eval(sheet).toInt else { break }
+            guard points.shouldResetOn?.matches(rest) == true, let pointsMax = points.max?.eval(sheet).toInt else { break }
             control = .pointsTracker(points.replace(current: pointsMax))
         case let .action(action):
             guard
-                action.shouldResetOn == rest,
+                action.shouldResetOn?.matches(rest) == true,
                 let maxUses = action.maxUses,
                 let value = maxUses.eval(sheet).toInt
             else { break }

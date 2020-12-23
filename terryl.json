@@ -10,7 +10,6 @@
         {
           "type" : "action",
           "action" : {
-            "shouldResetOn" : null,
             "title" : "Sneak Attack",
             "description" : "Deal extra damage when you hit with an attack if you have advantage OR if another enemy of the target is within 5 ft of target and you don't have disadvantage.  Attack must use a finesse or a ranged weapon.",
             "subactions" : [
@@ -36,23 +35,30 @@
             "subactions" : [
 
             ],
-            "shouldResetOn" : "short",
             "description" : "Once per short rest as a bonus action you can teleport up to 30' to an unoccupied space you can see.",
+            "shouldResetOn" : "short",
             "remainingUses" : 1
           }
         },
         {
           "type" : "ability",
           "ability" : {
-            "title" : "Defensive Duelist",
+            "title" : "Alert",
             "isExpanded" : true,
-            "description" : "When you are wielding a finesse weapon with which you are proficient and another creature hits you with a melee attack, you can use your reaction to add 2 to your AC for that attack."
+            "description" : "You can’t be surprised while you are conscious.\nYou gain a +5 bonus to initiative.\nOther creatures don’t gain advantage on attack rolls against you as a result of being hidden from you."
+          }
+        },
+        {
+          "type" : "ability",
+          "ability" : {
+            "title" : "Assassin - 3rd level",
+            "isExpanded" : true,
+            "description" : "At 3rd level, you get advantage (+ sneak attack) on attack rolls against any creature that hasn't taken a turn in combat. Any hit you score against a surprised creature is a critical hit."
           }
         },
         {
           "type" : "action",
           "action" : {
-            "shouldResetOn" : null,
             "title" : "Rapier",
             "description" : "Finesse, Range 5",
             "subactions" : [
@@ -99,7 +105,6 @@
         {
           "type" : "action",
           "action" : {
-            "shouldResetOn" : null,
             "title" : "Dagger",
             "description" : "Finesse, Light, Thrown, Range 20\/60",
             "subactions" : [
@@ -167,30 +172,28 @@
         {
           "type" : "pointsTracker",
           "points" : {
+            "shouldResetOn" : "long",
             "title" : "Hit Points",
-            "current" : 22,
-            "readonly":false,
-            "max" : {"type":"integer", "value": 23},
-            "type" :
-              {
-                "type" : "hitPoints"
-              }
-            ,
-            "shouldResetOn" : "long"
+            "current" : 23,
+            "max" : {
+              "type" : "integer",
+              "value" : 23
+            },
+            "type" : {
+              "type" : "hitPoints"
+            },
+            "readonly" : false
           }
         },
         {
           "type" : "pointsTracker",
           "points" : {
             "title" : "Inspiration",
-            "readonly":false,
-            "current" : 0,
-            "type" :
-              {
-                "type" : "inspiration"
-              }
-            ,
-            "shouldResetOn" : null
+            "current" : 1,
+            "type" : {
+              "type" : "inspiration"
+            },
+            "readonly" : false
           }
         },
         {
@@ -254,7 +257,7 @@
                 "type" : "variable",
                 "value" : "CON.Mod"
               },
-              "remaining" : 2
+              "remaining" : 4
             }
           ]
         },
@@ -262,14 +265,11 @@
           "type" : "pointsTracker",
           "points" : {
             "title" : "Level",
-            "readonly":false,
-            "current" : 3,
-            "type" :
-              {
-                "type" : "level"
-              }
-            ,
-            "shouldResetOn" : null
+            "current" : 4,
+            "type" : {
+              "type" : "level"
+            },
+            "readonly" : false
           }
         },
         {
@@ -418,6 +418,11 @@
             },
             {
               "title" : "Disguise kit",
+              "basedOn" : "",
+              "expertise" : "proficient"
+            },
+            {
+              "title" : "Poisoner's kit",
               "basedOn" : "",
               "expertise" : "proficient"
             },
@@ -765,6 +770,36 @@
         }
       ],
       "isFormulaColumn" : true
+    },
+    {
+      "title" : "Future",
+      "controls" : [
+        {
+          "type" : "ability",
+          "ability" : {
+            "title" : "Assassin - 9th",
+            "isExpanded" : true,
+            "description" : "At 9th level, you can spend 7 days and 25GP to create a new identity, other creatures believe that identity unless they have an obvious reason not to."
+          }
+        },
+        {
+          "type" : "ability",
+          "ability" : {
+            "title" : "Assassin - 13th",
+            "isExpanded" : true,
+            "description" : "At 13th Level, you can unerringly mimic another person's speech, writing, mannerisms\/behavior. You must spend 3 hours studying the person. Advantage on Deception (CHA) to avoid detection."
+          }
+        },
+        {
+          "type" : "ability",
+          "ability" : {
+            "title" : "Assassin - 17th",
+            "isExpanded" : true,
+            "description" : "At 17th level, after a successful surprise attack (critical hit) the creature must make a CON save (>={{8+proficiencyBonus+Dex.MOD}}) or take double damage."
+          }
+        }
+      ],
+      "isFormulaColumn" : false
     }
   ]
 }
