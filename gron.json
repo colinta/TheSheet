@@ -1235,18 +1235,6 @@
     {
       "controls" : [
         {
-          "action" : {
-            "description" : "Duration: Concentration, 1 hour\nA willing creature you touch gains the ability to move up, down, and across vertical surfaces and upside down along ceilings, while leaving its hands free. The target also gains a climbing speed equal to its walking speed.",
-            "isExpanded" : true,
-            "level" : "2",
-            "subactions" : [
-
-            ],
-            "title" : "Spider Climb"
-          },
-          "type" : "action"
-        },
-        {
           "ability" : {
             "description" : "Immediately after you take the Attack action on your turn, you can spend 1 ki point to make two unarmed strikes as a bonus action.",
             "isExpanded" : true,
@@ -1290,6 +1278,18 @@
         },
         {
           "action" : {
+            "description" : "Duration: Concentration, 1 hour\nA willing creature you touch gains the ability to move up, down, and across vertical surfaces and upside down along ceilings, while leaving its hands free. The target also gains a climbing speed equal to its walking speed.",
+            "isExpanded" : true,
+            "level" : "2",
+            "subactions" : [
+
+            ],
+            "title" : "Spider Climb"
+          },
+          "type" : "action"
+        },
+        {
+          "action" : {
             "description" : "Range: 120'\nDuration: Concentration, 10 minutes\nCreate image that is no larger than a 20' cube. Appears completely real, including sounds, smells, and temperature, and is animated. As an action you can move it to another spot. Physical interaction or investigation (INT) check vs spell save DC makes the spell transparent.\nAt level 6+ the spell lasts until dispelled without requiring concentration.",
             "isExpanded" : true,
             "level" : "3",
@@ -1299,28 +1299,6 @@
             "title" : "Major Image"
           },
           "type" : "action"
-        },
-        {
-          "ability" : {
-            "description" : "Take an attack of opportunity when an enemy enters range if you didn’t move your legs on previous turn. Or you can choose to trip the enemy - contested DEX check.",
-            "isExpanded" : true,
-            "title" : "Old Instincts",
-            "uses" : {
-              "amount" : 1,
-              "type" : {
-                "type" : "ki"
-              }
-            }
-          },
-          "type" : "ability"
-        },
-        {
-          "ability" : {
-            "description" : "Quarterstaff becomes a 1d10 weapon when used two handed (1d8 when used one handed).",
-            "isExpanded" : true,
-            "title" : "Trusty Walking Stick"
-          },
-          "type" : "ability"
         },
         {
           "ability" : {
@@ -1357,41 +1335,6 @@
           "type" : "ability"
         },
         {
-          "action" : {
-            "description" : "Range: 120'\nYou create three spears of psychic energy and hurl them at targets within range. You can hurl them at one target or several.\nEach target makes an INT saving throw against your spell save DC. On a failed save, you deliver 2d6 psychic damage and the target must give up a move, an action, or a bonus action; it gets only two of the three.\nOne more spear for each spell slot > 2nd level.",
-            "isExpanded" : true,
-            "level" : "2",
-            "subactions" : [
-              {
-                "check" : {
-                  "class" : "variable",
-                  "value" : "spellSaveDC"
-                },
-                "damage" : {
-                  "class" : "dice",
-                  "d" : 6,
-                  "n" : 2
-                },
-                "type" : "Psychic"
-              }
-            ],
-            "title" : "Psychic Ray"
-          },
-          "type" : "action"
-        },
-        {
-          "action" : {
-            "description" : "Range: 30' | Duration: 1 minute\nYou create a sound and\/or an image of an object within range that lasts for the duration, or until dismissed as an action. Volume of sound from whisper to scream, can be a voice, one repeating or many sounds. Image must fit in 5' cube. Image cannot create light, sound, touch, or smell. Successful INT (Investigation) check against spell save DC can reveal the illusion.",
-            "isExpanded" : true,
-            "level" : "Cantrip",
-            "subactions" : [
-
-            ],
-            "title" : "Improved Minor Illusion"
-          },
-          "type" : "action"
-        },
-        {
           "ability" : {
             "description" : "",
             "isExpanded" : true,
@@ -1412,58 +1355,14 @@
           "type" : "action"
         },
         {
-          "action" : {
-            "description" : "Immediately after any melee attack that uses your quarterstaff you can choose to launch yourself away from your opponent 10 ft, and if the opponent fails a STR saving throw they are knocked back 10 ft.",
-            "isExpanded" : true,
-            "subactions" : [
-
-            ],
-            "title" : "Back you Fiend"
-          },
-          "type" : "action"
-        },
-        {
           "ability" : {
-            "description" : "As a bonus action the quarterstaff can be imbued with psychic magic, making it a magical weapon. After a successful attack the magic energy can be released into the target for 2d4 damage. Otherwise lasts 1 minute.",
+            "description" : "When you Cast a Spell that forces a creature to make a saving throw to resist its effects, you can spend 3 sorcery points to give one target of the spell disadvantage on its first saving throw made against the spell.",
             "isExpanded" : true,
-            "title" : "Grumpy Old Man",
+            "title" : "Heightened Spell",
             "uses" : {
               "amount" : 1,
               "type" : {
-                "type" : "ki"
-              }
-            }
-          },
-          "type" : "ability"
-        },
-        {
-          "action" : {
-            "description" : "Quarterstaff is considered an unarmed attack for Flurry of Blows and Martial attacks.",
-            "isExpanded" : true,
-            "subactions" : [
-
-            ],
-            "title" : "Way of the Old Master"
-          },
-          "type" : "action"
-        },
-        {
-          "ability" : {
-            "description" : "Regain 1d6 Sorcery points during a short rest.",
-            "isExpanded" : true,
-            "title" : "Meditation"
-          },
-          "type" : "ability"
-        },
-        {
-          "ability" : {
-            "description" : "As an action or bonus action, spend 2-10 ki points to make 1-5 attacks. If they target different creatures the creatures must be within 10 feet of each other.",
-            "isExpanded" : true,
-            "title" : "Who're You Calling Old!?",
-            "uses" : {
-              "amount" : 2,
-              "type" : {
-                "type" : "ki"
+                "type" : "sorcery"
               }
             }
           },
