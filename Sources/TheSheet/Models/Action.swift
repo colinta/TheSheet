@@ -38,9 +38,7 @@ struct Action: Codable {
     init(
         title: String, level: String? = nil, check: Operation? = nil, damage: Operation? = nil,
         type: String? = nil,
-        description: String? = nil, isExpanded: Bool = false,
-        remainingUses: Int? = nil, maxUses: Operation? = nil,
-        shouldResetOn: Bool = false
+        description: String? = nil, isExpanded: Bool = false
     ) {
         self.init(
             title: title,
