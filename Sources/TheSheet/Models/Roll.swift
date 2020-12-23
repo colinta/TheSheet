@@ -11,6 +11,9 @@ struct Roll {
         if modifier == 0 {
             return diceStr
         }
+        if modifier < 0 {
+            return "\(diceStr)-\(-modifier)"
+        }
         return "\(diceStr)+\(modifier)"
     }
 

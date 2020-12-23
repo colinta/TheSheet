@@ -17,6 +17,7 @@ indirect enum Operation {
     case add([Operation])
     case subtract([Operation])
     case multiply([Operation])
+    case negate(Operation)
     case divide(Operation, Operation)
     case max([Operation])
     case min([Operation])
@@ -226,7 +227,11 @@ indirect enum Operation {
             for operation in operations {
                 let resolved = operation.eval(sheet, dontRecur)
                 if case let .roll(roll) = resolved {
-                    totalRoll = totalRoll.subtracting(roll)
+                    if isFirst {
+                        totalRoll = roll
+                    } else {
+                        totalRoll = totalRoll.subtracting(roll)
+                    }
                 } else if case let .integer(value) = resolved {
                     isModifier = isModifier ?? false
                     if isFirst {
@@ -263,6 +268,17 @@ indirect enum Operation {
                 }
             }
             return reduce(toValues(operations, sheet, dontRecur), *)
+        case let .negate(operation):
+            let resolved = operation.eval(sheet, dontRecur)
+            if case let .roll(roll) = resolved {
+                return .roll(Roll(dice: [], modifier: 0).subtracting(roll))
+            } else if case let .integer(value) = resolved {
+                return .integer(-value)
+            } else if case let .modifier(value) = resolved {
+                return .modifier(-value)
+            } else {
+                return .undefined
+            }
         case let .divide(lhs, rhs):
             return reduce(
                 toValues([lhs, rhs], sheet, dontRecur),
@@ -354,6 +370,8 @@ indirect enum Operation {
         case let .multiply(operations):
             return attributedOperator(
                 "×", operations: operations, sheet: sheet, precedence: 3, prevPrecedence)
+        case let .negate(value):
+            return "-".foreground(.magenta) + value.toAttributed(sheet)
         case let .divide(lhs, rhs):
             return attributedOperator(
                 "÷", operations: [lhs, rhs], sheet: sheet, precedence: 3, prevPrecedence)
@@ -425,6 +443,8 @@ indirect enum Operation {
             return "(- \(operations.map(\.toEditable).joined(separator: " ")))"
         case let .multiply(operations):
             return "(× \(operations.map(\.toEditable).joined(separator: " ")))"
+        case let .negate(operation):
+            return "(- \(operation.toEditable))"
         case let .divide(lhs, rhs):
             return "(÷ \(lhs.toEditable) \(rhs.toEditable))"
         case let .floor(operation):
@@ -499,6 +519,9 @@ extension Operation: Codable {
         case "multiply":
             let operations = try values.decode([Operation].self, forKey: .value)
             self = .multiply(operations)
+        case "negate":
+            let operation = try values.decode(Operation.self, forKey: .value)
+            self = .negate(operation)
         case "divide":
             let lhs = try values.decode(Operation.self, forKey: .lhs)
             let rhs = try values.decode(Operation.self, forKey: .rhs)
@@ -582,6 +605,9 @@ extension Operation: Codable {
         case let .multiply(operations):
             try container.encode("multiply", forKey: .type)
             try container.encode(operations, forKey: .value)
+        case let .negate(operation):
+            try container.encode("negate", forKey: .type)
+            try container.encode(operation, forKey: .value)
         case let .divide(lhs, rhs):
             try container.encode("divide", forKey: .type)
             try container.encode(lhs, forKey: .lhs)

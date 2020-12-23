@@ -383,6 +383,7 @@ extension SheetControl: Codable {
         }
     }
 }
+
 extension SheetControl {
     private func takeRest(sheet: Sheet, rest: Rest) -> SheetControl {
         var control: SheetControl = self

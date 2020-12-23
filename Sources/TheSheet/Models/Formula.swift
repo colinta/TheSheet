@@ -121,6 +121,9 @@ extension Formula.Editable {
         for (match, fn) in functions {
             guard let buffer = buffer.removingPrefix(match) else { continue }
             let (args, remainder) = try parseArgs(buffer)
+            if match == "-" && args.count == 1 {
+                return (Operation.negate(args[0]), remainder)
+            }
             return (fn(args), remainder)
         }
         for (match, fn) in arity3 {
