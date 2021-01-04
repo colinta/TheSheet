@@ -7,37 +7,11 @@
         },
         {
           "points" : {
-            "current" : 1,
-            "max" : {
-              "class" : "if",
-              "condition" : {
-                "class" : "=",
-                "lhs" : {
-                  "class" : "variable",
-                  "value" : "sorcererLevel"
-                },
-                "rhs" : {
-                  "class" : "integer",
-                  "value" : 1
-                }
-              },
-              "lhs" : {
-                "class" : "integer",
-                "value" : 0
-              },
-              "rhs" : {
-                "class" : "variable",
-                "value" : "sorcererLevel"
-              }
-            },
-            "readonly" : false,
-            "shouldResetOn" : "long",
-            "title" : "Sorcery Points",
-            "type" : {
-              "type" : "sorcery"
-            }
+            "kiUsed" : 0,
+            "sorceryUsed" : 0,
+            "title" : "Weave Points"
           },
-          "type" : "pointsTracker"
+          "type" : "weavePointsTracker"
         },
         {
           "ability" : {
@@ -270,7 +244,7 @@
                 "title" : "1"
               },
               {
-                "current" : 1,
+                "current" : 3,
                 "max" : 3,
                 "title" : "2"
               }
@@ -303,19 +277,16 @@
         },
         {
           "action" : {
-            "description" : "Make a melee attack against one creature. On a hit the target suffers immediate additional thunder damage and if the target moves willingly >5' they take additional thunder damage.",
+            "description" : "Make a melee attack against one creature. On a hit the target suffers immediate additional thunder damage and if the target moves willingly >5' they take movement thunder damage.",
             "isExpanded" : true,
             "level" : "Cantrip",
             "subactions" : [
               {
-                "check" : {
-                  "class" : "variable",
-                  "value" : "spellSaveDC"
-                },
                 "damage" : {
                   "class" : "variable",
                   "value" : "boomingBlade.Additional"
                 },
+                "title" : "Additional Damage",
                 "type" : "Thunder"
               },
               {
@@ -323,6 +294,7 @@
                   "class" : "variable",
                   "value" : "boomingBlade.Movement"
                 },
+                "title" : "Movement damage",
                 "type" : "Thunder"
               }
             ],
@@ -439,7 +411,7 @@
         },
         {
           "action" : {
-            "description" : "Cast: Bonus Action\nBriefly surrounded by silvery mist, you teleport up to 30 feet to an unoccupied space that you can see.",
+            "description" : "Briefly surrounded by silvery mist, you teleport up to 30 feet to an unoccupied space that you can see.",
             "isExpanded" : true,
             "level" : "2",
             "subactions" : [
@@ -457,7 +429,7 @@
       "controls" : [
         {
           "points" : {
-            "current" : 27,
+            "current" : 42,
             "max" : {
               "class" : "integer",
               "value" : 42
@@ -495,7 +467,7 @@
               "title" : "Attack",
               "value" : {
                 "class" : "variable",
-                "value" : "attackBonus"
+                "value" : "attackRoll.proficient"
               }
             },
             {
@@ -529,7 +501,7 @@
               "title" : "Spell",
               "value" : {
                 "class" : "variable",
-                "value" : "spellAttack"
+                "value" : "spellAttackRoll"
               }
             },
             {
@@ -581,7 +553,7 @@
                 "class" : "variable",
                 "value" : "CON.Mod"
               },
-              "remaining" : 1
+              "remaining" : 3
             }
           ],
           "type" : "hitDice"
@@ -614,7 +586,7 @@
         },
         {
           "points" : {
-            "current" : 1,
+            "current" : 3,
             "max" : {
               "class" : "subtract",
               "value" : [
@@ -1083,40 +1055,6 @@
     },
     {
       "controls" : [
-        {
-          "points" : {
-            "current" : 0,
-            "max" : {
-              "class" : "if",
-              "condition" : {
-                "class" : "=",
-                "lhs" : {
-                  "class" : "variable",
-                  "value" : "monkLevel"
-                },
-                "rhs" : {
-                  "class" : "integer",
-                  "value" : 1
-                }
-              },
-              "lhs" : {
-                "class" : "integer",
-                "value" : 0
-              },
-              "rhs" : {
-                "class" : "variable",
-                "value" : "monkLevel"
-              }
-            },
-            "readonly" : false,
-            "shouldResetOn" : "short",
-            "title" : "Ki Points",
-            "type" : {
-              "type" : "ki"
-            }
-          },
-          "type" : "pointsTracker"
-        },
         {
           "ability" : {
             "description" : "Immediately after you take the Attack action on your turn, you can spend 1 ki point to make two unarmed strikes as a bonus action.",

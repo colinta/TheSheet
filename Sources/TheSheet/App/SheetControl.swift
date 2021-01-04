@@ -12,6 +12,7 @@ enum SheetControl {
     case ability(Ability)
     case spellSlots(SpellSlots)
     case pointsTracker(Points)
+    case weavePointsTracker(WeavePoints)
     case attributes([Attribute])
     case skills([Skill])
     case stats(String, [Stat])
@@ -54,6 +55,8 @@ enum SheetControl {
             return formulas
         case let .pointsTracker(points):
             return points.formulas
+        case let .weavePointsTracker(points):
+            return points.formulas
         default:
             return []
         }
@@ -89,6 +92,7 @@ enum SheetControl {
         case burnSlot(slotIndex: Int)
         case buySlot(slotIndex: Int)
         case updatePoints(current: Int)
+        case updateWeavePoints(ki: Int, sorcery: Int)
         case toggleExpanded
         case changeQuantity(delta: Int)
         case changeQuantityAtIndex(index: Int, delta: Int)
@@ -162,6 +166,8 @@ enum SheetControl {
             return (control, SheetControl.buySlot(slotIndex: slotIndex))
         case let (.pointsTracker(points), .updatePoints(current)):
             control = .pointsTracker(points.replace(current: current))
+        case let (.weavePointsTracker(points), .updateWeavePoints(kiUsed, sorceryUsed)):
+            control = .weavePointsTracker(points.replace(kiUsed: kiUsed).replace(sorceryUsed: sorceryUsed))
         case let (.attributes(attributes), .changeQuantityAtIndex(changeIndex, delta)):
             guard changeIndex >= 0, changeIndex < attributes.count else { break }
             control = .attributes(
@@ -214,10 +220,15 @@ enum SheetControl {
         case let .spellSlots(spellSlots):
             let sorceryPoints = sheet.columns.reduce(0) { memo, column in
                 column.controls.reduce(memo) { memo, control in
-                    guard case let .pointsTracker(points) = control, points.is(.sorcery) else {
-                        return memo
+                    if case let .pointsTracker(points) = control, points.is(.sorcery) {
+                        return points.current
                     }
-                    return points.current
+                    else if case let .weavePointsTracker(points) = control,
+                        let current = points.current.eval(sheet).toInt
+                    {
+                        return current
+                    }
+                    return memo
                 }
             }
             let modifiedSpellSlots: [SpellSlot]
@@ -240,6 +251,9 @@ enum SheetControl {
         case let .pointsTracker(points):
             return PointsTracker(
                 points: points, sheet: sheet, onChange: Message.updatePoints)
+        case let .weavePointsTracker(points):
+            return WeavePointsTracker(
+                points: points, sheet: sheet, onChange: Message.updateWeavePoints)
         case let .stats(title, stats):
             return StatsView(
                 title: title, stats: stats, sheet: sheet, onRoll: { Message.delegate(.roll($0)) })
@@ -317,6 +331,9 @@ extension SheetControl: Codable {
         case "pointsTracker":
             let points = try values.decode(Points.self, forKey: .points)
             self = .pointsTracker(points)
+        case "weavePointsTracker":
+            let points = try values.decode(WeavePoints.self, forKey: .points)
+            self = .weavePointsTracker(points)
         case "attributes":
             let attributes = try values.decode([Attribute].self, forKey: .attributes)
             self = .attributes(attributes)
@@ -361,6 +378,9 @@ extension SheetControl: Codable {
         case let .pointsTracker(points):
             try container.encode("pointsTracker", forKey: .type)
             try container.encode(points, forKey: .points)
+        case let .weavePointsTracker(points):
+            try container.encode("weavePointsTracker", forKey: .type)
+            try container.encode(points, forKey: .points)
         case let .attributes(attributes):
             try container.encode("attributes", forKey: .type)
             try container.encode(attributes, forKey: .attributes)
@@ -401,6 +421,12 @@ extension SheetControl {
         case let .pointsTracker(points):
             guard points.shouldResetOn?.matches(rest) == true, let pointsMax = points.max?.eval(sheet).toInt else { break }
             control = .pointsTracker(points.replace(current: pointsMax))
+        case let .weavePointsTracker(points):
+            var nextPoints = points.replace(kiUsed: 0)
+            if rest == .long {
+                nextPoints = nextPoints.replace(sorceryUsed: 0)
+            }
+            control = .weavePointsTracker(nextPoints)
         case let .action(action):
             guard
                 action.shouldResetOn?.matches(rest) == true,
@@ -437,11 +463,16 @@ extension SheetControl {
                             return slot.replace(current: slot.current - 1)
                         }))
             }.mapControls { control in
-                guard canBurn, case let .pointsTracker(points) = control, points.is(.sorcery) else {
-                    return control
+                guard canBurn else { return control }
+                if case let .pointsTracker(points) = control, points.is(.sorcery)
+                {
+                    return .pointsTracker(
+                        points.replace(current: points.current + newPoints))
                 }
-                return .pointsTracker(
-                    points.replace(current: points.current + newPoints))
+                else if case let .weavePointsTracker(points) = control {
+                    return .weavePointsTracker(points.replace(sorceryUsed: points.sorceryUsed - newPoints))
+                }
+                return control
             }
         }
     }
@@ -451,13 +482,21 @@ extension SheetControl {
         return { sheet in
             var canBuy = false
             return sheet.mapControls { control in
-                guard case let .pointsTracker(points) = control,
-                    points.is(.sorcery),
-                    points.current >= cost
-                else { return control }
-                canBuy = true
-                return .pointsTracker(
-                    points.replace(current: points.current - cost))
+                if case let .pointsTracker(points) = control,
+                    points.is(.sorcery)
+                {
+                    canBuy = points.current >= cost
+                    return .pointsTracker(
+                        points.replace(current: points.current - cost))
+
+                }
+                else if case let .weavePointsTracker(points) = control {
+                    canBuy = true
+                    return .weavePointsTracker(
+                        points.replace(sorceryUsed: points.sorceryUsed + cost)
+                        )
+                }
+                return control
             }.mapControls { control in
                 guard canBuy, case let .spellSlots(spellSlots) = control else { return control }
                 return .spellSlots(
