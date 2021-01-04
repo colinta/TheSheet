@@ -4,15 +4,13 @@
 
 import Ashen
 
-func AbilityView<Msg>(
-    _ ability: Ability, onExpand: @escaping @autoclosure SimpleEvent<Msg>,
-    onChange: @escaping (Int) -> Msg
-) -> View<
-    Msg
-> {
-    let expandedViews: [View<Msg>]
-    let buttonView: View<Msg>
-    let abilityStats: View<Msg>? = _AbilityDescriptionView(
+func AbilityView(
+    _ ability: Ability, onExpand: @escaping @autoclosure SimpleEvent<ControlMessage>,
+    onChange: @escaping (Int) -> ControlMessage
+) -> View<ControlMessage> {
+    let expandedViews: [View<ControlMessage>]
+    let buttonView: View<ControlMessage>
+    let abilityStats: View<ControlMessage>? = _AbilityDescriptionView(
         ability, onChange)
     if abilityStats == nil {
         buttonView = Space()
@@ -37,19 +35,19 @@ func AbilityView<Msg>(
     ).border(.single)
 }
 
-func _AbilityDescriptionView<Msg>(
-    _ ability: Ability, _ onChange: @escaping (Int) -> Msg
-) -> View<Msg>? {
-    var abilityViews: [View<Msg>] = [_AbilityDescriptionView(ability.description)]
+func _AbilityDescriptionView(
+    _ ability: Ability, _ onChange: @escaping (Int) -> ControlMessage
+) -> View<ControlMessage>? {
+    var abilityViews: [View<ControlMessage>] = [_AbilityDescriptionView(ability.description)]
 
     if let uses = ability.uses {
-        let abilityUses: View<Msg> = _AbilityUsesView(uses: uses, onChange)
+        let abilityUses: View<ControlMessage> = _AbilityUsesView(uses: uses, onChange)
         abilityViews.append(abilityUses)
     }
 
     return Stack(
         .down,
-        abilityViews.reduce([View<Msg>]()) { views, abilityView in
+        abilityViews.reduce([View<ControlMessage>]()) { views, abilityView in
             if views.isEmpty {
                 return [abilityView]
             } else {
@@ -58,18 +56,16 @@ func _AbilityDescriptionView<Msg>(
         })
 }
 
-func _AbilityTitleView<Msg>(_ title: String) -> View<Msg> {
+func _AbilityTitleView(_ title: String) -> View<ControlMessage> {
     Text(title.bold()).centered().underlined()
 }
-func _AbilityDescriptionView<Msg>(_ description: String) -> View<
-    Msg
-> {
+func _AbilityDescriptionView(_ description: String) -> View<ControlMessage> {
     Text(description, .wrap(true))
         .fitInContainer(dimension: .width)
 }
-func _AbilityUsesView<Msg>(
-    uses: Ability.Uses, _ onChange: @escaping (Int) -> Msg
-) -> View<Msg> {
+func _AbilityUsesView(
+    uses: Ability.Uses, _ onChange: @escaping (Int) -> ControlMessage
+) -> View<ControlMessage> {
     Flow(
         .ltr,
         [

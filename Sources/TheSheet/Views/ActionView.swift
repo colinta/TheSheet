@@ -4,17 +4,15 @@
 
 import Ashen
 
-func ActionView<Msg>(
-    _ action: Action, sheet: Sheet, onExpand: @escaping @autoclosure SimpleEvent<Msg>,
-    onChange: @escaping (Int) -> Msg, onResetUses: @escaping @autoclosure SimpleEvent<Msg>,
-    onRoll: @escaping (Roll) -> Msg
-) -> View<
-    Msg
-> {
-    let expandedViews: [View<Msg>]
+func ActionView(
+    _ action: Action, sheet: Sheet, onExpand: @escaping @autoclosure SimpleEvent<ControlMessage>,
+    onChange: @escaping (Int) -> ControlMessage, onResetUses: @escaping @autoclosure SimpleEvent<ControlMessage>,
+    onRoll: @escaping (Roll) -> ControlMessage
+) -> View<ControlMessage> {
+    let expandedViews: [View<ControlMessage>]
     let buttonText: String
     if action.isExpanded {
-        let actionStats: View<Msg>? = _ActionStatsView(
+        let actionStats: View<ControlMessage>? = _ActionStatsView(
             action, sheet: sheet, onChange, onResetUses(), onRoll)
         expandedViews = actionStats.map { [$0] } ?? []
         buttonText = "↑↑↑"
@@ -35,15 +33,15 @@ func ActionView<Msg>(
     ).border(.single)
 }
 
-func _ActionStatsView<Msg>(
-    _ action: Action, sheet: Sheet, _ onChange: @escaping (Int) -> Msg,
-    _ onResetUses: @escaping @autoclosure SimpleEvent<Msg>,
-    _ onRoll: @escaping (Roll) -> Msg
-) -> View<Msg>? {
-    var actionViews = action.subactions.reduce([View<Msg>]()) { views, sub in
-        let statViews: [View<Msg>] = [
-            sub.check.map({ _ActionCheckView($0, sheet: sheet, onRoll) }) as View<Msg>?,
-            sub.damage.map({ _ActionDamageView($0, sheet: sheet, onRoll) }) as View<Msg>?,
+func _ActionStatsView(
+    _ action: Action, sheet: Sheet, _ onChange: @escaping (Int) -> ControlMessage,
+    _ onResetUses: @escaping @autoclosure SimpleEvent<ControlMessage>,
+    _ onRoll: @escaping (Roll) -> ControlMessage
+) -> View<ControlMessage>? {
+    var actionViews = action.subactions.reduce([View<ControlMessage>]()) { views, sub in
+        let statViews: [View<ControlMessage>] = [
+            sub.check.map({ _ActionCheckView($0, sheet: sheet, onRoll) }) as View<ControlMessage>?,
+            sub.damage.map({ _ActionDamageView($0, sheet: sheet, onRoll) }) as View<ControlMessage>?,
             sub.type.map({ _ActionTypeView($0, sheet: sheet, onRoll) }),
         ].compactMap { $0 }
 
@@ -58,7 +56,7 @@ func _ActionStatsView<Msg>(
                         Flow(
                             .ltr,
                             [(.fixed, Space().width(1))]
-                                + statViews.flatMap { view -> [(FlowSize, View<Msg>)] in
+                                + statViews.flatMap { view -> [(FlowSize, View<ControlMessage>)] in
                                     [(.flex1, view), (.fixed, Space().width(1))]
                                 }),
                     ])
@@ -68,7 +66,7 @@ func _ActionStatsView<Msg>(
                 Flow(
                     .ltr,
                     [(.fixed, Space().width(1))]
-                        + statViews.flatMap { view -> [(FlowSize, View<Msg>)] in
+                        + statViews.flatMap { view -> [(FlowSize, View<ControlMessage>)] in
                             [(.flex1, view), (.fixed, Space().width(1))]
                         })
             ]
@@ -76,12 +74,12 @@ func _ActionStatsView<Msg>(
     }
 
     if let description = action.description, !description.isEmpty {
-        let actionDescription: View<Msg> = _ActionDescriptionView(description)
+        let actionDescription: View<ControlMessage> = _ActionDescriptionView(description)
         actionViews.append(actionDescription)
     }
 
     if let remainingUses = action.remainingUses {
-        let actionUses: View<Msg> = _ActionUsesView(
+        let actionUses: View<ControlMessage> = _ActionUsesView(
             action: action, remainingUses: remainingUses, sheet: sheet,
             onChange, onResetUses())
         actionViews.append(actionUses)
@@ -90,7 +88,7 @@ func _ActionStatsView<Msg>(
     guard !actionViews.isEmpty else { return nil }
     return Stack(
         .down,
-        actionViews.reduce([View<Msg>]()) { views, actionView in
+        actionViews.reduce([View<ControlMessage>]()) { views, actionView in
             if views.isEmpty {
                 return [actionView]
             } else {
@@ -99,39 +97,35 @@ func _ActionStatsView<Msg>(
         })
 }
 
-func _ActionTitleView<Msg>(_ title: String) -> View<Msg> {
+func _ActionTitleView(_ title: String) -> View<ControlMessage> {
     Text(title.bold()).centered().underlined()
 }
-func _ActionLevelView<Msg>(_ level: String?) -> View<Msg> {
+func _ActionLevelView(_ level: String?) -> View<ControlMessage> {
     level.map { Text($0) } ?? Space()
 }
-func _ActionCheckView<Msg>(_ check: Operation, sheet: Sheet, _ onRoll: @escaping (Roll) -> Msg)
-    -> View<Msg>
+func _ActionCheckView(_ check: Operation, sheet: Sheet, _ onRoll: @escaping (Roll) -> ControlMessage)
+    -> View<ControlMessage>
 {
     StatView(title: "Check", value: check, sheet: sheet, onRoll: onRoll)
 }
-func _ActionDamageView<Msg>(_ damage: Operation, sheet: Sheet, _ onRoll: @escaping (Roll) -> Msg)
-    -> View<Msg>
+func _ActionDamageView(_ damage: Operation, sheet: Sheet, _ onRoll: @escaping (Roll) -> ControlMessage)
+    -> View<ControlMessage>
 {
     StatView(title: "Damage", value: damage, sheet: sheet, onRoll: onRoll)
 }
-func _ActionTypeView<Msg>(_ type: String, sheet: Sheet, _ onRoll: @escaping (Roll) -> Msg) -> View<
-    Msg
-> {
+func _ActionTypeView(_ type: String, sheet: Sheet, _ onRoll: @escaping (Roll) -> ControlMessage) -> View<ControlMessage> {
     StatView(title: "Type", value: .string(type), sheet: sheet, onRoll: onRoll)
 }
-func _ActionDescriptionView<Msg>(_ description: String) -> View<
-    Msg
-> {
+func _ActionDescriptionView(_ description: String) -> View<ControlMessage> {
     Text(description, .wrap(true))
         .fitInContainer(dimension: .width)
 }
-func _ActionUsesView<Msg>(
+func _ActionUsesView(
     action: Action, remainingUses: Int, sheet: Sheet,
-    _ onChange: @escaping (Int) -> Msg,
-    _ onResetUses: @escaping @autoclosure SimpleEvent<Msg>
-) -> View<Msg> {
-    let remaining: View<Msg>
+    _ onChange: @escaping (Int) -> ControlMessage,
+    _ onResetUses: @escaping @autoclosure SimpleEvent<ControlMessage>
+) -> View<ControlMessage> {
+    let remaining: View<ControlMessage>
     if let maxUses = action.maxUses {
         remaining = Text(" \(remainingUses) of \(maxUses.eval(sheet).toReadable) remaining")
     } else {

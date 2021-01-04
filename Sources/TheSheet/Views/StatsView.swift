@@ -4,8 +4,8 @@
 
 import Ashen
 
-func StatsView<Msg>(title: String, stats: [Stat], sheet: Sheet, onRoll: @escaping (Roll) -> Msg)
-    -> View<Msg>
+func StatsView(title: String, stats: [Stat], sheet: Sheet, onRoll: @escaping (Roll) -> ControlMessage)
+    -> View<ControlMessage>
 {
     Stack(
         .down,
@@ -27,7 +27,7 @@ func StatsView<Msg>(title: String, stats: [Stat], sheet: Sheet, onRoll: @escapin
                 else {
                     let rows = Int((Float(stats.count) / Float(size.width / statWidth)).rounded(.up))
                     let perRow = stats.count / rows
-                    let views: [View<Msg>] = (0..<rows).map { row in
+                    let views: [View<ControlMessage>] = (0..<rows).map { row in
                         let statViews = stats[(row * perRow)..<min(stats.count, (row + 1) * perRow)]
                         return Flow(
                             .ltr,
@@ -45,14 +45,14 @@ func StatsView<Msg>(title: String, stats: [Stat], sheet: Sheet, onRoll: @escapin
         ])
 }
 
-func StatView<Msg>(_ stat: Stat, sheet: Sheet, onRoll: @escaping (Roll) -> Msg) -> View<Msg> {
+func StatView(_ stat: Stat, sheet: Sheet, onRoll: @escaping (Roll) -> ControlMessage) -> View<ControlMessage> {
     StatView(title: stat.title, value: stat.value, sheet: sheet, onRoll: onRoll)
 }
 
-func StatView<Msg>(title: String, value op: Operation, sheet: Sheet, onRoll: @escaping (Roll) -> Msg) -> View<Msg> {
+func StatView(title: String, value op: Operation, sheet: Sheet, onRoll: @escaping (Roll) -> ControlMessage) -> View<ControlMessage> {
     let value = op.eval(sheet)
-    let valueText: View<Msg> = Text(value.toAttributed).centered().underlined()
-    let valueView: View<Msg>
+    let valueText: View<ControlMessage> = Text(value.toAttributed).centered().underlined()
+    let valueView: View<ControlMessage>
     if let roll = value.toRollable {
         valueView = OnLeftClick(valueText, onRoll(roll))
     } else {

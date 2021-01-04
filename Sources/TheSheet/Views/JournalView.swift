@@ -4,10 +4,8 @@
 
 import Ashen
 
-func JournalView<Msg>(journal: Journal, onExpand: @escaping @autoclosure SimpleEvent<Msg>) -> View<
-    Msg
-> {
-    let expandedViews: [View<Msg>]
+func JournalView(journal: Journal, onExpand: @escaping @autoclosure SimpleEvent<ControlMessage>) -> View<ControlMessage> {
+    let expandedViews: [View<ControlMessage>]
     let buttonText: String
     if journal.isExpanded {
         expandedViews = [Text(journal.text, .wrap(true))]

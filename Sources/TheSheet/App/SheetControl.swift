@@ -4,6 +4,8 @@
 
 import Ashen
 
+typealias ControlMessage = SheetControl.Message
+
 enum SheetControl {
     case inventory(Inventory)
     case action(Action)

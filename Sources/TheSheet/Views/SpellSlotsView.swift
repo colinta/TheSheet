@@ -4,21 +4,21 @@
 
 import Ashen
 
-func SpellSlotsView<Msg>(
+func SpellSlotsView(
     title: Attributed, spellSlots: [SpellSlot], sorceryPoints: Int,
-    onToggle: @escaping ((slotIndex: Int, current: Int)) -> Msg,
-    onChangeMax: @escaping (Int, Int) -> Msg,
-    onBurn: @escaping (Int) -> Msg, onBuy: @escaping (Int) -> Msg
-) -> View<Msg> {
+    onToggle: @escaping ((slotIndex: Int, current: Int)) -> ControlMessage,
+    onChangeMax: @escaping (Int, Int) -> ControlMessage,
+    onBurn: @escaping (Int) -> ControlMessage, onBuy: @escaping (Int) -> ControlMessage
+) -> View<ControlMessage> {
     let maxMax = spellSlots.reduce(0) { memo, slot in
         max(memo, slot.max, slot.current)
     }
-    let titles: View<Msg> = Stack(
+    let titles: View<ControlMessage> = Stack(
         .down,
         spellSlots.map { slot in
             Text(slot.title).bold().padding(left: 1, right: 1).height(1)
         })
-    let columns: [(FlowSize, View<Msg>)] = (0..<maxMax).map { column in
+    let columns: [(FlowSize, View<ControlMessage>)] = (0..<maxMax).map { column in
         (
             .fixed,
             Stack(
@@ -37,7 +37,7 @@ func SpellSlotsView<Msg>(
                 })
         )
     }
-    let labels: View<Msg> = Stack(
+    let labels: View<ControlMessage> = Stack(
         .down,
         spellSlots.enumerated().map { slotIndex, slot in
             let burnPoints = SpellSlot.points(forLevel: slotIndex + 1)
@@ -80,23 +80,23 @@ func SpellSlotsView<Msg>(
         ])
 }
 
-func SlotCell<Msg>(isUsed: Bool, _ onToggle: @escaping (Int) -> Msg) -> View<Msg> {
+func SlotCell(isUsed: Bool, _ onToggle: @escaping (Int) -> ControlMessage) -> View<ControlMessage> {
     OnLeftClick(
         Text("[\(isUsed ? "○" : "●")]".foreground(isUsed ? .none : .blue)),
         onToggle(isUsed ? 1 : -1))
 }
 
-func BurnCell<Msg>(
-    _ canBurn: Bool, _ burnPoints: Int, _ onBurn: @escaping @autoclosure SimpleEvent<Msg>
-) -> View<Msg> {
+func BurnCell(
+    _ canBurn: Bool, _ burnPoints: Int, _ onBurn: @escaping @autoclosure SimpleEvent<ControlMessage>
+) -> View<ControlMessage> {
     let burnText = "Burn(\(burnPoints))"
     return canBurn
         ? OnLeftClick(Text(burnText.foreground(.yellow)), onBurn())
         : Text(burnText.foreground(.black))
 }
-func BuyCell<Msg>(
-    _ canBuy: Bool, _ buyPoints: Int?, _ onBuy: @escaping @autoclosure SimpleEvent<Msg>
-) -> View<Msg> {
+func BuyCell(
+    _ canBuy: Bool, _ buyPoints: Int?, _ onBuy: @escaping @autoclosure SimpleEvent<ControlMessage>
+) -> View<ControlMessage> {
     guard let buyPoints = buyPoints else { return Space().width(6) }
     let buyText = "Buy(\(buyPoints))"
     return canBuy

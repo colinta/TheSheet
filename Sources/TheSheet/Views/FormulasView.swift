@@ -4,7 +4,7 @@
 
 import Ashen
 
-func FormulasView<Msg>(editable: [Formula], fixed: [Formula], sheet: Sheet) -> View<Msg> {
+func FormulasView(editable: [Formula], fixed: [Formula], sheet: Sheet) -> View<ControlMessage> {
     Stack(
         .down,
         editable.map { formula in
@@ -20,8 +20,8 @@ func FormulasView<Msg>(editable: [Formula], fixed: [Formula], sheet: Sheet) -> V
     )
 }
 
-func FormulaView<Msg>(_ formula: Formula, sheet: Sheet, canEdit: Bool) -> View<Msg> {
-    let formulaView: View<Msg> = Stack(
+func FormulaView(_ formula: Formula, sheet: Sheet, canEdit: Bool) -> View<ControlMessage> {
+    let formulaView: View<ControlMessage> = Stack(
         .ltr,
         [
             Text(formula.variable.underlined()),

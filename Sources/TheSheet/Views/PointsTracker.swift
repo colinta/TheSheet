@@ -4,7 +4,7 @@
 
 import Ashen
 
-func PointsTracker<Msg>(points: Points, sheet: Sheet, onChange: @escaping (Int) -> Msg) -> View<Msg> {
+func PointsTracker(points: Points, sheet: Sheet, onChange: @escaping (Int) -> ControlMessage) -> View<ControlMessage> {
     Stack(
         .down,
         [
@@ -17,9 +17,7 @@ func PointsTracker<Msg>(points: Points, sheet: Sheet, onChange: @escaping (Int) 
         ])
 }
 
-private func PointsDisplay<Msg>(_ points: Points, _ sheet: Sheet, _ onChange: @escaping (Int) -> Msg) -> View<
-    Msg
-> {
+private func PointsDisplay(_ points: Points, _ sheet: Sheet, _ onChange: @escaping (Int) -> ControlMessage) -> View<ControlMessage> {
     if let pointsMax = points.max?.eval(sheet).toInt {
         return Flow(
             .ltr,
@@ -34,9 +32,7 @@ private func PointsDisplay<Msg>(_ points: Points, _ sheet: Sheet, _ onChange: @e
     }
 }
 
-private func ReadonlyPointsDisplay<Msg>(_ points: Points, _ sheet: Sheet, _ onChange: @escaping (Int) -> Msg) -> View<
-    Msg
-> {
+private func ReadonlyPointsDisplay(_ points: Points, _ sheet: Sheet, _ onChange: @escaping (Int) -> ControlMessage) -> View<ControlMessage> {
     let current = points.toVariable?.eval(sheet).toReadable ?? ""
     if let pointsMax = points.max?.eval(sheet) {
         return Flow(
@@ -53,13 +49,11 @@ private func ReadonlyPointsDisplay<Msg>(_ points: Points, _ sheet: Sheet, _ onCh
     }
 }
 
-private func PointsPercentTitle<Msg>(_ points: Points, _ sheet: Sheet) -> View<
-    Msg
-> {
+private func PointsPercentTitle(_ points: Points, _ sheet: Sheet) -> View<ControlMessage> {
     if points.readonly, let current = points.toVariable?.eval(sheet).toInt {
         let pointsMax = points.toMaxVariable?.eval(sheet).toInt
-        return PercentTitle("", current, pointsMax)
+        return PercentTitle(current, pointsMax)
     } else {
-        return PercentTitle("", points.current, points.max?.eval(sheet).toInt)
+        return PercentTitle(points.current, points.max?.eval(sheet).toInt)
     }
 }

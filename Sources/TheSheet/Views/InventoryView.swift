@@ -4,11 +4,11 @@
 
 import Ashen
 
-func InventoryView<Msg>(
-    _ inventory: Inventory, onChange: @escaping (Int) -> Msg,
-    onRemove: @escaping @autoclosure SimpleEvent<Msg>
-) -> View<Msg> {
-    var views: [View<Msg>] = [Text(inventory.title)]
+func InventoryView(
+    _ inventory: Inventory, onChange: @escaping (Int) -> ControlMessage,
+    onRemove: @escaping @autoclosure SimpleEvent<ControlMessage>
+) -> View<ControlMessage> {
+    var views: [View<ControlMessage>] = [Text(inventory.title)]
     if let quantity = inventory.quantity {
         views.append(Text("\(quantity) "))
         views.append(OnLeftClick(Text("[-]".foreground(.red)), onChange(-1)))

@@ -4,9 +4,7 @@
 
 import Ashen
 
-func TakeRestView(
-    _ onRest: @escaping (Rest) -> SheetControl.Message
-) -> View<SheetControl.Message> {
+func TakeRestView(_ onRest: @escaping (Rest) -> ControlMessage) -> View<ControlMessage> {
     Stack(
         .down,
         [

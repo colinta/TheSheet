@@ -4,12 +4,10 @@
 
 import Ashen
 
-func AttributesView<Msg>(
-    _ attributes: [Attribute], sheet: Sheet, onChange: @escaping (Int, Int) -> Msg,
-    onRoll: @escaping (Roll) -> Msg
-) -> View<
-    Msg
-> {
+func AttributesView(
+    _ attributes: [Attribute], sheet: Sheet, onChange: @escaping (Int, Int) -> ControlMessage,
+    onRoll: @escaping (Roll) -> ControlMessage
+) -> View<ControlMessage> {
     let (lhs, rhs) = attributes.enumerated().reduce(([Attribute](), [Attribute]())) {
         lhs_rhs, index_attr in
         let (lhs, rhs) = lhs_rhs
@@ -42,11 +40,11 @@ func AttributesView<Msg>(
         ])
 }
 
-func AttributeView<Msg>(
-    _ attribute: Attribute, sheet: Sheet, onChange: @escaping (Int) -> Msg,
-    onRoll: @escaping (Roll) -> Msg
+func AttributeView(
+    _ attribute: Attribute, sheet: Sheet, onChange: @escaping (Int) -> ControlMessage,
+    onRoll: @escaping (Roll) -> ControlMessage
 )
-    -> View<Msg>
+    -> View<ControlMessage>
 {
     Stack(
         .ltr,

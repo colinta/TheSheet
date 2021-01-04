@@ -46,10 +46,11 @@ func PlusMinus<Msg>(
                     } else {
                         amount = 5
                     }
+                    let value = (current ?? 0) - amount
                     if let minVal = minVal {
-                        return onChange(max(minVal, (current ?? 0) - amount))
+                        return onChange(max(minVal, value))
                     }
-                    return onChange((current ?? 0) - amount)
+                    return onChange(value)
                 }, .isEnabled(isEnabled)),
             OnClick(
                 Text("[+]".foreground(isEnabled ? .green : .black)),
@@ -60,10 +61,11 @@ func PlusMinus<Msg>(
                     } else {
                         amount = 5
                     }
+                    let value = (current ?? 0) + amount
                     if let maxVal = maxVal {
-                        return onChange(min(maxVal, (current ?? 0) - amount))
+                        return onChange(min(maxVal, value))
                     }
-                    return onChange((current ?? 0) + amount)
+                    return onChange(value)
                 }, .isEnabled(isEnabled)),
         ])
 }
