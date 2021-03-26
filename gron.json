@@ -7,7 +7,7 @@
         },
         {
           "points" : {
-            "current" : 1,
+            "current" : 4,
             "max" : {
               "class" : "if",
               "condition" : {
@@ -265,12 +265,12 @@
             "shouldResetOnLongRest" : true,
             "slots" : [
               {
-                "current" : 4,
+                "current" : 3,
                 "max" : 4,
                 "title" : "1"
               },
               {
-                "current" : 1,
+                "current" : 3,
                 "max" : 3,
                 "title" : "2"
               }
@@ -457,10 +457,10 @@
       "controls" : [
         {
           "points" : {
-            "current" : 27,
+            "current" : 50,
             "max" : {
               "class" : "integer",
-              "value" : 42
+              "value" : 50
             },
             "readonly" : false,
             "shouldResetOn" : "long",
@@ -585,69 +585,6 @@
             }
           ],
           "type" : "hitDice"
-        },
-        {
-          "points" : {
-            "current" : 4,
-            "max" : {
-              "class" : "subtract",
-              "value" : [
-                {
-                  "class" : "integer",
-                  "value" : 20
-                },
-                {
-                  "class" : "variable",
-                  "value" : "level"
-                }
-              ]
-            },
-            "readonly" : false,
-            "title" : "Sorcerer Level",
-            "type" : {
-              "title" : "Sorcerer Level",
-              "type" : "other",
-              "variable" : "sorcererLevel"
-            }
-          },
-          "type" : "pointsTracker"
-        },
-        {
-          "points" : {
-            "current" : 1,
-            "max" : {
-              "class" : "subtract",
-              "value" : [
-                {
-                  "class" : "integer",
-                  "value" : 20
-                },
-                {
-                  "class" : "variable",
-                  "value" : "level"
-                }
-              ]
-            },
-            "readonly" : false,
-            "title" : "Monk Level",
-            "type" : {
-              "title" : "Monk Level",
-              "type" : "other",
-              "variable" : "monkLevel"
-            }
-          },
-          "type" : "pointsTracker"
-        },
-        {
-          "points" : {
-            "current" : 0,
-            "readonly" : true,
-            "title" : "Level",
-            "type" : {
-              "type" : "level"
-            }
-          },
-          "type" : "pointsTracker"
         },
         {
           "attributes" : [
@@ -796,6 +733,69 @@
           "type" : "skills"
         },
         {
+          "points" : {
+            "current" : 4,
+            "max" : {
+              "class" : "subtract",
+              "value" : [
+                {
+                  "class" : "integer",
+                  "value" : 20
+                },
+                {
+                  "class" : "variable",
+                  "value" : "level"
+                }
+              ]
+            },
+            "readonly" : false,
+            "title" : "Sorcerer Level",
+            "type" : {
+              "title" : "Sorcerer Level",
+              "type" : "other",
+              "variable" : "sorcererLevel"
+            }
+          },
+          "type" : "pointsTracker"
+        },
+        {
+          "points" : {
+            "current" : 1,
+            "max" : {
+              "class" : "subtract",
+              "value" : [
+                {
+                  "class" : "integer",
+                  "value" : 20
+                },
+                {
+                  "class" : "variable",
+                  "value" : "level"
+                }
+              ]
+            },
+            "readonly" : false,
+            "title" : "Monk Level",
+            "type" : {
+              "title" : "Monk Level",
+              "type" : "other",
+              "variable" : "monkLevel"
+            }
+          },
+          "type" : "pointsTracker"
+        },
+        {
+          "points" : {
+            "current" : 0,
+            "readonly" : true,
+            "title" : "Level",
+            "type" : {
+              "type" : "level"
+            }
+          },
+          "type" : "pointsTracker"
+        },
+        {
           "ability" : {
             "description" : "Double Proficiency Bonus to Charisma when talking with Dragons",
             "isExpanded" : true,
@@ -828,83 +828,11 @@
         {
           "journal" : {
             "isExpanded" : true,
-            "text" : "We untie the goblin, Urzo, and trust\/intimidate him to help us, we follow the stream, it widens as we approach a cliff edge.  At the bottom is a pool, which lines up well with the treasure map.\nWe decide to cross the stream, which is '15 wide, so Eldrin shoots an arrow across (nat' 20!) and then walks across the tightrope.  Lu has some trouble getting across, Gron freezes water and Eldrin shoots another rope across to help.  As Jolly Jon crosses 2 giant eagle \/ horse creatures (Gron remembers\/knows they are \"Perytons\" aka \"Pelotons\").\nEldrin tries to calm one down – it has an injured wing – by offering it some healing water.  Jolly Jon speaks with animals! What!? He convinces it we mean no harm.  Lu heals it, and Eldrin gives it berries.  We ask them to take us to the pond, but they are nervous – the blue dragon lives down there.  So they take us 1\/4 mi away, at the bottom of the cliff, and we send in Eldrin using invisibility.  The dragon shows up and goes in the water, and then 10 orcs appear from boulder illusions and follow the dragon, saying they need to capture it while it eats.\nWe discuss, decide that we need to prevent them from capturing the dragon (Osilith wants a dragon), so we eat our magic breathing mushrooms and follow.  Urzo comes with us!\nWe sneak past one orc, who is posted up as guard, using Eldrin's \"Pass Undetected\" spell, reach the dragon.  Only two orcs remain, the leader and one fighter.  We charge in, tell the dragon we are there to help.\nWe defeat the leader (with an arrow from Eldrin), then the dragon dispatches the fighter.  When we return: we need to talk to the dragon (Araugauthos) and set a bear trap for the orc that was guarding the entrance.",
-            "title" : "2020\/11\/10 - Day 10"
+            "text" : "",
+            "title" : "One Note\n––––––––\n\nhttps://1drv.ms/u/s!AkksLX-g9cCjkjzk7krAGr3ugERK?e=p3afEd"
           },
           "type" : "journal"
         },
-        {
-          "journal" : {
-            "isExpanded" : true,
-            "text" : "We fought the rest of the fire orcs, they grew a ton, but Jolly Jon thankfully became mega strong. Zoarah and Lu turned into dragons, became Gruumsch, we tried to fight, but most of us died, except Jolly Jon, he met Gruumsch's son, who gives him a sword. Crossguard made of lumps of steely, jagged shard of a blade (broken).\nGruumsch's son Korag says he was captured by dwarves, imprisoned. The sword handle looks like muscle (carved stone). The crossed hammer and chisel is carved into it.\nThe dwarves \"split his soul into blood and bone\" (Jon holds Blood). In rage, the rest of the blade forms. \"The more pain you receive the more you dole out.\" (in a battle, Jon can stab himself with the sword, and if he survives he regains all the HP he has inflicted so far).\n\"Look to the north\", Jon sees a beacon of light far to the north. Flash of an image: crag of a mountain, a cave billowing flame.\n\"Find my bones, find your destiny, free me from this dwarven prison\".\n\"As long as you're swinging that sword, I'll be around\".\nWe're back in the circle. Jon holds a huge blood sword, like out of FF7.\nChunt is super happy, everone cheers. Big party.\nLevel Up!\nWe ask Chunt about Arasmus, maybe in Waterdeep, ask cleric headquarters.\nLu shows Chunt a magic-ass-wood-looking amulet. \"Touched by Sylvanis, it would make you better at knowing the world around you\" (+1 on Nature and Animal Handling checks).\nTreasure chest map! Triple forking river in the sword mountains, starting point is near that. We met a goblin, Uzo, who wants to help us, so we tied him up and fed him food.",
-            "title" : "2020\/09\/09 - Day 9"
-          },
-          "type" : "journal"
-        },
-        {
-          "journal" : {
-            "isExpanded" : true,
-            "text" : "We are met by the Shield of Yartar, who escort us into town. The Leader is the Water Baron.\nWe go to the information desk and learn about the health district, \"One Foot On the Boat\" Inn, a Cleric convention, and the Barnabus C. Winthrop Library of Business History & Other Things. Gron meets with Krrtck there and they think the bite is a Were-worm curse.\nOn the Cleric boat, the others talk to Vargis who recommends applying a poultice\nClerics on the boat say to use leeches from somewhere north, the Evermores, used for poison\nJunt - cleric of Groosh, called everyone else assholes, says he has a better idea, meet him north of town.\nElves: Luvalar, meeting on day two?\nLearned how to slow magic with herbs\/poultice\nLu meets w\/ Luvalar during the night, hears the name \"Arasmus\" from dying Luvalar after poisoned arrows are shot from across the river.\nWe meet Groosh at his hut, he sends us all through a fire portal and we fight fire-orcs in some other plane. Killing one gives us a kind of rage ability, but as they get knocked out the remaining foes get stronger, too.",
-            "title" : "2020\/08\/27 - Yartar"
-          },
-          "type" : "journal"
-        },
-        {
-          "journal" : {
-            "isExpanded" : true,
-            "text" : "We start in the Ice Spires, meet Ryan's goofy worm character Kevin Everyman, travel (magically?) to some woods - very quiet until we notice it's quiet, then the animal sounds begin. We see the town that Lu saw in her vision, and fight a wraith, Lu smashes it no problem with a maul. Go into a dark cave where Kevin says he is from. Then to Eldrin's school (Tools'n'brats). We went to a dwarven settlement where we were led to a cave, out of the cave came a Silver dragon, which after some fighting turned into Gron. Then Kevin Everyman awoke as Osilith, and took us to his \"birthplace\" where he was created, some sort of weapon against – maybe – Skynet. Gron did a fun crazy monk attack before throwing an unconscious Jolly Jon through a door that Osilith had stepped through.\nWe traveled to Yartar to hopefully get the worm disease dealt with.",
-            "title" : "2020\/08\/08 - Day 7"
-          },
-          "type" : "journal"
-        },
-        {
-          "journal" : {
-            "isExpanded" : true,
-            "text" : "We take stock of everyone, Steve is OK, one farm hand, Simon, has a worm leg which Jolly Jon cuts off (nat 20!), the other, Billy, is OK. But Jolly Jon, Zoarah, and Hatharal were bit by Bothsworm and so they also have the worm sickness. We explored the caves, found rock rubble, Lu took a staff and went ragey and saw through time, snapped out of it and has a sweet staff now. Back in the main area Gron is trapped in a block of ice, and 4 dragonborn arrive: Hghrron (Gron's mom, and a monk), Krrtck (powerful sorcerer), and Chigh (powerful monk), dunno about the 4th (an extra? Ryan didn't use him). The sorcerer explains about Gron \/ Patternist, opens a door to \"The Shadow of the Pattern\".",
-            "title" : "2020\/07\/29 - Day 6"
-          },
-          "type" : "journal"
-        },
-        {
-          "journal" : {
-            "isExpanded" : true,
-            "text" : "We go into the cave. Just outside is a journal that says they were trying to find the cave of seasons. This is that temple - built by dwarves and \"keeps the seasons\". They heard strange noises under the earth. We went in the well, a path led to a big room. Stone carvings of moon and sun. Found a \"berry key\" but then fire exploded, we ran out and climbed back out of the well. We go through the caves and found a room with healing water (each drink = d4), and a key at the bottom of the water. In the main room we found Steve tied to a column, and the two farm hands, and 1 dwarf (too far gone). The drawf from episode 1 is half worm - Sir Bothsworm! After we kill him (Zoarah helps) he says \"You can kill me, but Osilith will still take this whole world.\"",
-            "title" : "2020\/07\/16 - Day 5"
-          },
-          "type" : "journal"
-        },
-        {
-          "journal" : {
-            "isExpanded" : true,
-            "text" : "We left the Dwarven town and go through the southern side of the sword mountains (towards a camp we heard about?). We find a nice arrow, colors are house Marbury. We hear a horn and a pig runs out. Gron conjures a log to make it turn and Jolly Jon smashes it with his maul. We meet Jorn Jonah Marbury, Fenric Marbury (son), and Zoarah Marbury, introduced as his daughter but maybe adopted. Their guide is an Elf named Falcon. We join them to their hunting lodge. Falcon agrees that \"Araugauthos\" sounds draconic, no other information, no dragon sightings. We stay at the lodge that night, Gron has a dream of a silver *or white* dragon that says \"You magic will grow.\"\nThe next day we go through the woods an come across a boulder and Gron jumps onto it, it turns out to be a troll and it quickly knocks Gron unconscious, but someone heals him. The troll regenerates but casting Chill Touch stops the regeneration.\nAt the camp the tents are empty. Gron casts an illusion of a worm to trick Hatharal, and then a wormy arm thing attacks Gron. Hilarious arm battle.",
-            "title" : "2020\/06\/18 - Day 4"
-          },
-          "type" : "journal"
-        },
-        {
-          "journal" : {
-            "isExpanded" : true,
-            "text" : "A monster appears out of the wall, a shape shifting mass with eyes and teeth and tentacles, and makes the sounds of gnomes it ate. Jon Rogers delt the death blow, and it turned into an orc w\/ a hole in its chest, like the first orc. Wears a necklace w\/ symbol of Talos, has a map w\/ an X on it, and has a note that says \"Find the font of magic...Osolith (who?) demands...Araugauthos (dragon name)...\". Eldrin gets a 10'  extending pole, Jolly Jon got \"Clockwork amulet\" (Auto roll a 10 instead of rolling a d20 for attack check).\nGron takes a walk and sees the blue dragon again, sees a chain hanging from its neck, one wing is damaged.\nSlime analysis: slime from the field is not from the shape shifter. It had sediment that wouldn't be found in a farm field - a mine maybe (flecks of metal).\nWe run into a group of 4 harpies and almost get wiped out. They have the mark of Talos - maybe there are more orcs in this area. Found a metal spike in the club, worth 10gp, 10 perfect harpy feathers, 2 harpy talons.\nWe travel to the mushroom-growing dwarves' area and stay in the inn. Jolly Jon pours mushroom oil in Eldrin's drink, to much amusement. The dwarves give us each 15g of \"wetshrooms\" to try out, let us breathe underwater.",
-            "title" : "2020\/05\/28 - Day 3"
-          },
-          "type" : "journal"
-        },
-        {
-          "journal" : {
-            "isExpanded" : true,
-            "text" : "Leaving the tower we got away from Daggermaw by casting illusions, which gave Gron and Ludavisia inspiration! We made our way back to Leilon, saw a blue\/lightning dragon far away, which is a rare sight. In Leilon, talking to Steve, we learned about dwarves harvesting mushrooms in a town south of Leilon. We visited Wilburton farm and talked to the mom of Billy, in the field there were some misc. shoes, and lots of mucus\/slime, and disturbed soil in a roughly circular shape. We learn about Korbaz in Gnomengaard who might know about the slime.\nWe travel to Gnomengaard and meet Morbo at the entrance. Korbaz is locked away in the throne room, Morbo recommends we talk to Fibbelstib and Dabbledob.\nA gnome attacks us w\/ a turret, we meet Factoray. We explored Gnomengaard, got past spinning blades, met lots of gnomes, they think there's a shape shifter hiding somewhere. In the throne room we open a chest and took a Hat of Wizardry and a Wand of Pyrotechnics, which are are allowed to borrow. One of the Kings (Korbaz or Nerkley) says the rug grew teeth and tried to attack him.",
-            "title" : "2020\/05\/07 - Day 2"
-          },
-          "type" : "journal"
-        },
-        {
-          "journal" : {
-            "isExpanded" : true,
-            "text" : "We start in the Slumbering Bear Inn, in Leilon. Janelle is the bartender. Sir Botswane the Dwarf is there (red beard, badass).\nSteve invites us to the town hall for quests. There's an apothecary and a church.\nQuests:\n• Shipwrecks - eerie light, 4 ships gone\n• Disappearing people (~12 people)\n• Goblins messed up some caravans, maybe there's loot.\nWe chose the shipwrecks\/lighthouse. At the apothecary is Grolk, a half-orc. Looking for Witchwort, grompstool, and honeylight.\nOn the road we ran into Harris and Beardsley from the Hogs Mead Brewery.\nAt the lighthouse we met Halfred the crab, learned about Marrol the elf and Daggermaw the shark. Jolly Jon tried to attack Marrol's ghost form, Gron settled her down, Marrol lost her arcane focus, we should find it. We got lightning power from an altar to Talos, fought harpies, rested, and fought Muesko the orc necromancer, who had a hole in his chest. We found \"Hasselhommer\" and \"Cloak of Many Fashions\". Ships that were damaged: \"Golden Gull, Orca\"",
-            "title" : "2020\/04\/23 - Day 1"
-          },
-          "type" : "journal"
-        }
       ],
       "isFormulaColumn" : false,
       "title" : "Journal"
@@ -920,7 +848,7 @@
         },
         {
           "inventory" : {
-            "quantity" : 39,
+            "quantity" : 41,
             "title" : "Silver"
           },
           "type" : "inventory"
@@ -929,6 +857,12 @@
           "inventory" : {
             "quantity" : 15,
             "title" : "Copper"
+          },
+          "type" : "inventory"
+        },
+        {
+          "inventory" : {
+            "title" : "Monocle from body in ship"
           },
           "type" : "inventory"
         },
@@ -1016,7 +950,7 @@
         },
         {
           "inventory" : {
-            "quantity" : 10,
+            "quantity" : 9,
             "title" : "Torches"
           },
           "type" : "inventory"
