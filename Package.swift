@@ -10,7 +10,7 @@ let package = Package(
         .executable(name: "sheet", targets: ["TheSheet"]),
     ],
     dependencies: [
-        // .package(url: "https://github.com/colinta/Ashen.git", .branch("master")),
+        // .package(url: "https://github.com/colinta/Ashen.git", .branch("main")),
         .package(url: "https://github.com/apple/swift-argument-parser", from: "0.3.0"),
         .package(path: "../Ashen"),
     ],

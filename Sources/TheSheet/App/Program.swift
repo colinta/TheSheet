@@ -40,9 +40,6 @@ enum Message {
 }
 
 func initial(sheet: Sheet, fileURL: URL?, status: String? = nil) -> () -> Initial<Model, Message> {
-    // let command: Command<Message> = HttpRequest.get(url: "https://www.dnd5eapi.co/api/spells/acid-arrow/")
-    //     .decodeJson(Dnd5eSpell.self)
-    //     .start(onComplete: Message.httpResult)
     var model = Model(sheet: sheet, fileURL: fileURL)
     if let status = status {
         model = model.replace(status: status)

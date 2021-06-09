@@ -2,21 +2,23 @@ import Foundation
 import ArgumentParser
 import Ashen
 
-// debugSilenced(true)
-// let op: Operation = .if(.bool(true), .dice(Dice(n: 1, d: 4)), .if(.bool(true), .dice(Dice(n: 1, d: 4)), .dice(Dice(n: 1, d: 6))))
-// let sheet = Sheet(visibleColumnsCount: 0, columns: [])
-// print("=============== \(#file) line \(#line) ===============")
-// print("op: \(op.toAttributed(sheet).string)")
-
 @main
 struct Main: ParsableCommand {
     @Option(name: [.customShort("f"), .customLong("filename")])
-    var filename: String = "GET"
+    var filename: String?
 
     func run() throws {
-        let fileURL = URL(fileURLWithPath: filename)
+        // debugSilenced(true)
+        // let op: Operation = .if(.bool(true), .dice(Dice(n: 1, d: 4)), .if(.bool(true), .dice(Dice(n: 1, d: 4)), .dice(Dice(n: 1, d: 6))))
+        // let sheet = Sheet(visibleColumnsCount: 0, columns: [])
+        // print("=============== \(#file) line \(#line) ===============")
+        // print("op: \(op.toAttributed(sheet).string)")
+
+        let fileURL = filename.map { URL(fileURLWithPath: $0) }
         let sheet: Sheet
-        if let data = try? String(contentsOf: fileURL).data(using: .utf8) {
+        if let fileURL = fileURL,
+            let data = try? String(contentsOf: fileURL).data(using: .utf8)
+        {
             let coder = JSONDecoder()
             sheet = try coder.decode(Sheet.self, from: data)
         } else {
