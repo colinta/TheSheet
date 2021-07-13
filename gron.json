@@ -78,8 +78,17 @@
             "subactions" : [
               {
                 "check" : {
-                  "class" : "variable",
-                  "value" : "attackRoll.proficient"
+                  "class" : "add",
+                  "value" : [
+                    {
+                      "class" : "variable",
+                      "value" : "attackRoll.proficient"
+                    },
+                    {
+                      "class" : "integer",
+                      "value" : 1
+                    }
+                  ]
                 },
                 "damage" : {
                   "class" : "add",
@@ -92,6 +101,10 @@
                     {
                       "class" : "variable",
                       "value" : "attackBonus"
+                    },
+                    {
+                      "class" : "integer",
+                      "value" : 1
                     }
                   ]
                 },
@@ -100,8 +113,17 @@
               },
               {
                 "check" : {
-                  "class" : "variable",
-                  "value" : "attackRoll.proficient"
+                  "class" : "add",
+                  "value" : [
+                    {
+                      "class" : "variable",
+                      "value" : "attackRoll.proficient"
+                    },
+                    {
+                      "class" : "integer",
+                      "value" : 1
+                    }
+                  ]
                 },
                 "damage" : {
                   "class" : "add",
@@ -114,6 +136,10 @@
                     {
                       "class" : "variable",
                       "value" : "attackBonus"
+                    },
+                    {
+                      "class" : "integer",
+                      "value" : 1
                     }
                   ]
                 },
@@ -121,13 +147,13 @@
                 "type" : "Bludgeoning"
               }
             ],
-            "title" : "Quarterstaff"
+            "title" : "+1 Quarterstaff"
           },
           "type" : "action"
         },
         {
           "action" : {
-            "description" : "When you use the Attack action a monk weapon on your turn, you can make one Unarmed Strike as a Bonus Action.",
+            "description" : "When you use the Attack action using a monk weapon on your turn, you can make one Unarmed Strike as a Bonus Action.",
             "isExpanded" : true,
             "subactions" : [
               {
