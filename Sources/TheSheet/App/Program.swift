@@ -334,8 +334,8 @@ private func inModal(
             }, Message.cancelModal, .highlight(false)),
         Stack(
             .down,
+            (header.map { [$0] } ?? []) +
             [
-                header,
                 Scroll(
                     view,
                     onResizeContent: { scrollViewport in
@@ -345,8 +345,8 @@ private func inModal(
                 ).border(
                     .single
                 ),
-                footer,
-            ].compactMap { $0 }
+            ] +
+            (footer.map { [$0] } ?? [])
         )
         .background(view: Text(" "))
         .minWidth(75, fittingContainer: true)
