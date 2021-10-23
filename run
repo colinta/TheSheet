@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+# swift run -Xswiftc -parse-as-library -c release init
+swift run -Xswiftc -parse-as-library sheet "$@"

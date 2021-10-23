@@ -47,17 +47,17 @@ func initial(sheet: Sheet, fileURL: URL?, status: String? = nil) -> () -> Initia
     return {
         Initial(
             model,
-            commands: []
+            command: Command<Message>.none()
         )
     }
 }
 
-func update(model: inout Model, message: Message) -> State<Model, Message> {
+func update(model: Model, message: Message) -> State<Model, Message> {
     switch message {
     case let .sheetMessage(.columnMessage(_, .controlMessage(_, .delegate(.roll(roll))))):
         return .model(model.roll(roll))
     case let .sheetMessage(.columnMessage(columnIndex, .controlMessage(controlIndex, .delegate(.command(command))))):
-        return .update(model, [command.map { Message.sheetMessage(.columnMessage(columnIndex, .controlMessage(controlIndex, $0)))}])
+        return .update(model, command.map { Message.sheetMessage(.columnMessage(columnIndex, .controlMessage(controlIndex, $0)))})
     case let .sheetMessage(.columnMessage(columnIndex, .delegate(delegate))):
         switch delegate {
         case .editColumn:
@@ -189,7 +189,7 @@ func update(model: inout Model, message: Message) -> State<Model, Message> {
         if let timeout = model.status?.timeout, timeout > now {
             return .update(
                 model,
-                [Timeout(timeout - now + 0.01, Message.statusDidTimeout)])
+                Timeout(timeout - now + 0.01, Message.statusDidTimeout))
         }
 
         return .model(model.replace(status: nil))
@@ -235,7 +235,7 @@ func update(model: inout Model, message: Message) -> State<Model, Message> {
         do {
             let data = try coder.encode(model.sheet)
             try data.write(to: fileURL, options: [.atomic])
-            return .quit
+            return .quitAnd({ print("saved to \(fileURL)") })
         } catch {
             return showStatus(model: model, status: "Error saving JSON")
         }
@@ -246,7 +246,7 @@ private func showStatus(model: Model, status: String?) -> State<Model, Message> 
     if let status = status {
         return .update(
             model.replace(status: status),
-            [Timeout(STATUS_TIMEOUT, Message.statusDidTimeout)])
+            Timeout(STATUS_TIMEOUT, Message.statusDidTimeout))
     } else {
         return .model(model.replace(status: nil))
     }
@@ -265,6 +265,7 @@ func render(model: Model) -> [View<Message>] {
         OnKeyPress(.ctrl(.s), Message.saveJSON),
         OnKeyPress(.ctrl(.r), Message.reloadJSON),
         OnKeyPress(.ctrl(.x), Message.quit),
+        OnKeyPress(.signalQuit, Message.quit),
         OnKeyPress(.esc, Message.quit),
         OnKeyPress(.ctrl(.z), Message.undo),
         Flow(

@@ -567,7 +567,7 @@
                 "class" : "variable",
                 "value" : "CON.Mod"
               },
-              "remaining" : 4
+              "remaining" : 5
             },
             {
               "d" : 8,
@@ -586,7 +586,7 @@
         },
         {
           "points" : {
-            "current" : 4,
+            "current" : 5,
             "max" : {
               "class" : "subtract",
               "value" : [

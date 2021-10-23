@@ -2,8 +2,8 @@
 ///  EditableControl.swift
 //
 
-import Ashen
 import Foundation
+import Ashen
 
 enum EditableControl {
     case inventory(Inventory)

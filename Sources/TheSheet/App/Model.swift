@@ -2,8 +2,8 @@
 ///  Model.swift
 //
 
-import Ashen
 import Foundation
+import Ashen
 
 let STATUS_TIMEOUT: TimeInterval = 3
 
